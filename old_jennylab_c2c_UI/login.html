@@ -1,0 +1,51 @@
+<html>
+<head>
+<link href="assets/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="assets/css/preloader.css">
+<link rel="stylesheet" href="assets/css/login.css">
+
+<script src="./assets/js/jquery.min.js"></script>
+<script src="./assets/js/bootstrap.min.js"></script>
+
+
+<script>
+$(document).ready(function() {
+		
+	$("#preloader").hide();
+	$("#btnLogin").click(function() {
+		$("#divFormLogin").hide("slow");
+		$("#divLogoLogin").hide("slow");
+		$("#preloader").show();	
+	});	//btnLogin
+
+
+
+}); // document.ready
+</script>
+
+
+<body>
+<section>
+<div class="login-page"> 
+	<div id="divLogoLogin" class="text-center" style="padding-bottom:0%;padding-left:12.5%;">
+   		<img height="257px" width="168px" src="./assets/images/logo_003.png">
+	</div>
+  	<div id="divFormLogin" class="form">
+
+  		<div>
+  			<h1>JennyDash</h1>
+  		</div>
+    		<form class="login-form" onsubmit="return false;">
+    		 	 <input type="text" placeholder="username"/>
+    	 		 <input type="password" placeholder="password"/>
+      			<button id="btnLogin">login</button>
+    		</form>
+  	</div>
+
+	<div id="preloader">
+		<div id="loader">
+	</div>
+</div>
+</section>
+
+</body>
