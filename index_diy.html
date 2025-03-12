@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network Scanner Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Navbar and general styles */
+      body {
+        background: #f0f2f5;
+      }
+      .navbar {
+        background: #2c3e50;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        color: white !important;
+        font-weight: bold;
+      }
+      .nav-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+      }
+      .nav-link:hover {
+        color: white !important;
+      }
+      .search-bar {
+        background: #34495e;
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Width modes */
+      .normal-content {
+        width: 95%;
+        margin: 0 auto;
+      }
+      .full-width {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Network visualization styles */
+      #network-container {
+        width: 100%;
+        height: 500px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .card-main-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 15px;
+        font-weight: bold;
+        font-size: 1.1em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .thumbnail-container {
+        width: 250px;
+        flex-shrink: 0;
+        height: 220px;
+        margin-right: 20px;
+      }
+      .thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .info-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        padding-bottom: 5px;
+      }
+      .info-column {
+        flex: 1;
+        min-width: 200px;
+        padding: 5px 10px;
+      }
+      .info-row {
+        padding: 3px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 24px;
+      }
+      .info-label {
+        font-weight: 600;
+        color: #34495e;
+      }
+      .info-value {
+        color: #2c3e50;
+      }
+      .info-value.port {
+        color: #2980b9;
+        font-family: monospace;
+      }
+      .info-value.domain {
+        color: #27ae60;
+      }
+      .info-value.ip {
+        color: #8e44ad;
+        font-family: monospace;
+      }
+      .subdomain-list {
+        max-height: 60px;
+        overflow-y: auto;
+        font-size: 0.9em;
+        background: #f8f9fa;
+        padding: 3px;
+        border-radius: 3px;
+        margin-top: 3px;
+      }
+
+      .status-up {
+        color: green;
+      }
+
+      .network-controls {
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Chat Interface Styles */
+      .chat-interface {
+        display: none;
+        background: #f8f9fa;
+        min-height: calc(100vh - 180px);
+        padding: 20px 0;
+      }
+      .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 220px);
+      }
+      .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .message {
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        max-width: 70%;
+      }
+      .user-message {
+        background: #007bff;
+        color: white;
+        margin-left: auto;
+      }
+      .bot-message {
+        background: #e9ecef;
+        margin-right: auto;
+      }
+      .system-message {
+        background: #f8f9fa;
+        text-align: center;
+        max-width: 100%;
+        color: #666;
+        font-style: italic;
+      }
+      .chat-input-container {
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+      }
+
+      /* CLI Interface Styles */
+      .cli-interface {
+        display: none;
+        background: #1e1e1e;
+        min-height: calc(100vh - 180px);
+        padding: 20px 0;
+      }
+      .cli-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #000;
+        border-radius: 8px;
+        padding: 20px;
+        height: calc(100vh - 220px);
+        display: flex;
+        flex-direction: column;
+        font-family: 'Courier New', monospace;
+      }
+      .cli-output {
+        flex-grow: 1;
+        overflow-y: auto;
+        color: #00ff00;
+        margin-bottom: 20px;
+      }
+      .cli-line {
+        padding: 2px 0;
+        line-height: 1.2;
+      }
+      .cli-input-container {
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #333;
+        padding-top: 10px;
+      }
+      .cli-prompt {
+        color: #00ff00;
+        margin-right: 10px;
+      }
+      .cli-input {
+        background: transparent;
+        border: none;
+        color: #00ff00;
+        flex-grow: 1;
+        font-family: 'Courier New', monospace;
+        outline: none;
+      }
+      .btn-group .btn.active {
+        background-color: #2c3e50;
+        border-color: #2c3e50;
+        color: white;
+      }
+
+      /* IMPORTANT: Make the card content a flex container */
+      .card-content {
+        display: flex;
+        align-items: flex-start;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <i class="fas fa-network-wired"></i> NetScanner
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#"
+                ><i class="fas fa-home"></i> Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-search"></i> Scan</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-history"></i> History</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-cog"></i> Settings</a
+              >
+            </li>
+          </ul>
+          <div class="d-flex">
+            <a class="nav-link" href="#"
+              ><i class="fas fa-user"></i> Profile</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search Bar with Mode Toggle -->
+    <div class="search-bar">
+      <div class="container">
+        <div class="search-input d-flex">
+          <div class="input-group me-2">
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              placeholder="Search IP, domain, or organization..."
+            />
+            <button class="btn btn-primary" type="button">
+              <i class="fas fa-search"></i> Search
+            </button>
+          </div>
+          <div class="btn-group" role="group">
+            <button
+              class="btn btn-secondary active"
+              onclick="switchMode('normal')"
+              id="normalMode"
+            >
+              <i class="fas fa-th-large"></i> Normal
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick="switchMode('chat')"
+              id="chatMode"
+            >
+              <i class="fas fa-comments"></i> Chat
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick="switchMode('cli')"
+              id="cliMode"
+            >
+              <i class="fas fa-terminal"></i> CLI
+            </button>
+            <button
+              class="btn btn-secondary"
+              onclick="switchMode('network')"
+              id="networkMode"
+            >
+              <i class="fas fa-network-wired"></i> Network
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Container (normal mode) -->
+    <div class="normal-content" id="mainContent" style="display: none;">
+      <!-- Filters -->
+      <div class="filters mb-4">
+        <div class="row">
+          <div class="col-md-3">
+            <select class="form-select">
+              <option>Filter by Location</option>
+              <option>USA</option>
+              <option>Europe</option>
+              <option>Asia</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select">
+              <option>Filter by Service</option>
+              <option>HTTP</option>
+              <option>HTTPS</option>
+              <option>DNS</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select">
+              <option>Filter by OS</option>
+              <option>Windows</option>
+              <option>Linux</option>
+              <option>Unix</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-secondary w-100">Apply Filters</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Container -->
+      <div class="row" id="cardsContainer">
+        <!-- Cards will be added here by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Network Visualization Tool -->
+    <div id="networkInterface" class="full-width" style="display: none;">
+      <div class="container">
+        <div class="network-controls">
+          <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="addNode()">
+              <i class="fas fa-plus"></i> Add Node
+            </button>
+            <button class="btn btn-outline-primary" onclick="addEdge()">
+              <i class="fas fa-link"></i> Add Connection
+            </button>
+            <button class="btn btn-outline-danger" onclick="removeSelected()">
+              <i class="fas fa-trash"></i> Remove Selected
+            </button>
+          </div>
+        </div>
+        <div id="network-container">
+          <div
+            class="vis-network"
+            tabindex="0"
+            style="
+              position: relative;
+              overflow: hidden;
+              touch-action: pan-y;
+              user-select: none;
+              -webkit-user-drag: none;
+              -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+              width: 100%;
+              height: 100%;
+            "
+          >
+            <canvas
+              width="964"
+              style="
+                position: relative;
+                touch-action: none;
+                user-select: none;
+                -webkit-user-drag: none;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+                width: 100%;
+                height: 100%;
+              "
+              height="371"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatInterface" class="chat-interface full-width">
+      <div class="container">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="message system-message">
+              Welcome to Network Scanner Chat Assistant
+            </div>
+          </div>
+          <div class="chat-input-container">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="chatInput"
+                placeholder="Type your message here..."
+              />
+              <button class="btn btn-primary" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLI Interface -->
+    <div id="cliInterface" class="cli-interface full-width">
+      <div class="container">
+        <div class="cli-container">
+          <div class="cli-output" id="cliOutput">
+            <div class="cli-line">Welcome to NetScanner CLI Mode</div>
+            <div class="cli-line">Type 'help' for available commands</div>
+          </div>
+          <div class="cli-input-container">
+            <span class="cli-prompt">netscanner$</span>
+            <input type="text" class="cli-input" id="cliInput" autofocus />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
+    ></script>
+    <script>
+      function switchMode(mode) {
+        const mainContent = document.getElementById("mainContent");
+        const chatInterface = document.getElementById("chatInterface");
+        const cliInterface = document.getElementById("cliInterface");
+        const networkInterface = document.getElementById("networkInterface");
+        // Reset all buttons
+        document.getElementById("normalMode").classList.remove("active");
+        document.getElementById("chatMode").classList.remove("active");
+        document.getElementById("cliMode").classList.remove("active");
+        document.getElementById("networkMode").classList.remove("active");
+
+        // Hide all interfaces
+        mainContent.style.display = "none";
+        chatInterface.style.display = "none";
+        cliInterface.style.display = "none";
+        networkInterface.style.display = "none";
+
+        // Show selected interface + set button state
+        switch (mode) {
+          case "normal":
+            mainContent.style.display = "block";
+            document.getElementById("normalMode").classList.add("active");
+            break;
+          case "chat":
+            chatInterface.style.display = "block";
+            document.getElementById("chatMode").classList.add("active");
+            break;
+          case "cli":
+            cliInterface.style.display = "block";
+            document.getElementById("cliMode").classList.add("active");
+            document.getElementById("cliInput").focus();
+            break;
+          case "network":
+            networkInterface.style.display = "block";
+            document.getElementById("networkMode").classList.add("active");
+            break;
+        }
+      }
+
+      function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const message = input.value.trim();
+        if (!message) return;
+
+        const chatMessages = document.getElementById("chatMessages");
+
+        chatMessages.innerHTML += `
+          <div class="message user-message">
+            ${message}
+          </div>
+        `;
+
+        setTimeout(() => {
+          chatMessages.innerHTML += `
+            <div class="message bot-message">
+              I received your message: "${message}". How can I help you with network scanning?
+            </div>
+          `;
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+
+        input.value = "";
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // CLI Mode functionality
+      document.getElementById("cliInput")?.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          const input = this.value.trim();
+          if (!input) return;
+
+          const output = document.getElementById("cliOutput");
+
+          output.innerHTML += `<div class="cli-line">netscanner$ ${input}</div>`;
+
+          let response = "";
+          switch (input.toLowerCase()) {
+            case "help":
+              response = `Available commands:\n- scan [ip/domain]\n- history\n- clear\n- help`;
+              break;
+            case "clear":
+              output.innerHTML = "";
+              this.value = "";
+              return;
+            default:
+              if (input.startsWith("scan ")) {
+                response = `Scanning ${input.slice(5)}...\nResults will be displayed here.`;
+              } else {
+                response = `Command not found: ${input}\nType 'help' for available commands.`;
+              }
+          }
+
+          output.innerHTML += `<div class="cli-line">${response}</div>`;
+
+          this.value = "";
+          output.scrollTop = output.scrollHeight;
+        }
+      });
+
+      // Handle enter key in chat
+      document.getElementById("chatInput")?.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      // Create a network
+      var nodes = new vis.DataSet([
+        {
+          id: 1,
+          label: "Router",
+          shape: "image",
+          image: "https://img.icons8.com/color/48/000000/router.png",
+        },
+        {
+          id: 2,
+          label: "Server",
+          shape: "image",
+          image: "https://img.icons8.com/color/48/000000/server.png",
+        },
+        {
+          id: 3,
+          label: "Client",
+          shape: "image",
+          image: "https://img.icons8.com/color/48/000000/workstation.png",
+        },
+      ]);
+
+      var edges = new vis.DataSet([
+        { from: 1, to: 2 },
+        { from: 1, to: 3 },
+      ]);
+
+      var container = document.getElementById("network-container");
+      var data = {
+        nodes: nodes,
+        edges: edges,
+      };
+      var options = {
+        physics: {
+          enabled: true,
+          barnesHut: {
+            gravitationalConstant: -2000,
+            springLength: 200,
+          },
+        },
+      };
+      var network = new vis.Network(container, data, options);
+
+      function addNode() {
+        var nodeId = nodes.length + 1;
+        nodes.add({
+          id: nodeId,
+          label: "Device " + nodeId,
+          shape: "image",
+          image: "https://img.icons8.com/color/48/000000/computer.png",
+        });
+      }
+
+      function addEdge() {
+        var edgeId = edges.length + 1;
+        edges.add({
+          id: edgeId,
+          from: prompt("Enter source node ID:"),
+          to: prompt("Enter target node ID:"),
+        });
+      }
+
+      function removeSelected() {
+        var selectedNodes = network.getSelectedNodes();
+        var selectedEdges = network.getSelectedEdges();
+        nodes.remove(selectedNodes);
+        edges.remove(selectedEdges);
+      }
+
+      // Sample data for demonstration.
+      const scanResults = [
+        {
+          ip: "8.8.8.8",
+          status: "Active",
+          organization: "Google LLC",
+          domain: "google.com",
+          location: "🇺🇸 California, USA",
+          tcpPorts: "80, 443, 8080",
+          udpPorts: "53, 443",
+          asn: "AS15169",
+          prefix: "GOGL",
+          announce: "8.0.0.0/9",
+          dnsRecords: "A, AAAA, MX",
+          sslStatus: "Valid",
+          os: "Windows Server 2019",
+          services: "HTTP, HTTPS, DNS",
+          response: "42ms",
+          subdomains: [
+            "dns.google.com",
+            "gmail.google.com",
+            "cloud.google.com",
+            "ns1.google.com",
+            "ns2.google.com",
+          ],
+        },
+        {
+          ip: "1.1.1.1",
+          status: "Active",
+          organization: "Cloudflare, Inc.",
+          domain: "cloudflare.com",
+          location: "🇺🇸 California, USA",
+          tcpPorts: "80, 443",
+          udpPorts: "53, 443",
+          asn: "AS13335",
+          prefix: "CLOUDFLARENET",
+          announce: "1.1.1.0/24",
+          dnsRecords: "A, AAAA, MX, TXT",
+          sslStatus: "Valid",
+          os: "Linux",
+          services: "HTTP, HTTPS, DNS",
+          response: "15ms",
+          subdomains: [
+            "www.cloudflare.com",
+            "blog.cloudflare.com",
+            "support.cloudflare.com",
+          ],
+        },
+        {
+          ip: "192.168.1.1",
+          status: "Active",
+          organization: "Private Network",
+          domain: "N/A",
+          location: "Local Network",
+          tcpPorts: "80, 443, 22",
+          udpPorts: "",
+          asn: "N/A",
+          prefix: "N/A",
+          announce: "N/A",
+          dnsRecords: "N/A",
+          sslStatus: "N/A",
+          os: "Unknown",
+          services: "HTTP, SSH",
+          response: "2ms",
+          subdomains: [],
+        },
+      ];
+
+      function createCard(scanResult) {
+        // Create the main card element
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "col-12 mb-2";
+
+        const cardInnerDiv = document.createElement("div");
+        cardInnerDiv.className = "card";
+        cardDiv.appendChild(cardInnerDiv);
+
+        // card-content wrapper
+        const cardContent = document.createElement("div");
+        cardContent.className = "card-content";
+        cardInnerDiv.appendChild(cardContent);
+
+        // Thumbnail container
+        const thumbnailContainer = document.createElement("div");
+        thumbnailContainer.className = "thumbnail-container";
+        cardContent.appendChild(thumbnailContainer);
+
+        const thumbnailImg = document.createElement("img");
+        thumbnailImg.src = "https://via.placeholder.com/250";
+        thumbnailImg.className = "thumbnail";
+        thumbnailImg.alt = "System Screenshot";
+        thumbnailContainer.appendChild(thumbnailImg);
+
+        // Card main header + info
+        const headerAndInfo = document.createElement("div");
+        headerAndInfo.style.width = "100%";
+        cardContent.appendChild(headerAndInfo);
+
+        const cardMainHeader = document.createElement("div");
+        cardMainHeader.className = "card-main-header";
+        headerAndInfo.appendChild(cardMainHeader);
+
+        const headerText = document.createElement("div");
+        headerText.innerHTML = `<i class=\"fas fa-network-wired\"></i> IP: <span class=\"info-value ip\">${scanResult.ip}</span>`;
+        cardMainHeader.appendChild(headerText);
+
+        const statusBadge = document.createElement("div");
+        statusBadge.className = "status-badge";
+        statusBadge.innerHTML = `<i class=\"fas fa-check-circle\"></i> ${scanResult.status}`;
+        cardMainHeader.appendChild(statusBadge);
+
+        const infoContainer = document.createElement("div");
+        infoContainer.className = "info-container";
+        headerAndInfo.appendChild(infoContainer);
+
+        const infoColumn1 = document.createElement("div");
+        infoColumn1.className = "info-column";
+        infoContainer.appendChild(infoColumn1);
+
+        function addInfoRow(column, label, value, valueClass = "") {
+          const row = document.createElement("div");
+          row.className = "info-row";
+          row.innerHTML = `<span class=\"info-label\">${label}:</span><span class=\"info-value ${valueClass}\">${value}</span>`;
+          column.appendChild(row);
+        }
+
+        addInfoRow(infoColumn1, "Organization:", scanResult.organization);
+        addInfoRow(infoColumn1, "Domain:", scanResult.domain, "domain");
+        addInfoRow(infoColumn1, "Location:", scanResult.location);
+        addInfoRow(infoColumn1, "TCP Ports:", scanResult.tcpPorts, "port");
+        addInfoRow(infoColumn1, "UDP Ports:", scanResult.udpPorts, "port");
+
+        const infoColumn2 = document.createElement("div");
+        infoColumn2.className = "info-column";
+        infoContainer.appendChild(infoColumn2);
+
+        addInfoRow(infoColumn2, "ASN:", scanResult.asn);
+        addInfoRow(infoColumn2, "Prefix:", scanResult.prefix);
+        addInfoRow(infoColumn2, "Announce:", scanResult.announce);
+        addInfoRow(infoColumn2, "DNS Records:", scanResult.dnsRecords);
+        addInfoRow(infoColumn2, "SSL Status:", scanResult.sslStatus, "status-up");
+
+        const infoColumn3 = document.createElement("div");
+        infoColumn3.className = "info-column";
+        infoContainer.appendChild(infoColumn3);
+
+        addInfoRow(infoColumn3, "OS:", scanResult.os);
+        addInfoRow(infoColumn3, "Services:", scanResult.services);
+        addInfoRow(infoColumn3, "Response:", scanResult.response);
+
+        const subdomainsRow = document.createElement("div");
+        subdomainsRow.className = "info-row";
+        infoColumn3.appendChild(subdomainsRow);
+        subdomainsRow.innerHTML = '<span class="info-label">Subdomains:</span>';
+        const subdomainList = document.createElement("div");
+        subdomainList.className = "subdomain-list";
+        subdomainsRow.appendChild(subdomainList);
+
+        scanResult.subdomains.forEach((subdomain) => {
+          const subdomainDiv = document.createElement("div");
+          subdomainDiv.textContent = subdomain;
+          subdomainList.appendChild(subdomainDiv);
+        });
+
+        return cardDiv;
+      }
+
+      function populateCards() {
+        const cardsContainer = document.getElementById("cardsContainer");
+        cardsContainer.innerHTML = "";
+
+        scanResults.forEach((result) => {
+          const card = createCard(result);
+          cardsContainer.appendChild(card);
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Start in normal mode by default
+        switchMode("normal");
+        populateCards();
+      });
+
+      document.getElementById("normalMode").addEventListener("click", populateCards);
+    </script>
+  </body>
+</html>
