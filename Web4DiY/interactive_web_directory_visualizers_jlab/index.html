@@ -1,0 +1,399 @@
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    overflow: hidden;
+  }
+  #directory-container {
+    width: 70%;
+    height: 80vh;
+    background-color: #f0f0f0;
+    position: relative;
+    float: left;
+  }
+  .file-node {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: #ffffff;
+    border: 2px solid #333;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .file-node:hover {
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+  .file-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+  }
+  .file-name {
+    font-size: 12px;
+    text-align: center;
+    word-wrap: break-word;
+    max-width: 90px;
+  }
+  #code-editor {
+    width: 30%;
+    height: 80vh;
+    background-color: #1e1e1e;
+    position: fixed;
+    right: -30%;
+    top: 0;
+    transition: right 0.3s ease-in-out;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  #code-editor.open {
+    right: 0;
+  }
+  #editor-tabs {
+    display: flex;
+    background-color: #2d2d2d;
+    overflow-x: auto;
+  }
+  .editor-tab {
+    padding: 8px 15px;
+    background-color: #3c3c3c;
+    color: #d4d4d4;
+    cursor: pointer;
+    border-right: 1px solid #1e1e1e;
+    display: flex;
+    align-items: center;
+  }
+  .editor-tab.active {
+    background-color: #1e1e1e;
+  }
+  .close-tab {
+    margin-left: 8px;
+    color: #888;
+  }
+  .close-tab:hover {
+    color: #fff;
+  }
+  #editor-content {
+    flex-grow: 1;
+    padding: 10px;
+  }
+  #editor-content textarea {
+    width: 100%;
+    height: 100%;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: none;
+    resize: none;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  #toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f0f0f0;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .tool-button {
+    margin-right: 10px;
+  }
+</style>
+</head>
+<body>
+  <div id="directory-container">
+  <div id="add-file-form" style="position: absolute; top: 10px; left: 10px; background-color: #fff; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+    <input type="text" id="new-file-name" placeholder="File/Directory name" style="margin-right: 5px;">
+    <select id="new-file-type" style="margin-right: 5px;">
+      <option value="file">File</option>
+      <option value="folder">Directory</option>
+    </select>
+    <button id="add-file-btn">Add</button>
+  </div>
+</div>
+  <div id="code-editor">
+    <div id="editor-tabs"></div>
+    <div id="editor-content"></div>
+  </div>
+  <div id="toolbar">
+    <button id="compare-code" class="tool-button">Compare Code</button>
+    <button id="debug-code" class="tool-button">Debug Code</button>
+    <button id="run-code" class="tool-button">Run Code</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
+  <script>
+    // Initialize jsPlumb
+    jsPlumb.ready(function() {
+      const instance = jsPlumb.getInstance({
+        Connector: ["Bezier", { curviness: 50 }],
+        DragOptions: { cursor: "pointer", zIndex: 2000 },
+        PaintStyle: { stroke: "#456", strokeWidth: 2 },
+        EndpointStyle: { radius: 5, fill: "#456" },
+        HoverPaintStyle: { stroke: "#c61" },
+        EndpointHoverStyle: { fill: "#c61" },
+        Container: "directory-container"
+      });
+
+      const fileStructure = [
+        { name: "index.html", type: "file", content: "<html>\n  <head>\n    <title>My Web Project</title>\n  </head>\n  <body>\n    <h1>Welcome to my project!</h1>\n  </body>\n</html>" },
+        { name: "styles", type: "folder", children: [
+          { name: "main.css", type: "file", content: "body {\n  font-family: Arial, sans-serif;\n  margin: 0;\n  padding: 20px;\n}" },
+          { name: "responsive.css", type: "file", content: "@media (max-width: 768px) {\n  body {\n    padding: 10px;\n  }\n}" }
+        ]},
+        { name: "scripts", type: "folder", children: [
+          { name: "app.js", type: "file", content: "function init() {\n  console.log('Application initialized');\n}" },
+          { name: "utils.js", type: "file", content: "const helpers = {\n  formatDate: (date) => date.toLocaleDateString()\n}" }
+        ]},
+        { name: "assets", type: "folder", children: [
+          { name: "logo.svg", type: "file", content: "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n  <circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"#007bff\" />\n</svg>" }
+        ]}
+      ];
+
+      function createFileNode(file, x, y) {
+        const node = document.createElement("div");
+        node.className = "file-node";
+        node.id = file.name.replace(/\s+/g, '-').toLowerCase();
+        node.style.left = x + "px";
+        node.style.top = y + "px";
+        
+        const icon = document.createElement("div");
+        icon.className = "file-icon";
+        icon.innerHTML = file.type === "folder" ? "📁" : "📄";
+        
+        const name = document.createElement("div");
+        name.className = "file-name";
+        name.textContent = file.name;
+        
+        node.appendChild(icon);
+        node.appendChild(name);
+        
+        document.getElementById("directory-container").appendChild(node);
+        
+        instance.draggable(node);
+        
+        if (file.type === "folder") {
+          instance.makeSource(node, {
+            filter: ".file-icon",
+            anchor: "Continuous"
+          });
+        }
+        
+        instance.makeTarget(node, {
+          dropOptions: { hoverClass: "dragHover" },
+          anchor: "Continuous"
+        });
+        
+        node.addEventListener("click", () => {
+          if (file.type === "file") {
+            openFileInEditor(file);
+          }
+        });
+        
+        return node;
+      }
+
+      function renderFileStructure(files, parentX = 50, parentY = 50, level = 0) {
+        files.forEach((file, index) => {
+          const x = parentX + level * 200;
+          const y = parentY + index * 150;
+          
+          const node = createFileNode(file, x, y);
+          
+          if (file.type === "folder" && file.children) {
+            renderFileStructure(file.children, x + 150, y, level + 1);
+          }
+        });
+      }
+
+      renderFileStructure(fileStructure);
+
+      // Connect parent folders to their children
+      fileStructure.forEach(file => {
+        if (file.type === "folder" && file.children) {
+          const parentId = file.name.replace(/\s+/g, '-').toLowerCase();
+          file.children.forEach(child => {
+            const childId = child.name.replace(/\s+/g, '-').toLowerCase();
+            instance.connect({
+              source: parentId,
+              target: childId,
+              anchors: ["Right", "Left"],
+              deleteEndpointsOnDetach: false
+            });
+          });
+        }
+      });
+
+      // Code editor functionality
+      const codeEditor = document.getElementById("code-editor");
+      const editorTabs = document.getElementById("editor-tabs");
+      const editorContent = document.getElementById("editor-content");
+
+      let openFiles = [];
+
+      function openFileInEditor(file) {
+        if (!openFiles.some(f => f.name === file.name)) {
+          openFiles.push(file);
+          createEditorTab(file);
+        }
+        switchToFile(file);
+      }
+
+      function createEditorTab(file) {
+        const tab = document.createElement("div");
+        tab.className = "editor-tab";
+        tab.textContent = file.name;
+        tab.addEventListener("click", () => switchToFile(file));
+        
+        const closeBtn = document.createElement("span");
+        closeBtn.className = "close-tab";
+        closeBtn.textContent = "×";
+        closeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          closeFile(file);
+        });
+        
+        tab.appendChild(closeBtn);
+        editorTabs.appendChild(tab);
+      }
+
+      function switchToFile(file) {
+        const textarea = document.createElement("textarea");
+        textarea.value = file.content;
+        textarea.addEventListener("input", () => {
+          file.content = textarea.value;
+        });
+        
+        editorContent.innerHTML = "";
+        editorContent.appendChild(textarea);
+        
+        // Highlight active tab
+        Array.from(editorTabs.children).forEach(tab => {
+          tab.classList.toggle("active", tab.textContent.includes(file.name));
+        });
+        
+        codeEditor.classList.add("open");
+      }
+
+      function closeFile(file) {
+        openFiles = openFiles.filter(f => f.name !== file.name);
+        Array.from(editorTabs.children).forEach(tab => {
+          if (tab.textContent.includes(file.name)) {
+            tab.remove();
+          }
+        });
+        
+        if (openFiles.length > 0) {
+          switchToFile(openFiles[openFiles.length - 1]);
+        } else {
+          editorContent.innerHTML = "";
+          codeEditor.classList.remove("open");
+        }
+      }
+
+      // Toolbar functionality
+      document.getElementById("compare-code").addEventListener("click", () => {
+        alert("Select two files to compare their code.");
+        // Implement file selection and comparison logic here
+      });
+
+      document.getElementById("debug-code").addEventListener("click", () => {
+        alert("Select a file to debug its code.");
+        // Implement file selection and debugging logic here
+      });
+
+      document.getElementById("run-code").addEventListener("click", openProjectRunner);
+
+      // Function to create and open a project runner window
+      function openProjectRunner() {
+        const projectUrl = "https://websim.cyou/project/run/";
+        const runnerWindow = window.open(projectUrl, "ProjectRunner", "width=800,height=600");
+        
+        runnerWindow.onload = function() {
+          const runnerDoc = runnerWindow.document;
+          
+          // Create a simple project structure in the runner window
+          runnerDoc.body.innerHTML = `
+            <h1>Project Runner</h1>
+            <div id="file-list"></div>
+            <pre id="file-content"></pre>
+          `;
+          
+          const fileList = runnerDoc.getElementById("file-list");
+          const fileContent = runnerDoc.getElementById("file-content");
+          
+          // Populate file list
+          fileStructure.forEach(file => {
+            const fileLink = runnerDoc.createElement("a");
+            fileLink.href = "#";
+            fileLink.textContent = file.name;
+            fileLink.addEventListener("click", (e) => {
+              e.preventDefault();
+              fileContent.textContent = file.content || "No content available";
+            });
+            fileList.appendChild(fileLink);
+            fileList.appendChild(runnerDoc.createElement("br"));
+          });
+        };
+      }
+
+      // Function to adjust layout
+      function adjustLayout() {
+        const containerHeight = window.innerHeight;
+        const directoryContainer = document.getElementById("directory-container");
+        const toolbar = document.getElementById("toolbar");
+        
+        if (directoryContainer && toolbar && codeEditor) {
+          directoryContainer.style.height = (containerHeight - toolbar.offsetHeight) + "px";
+          toolbar.style.position = "fixed";
+          toolbar.style.bottom = "0";
+          toolbar.style.left = "0";
+          toolbar.style.width = "100%";
+          toolbar.style.backgroundColor = "#f0f0f0";
+          toolbar.style.padding = "10px";
+          toolbar.style.boxSizing = "border-box";
+          
+          codeEditor.style.height = containerHeight + "px";
+        }
+      }
+
+      // Call adjustLayout initially and on window resize
+      adjustLayout();
+      window.addEventListener("resize", adjustLayout);
+
+      // Add file/directory functionality
+      const addFileBtn = document.getElementById("add-file-btn");
+      const newFileName = document.getElementById("new-file-name");
+      const newFileType = document.getElementById("new-file-type");
+
+      addFileBtn.addEventListener("click", () => {
+        const name = newFileName.value.trim();
+        const type = newFileType.value;
+
+        if (name) {
+          const newFile = {
+            name: name,
+            type: type,
+            content: type === "file" ? "" : undefined,
+            children: type === "folder" ? [] : undefined
+          };
+
+          const x = Math.random() * (directoryContainer.offsetWidth - 150);
+          const y = Math.random() * (directoryContainer.offsetHeight - 150);
+
+          createFileNode(newFile, x, y);
+
+          newFileName.value = "";
+        } else {
+          alert("Please enter a name for the new file/directory.");
+        }
+      });
+    });
+  </script>
+</body></html>

@@ -1,0 +1,849 @@
+<title>CRM Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<style>
+.card {
+  border-radius: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  background: #fff;
+}
+.profile-card {
+  background: #fff;
+  backdrop-filter: none;
+}
+.profile-card .card-body {
+  padding: 1.5rem;
+}
+.profile-card i {
+  width: 20px;
+}
+.profile-card .badge {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+}
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-light min-vh-100">
+  <div class="container py-5">
+
+    <!-- Profile Section -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card profile-card">
+          <div class="card-body text-center" style="height: 100%;">
+            <img src="https://mdbootstrap.com/img/new/avatars/8.jpg" class="rounded-circle mb-3" style="width: 150px;" alt="Profile Picture">
+            <h5 class="mb-1">John Smith</h5>
+            <p class="text-muted mb-2">Senior Sales Representative</p>
+            
+            <!-- Additional User Info -->
+            <div class="text-start px-3 py-2">
+              <div class="mb-2">
+                <i class="fas fa-envelope text-primary me-2"></i>
+                <small><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9ff5f0f7f1b1ecf2f6ebf7dffae7fef2eff3fab1fcf0f2">[email&#160;protected]</a></small>
+              </div>
+              <div class="mb-2">
+                <i class="fas fa-phone text-primary me-2"></i>
+                <small>+1 (555) 123-4567</small>
+              </div>
+              <div class="mb-2">
+                <i class="fas fa-calendar text-primary me-2"></i>
+                <small>Joined: June 2022</small>
+              </div>
+              <div class="mb-2">
+                <i class="fas fa-birthday-cake text-primary me-2"></i>
+                <small>DOB: March 15, 1985</small>
+              </div>
+              <div class="mb-3">
+                <i class="fas fa-user-tag text-primary me-2"></i>
+                <span class="badge badge-primary">Sales</span>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-center mb-2">
+              <button type="button" class="btn btn-primary ms-1">Edit Profile</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="col-md-8">
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Total Customers</p>
+                    <h5 class="mb-0">1,245</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-users fa-3x text-primary"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Total Visits</p>
+                    <h5 class="mb-0">3,427</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-chart-line fa-3x text-success"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Monthly Revenue</p>
+                    <h5 class="mb-0">$52,489</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-dollar-sign fa-3x text-warning"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Pending Visits</p>
+                    <h5 class="mb-0">24</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-clock fa-3x text-danger"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Stats Row -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Customer Satisfaction</p>
+                    <h5 class="mb-0">94%</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-smile fa-3x text-info"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Conversion Rate</p>
+                    <h5 class="mb-0">68%</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-chart-pie fa-3x text-purple" style="color: #9c27b0;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Avg Days to Close</p>
+                    <h5 class="mb-0">14.2 days</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-hourglass-half fa-3x" style="color: #673ab7;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Pending Collections</p>
+                    <h5 class="mb-0">$12,450</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-money-bill-wave fa-3x" style="color: #ff9800;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Stats Row: Additional Stats -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Average Purchase Value</p>
+                    <h5 class="mb-0">$3,245</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-shopping-cart fa-3x text-info"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="mb-2 text-muted">Customer Distribution</p>
+                    <h5 class="mb-0">VIP: 12% | A: 35% | B: 53%</h5>
+                  </div>
+                  <div class="align-self-center">
+                    <i class="fas fa-users-cog fa-3x text-warning"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row">
+      <div class="col-md-8 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Visit Statistics</h5>
+            <div class="chart-container">
+              <canvas id="visitChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Visit Types Distribution</h5>
+            <div class="chart-container">
+              <canvas id="visitTypesChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Chart: Visit Types Over Time -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Visit Types Over Time</h5>
+            <div class="chart-container">
+              <canvas id="visitTypesTimeChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Collections Trend -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Monthly Collections Trend</h5>
+            <div class="chart-container">
+              <canvas id="collectionsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Chart: Revenue by Customer Type and Customer Growth -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Revenue by Customer Type</h5>
+            <div class="chart-container">
+              <canvas id="revenueByTypeChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Customer Growth</h5>
+            <div class="chart-container">
+              <canvas id="customerGrowthChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Charts Section: Additional Insights -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Sales Funnel</h5>
+            <div class="chart-container">
+              <canvas id="salesFunnelChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Performance Metrics</h5>
+            <div class="chart-container">
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Regional Distribution</h5>
+            <div class="chart-container">
+              <canvas id="regionalChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Visits Table -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Latest Visits</h5>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Visit ID</th>
+                <th>Customer</th>
+                <th>Visit Type</th>
+                <th>Expected Purchase</th>
+                <th>Payments</th>
+                <th>Payment Status</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#V2023001</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/1.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">Robert Johnson</p>
+                      <p class="text-muted mb-0">Class A</p>
+                    </div>
+                  </div>
+                </td>
+                <td>1st Visit</td>
+                <td>$5,000</td>
+                <td>$4,800</td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 150px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 96%;" aria-valuenow="96" aria-valuemin="0" aria-valuemax="100">96%</div>
+                  </div>
+                </td>
+                <td>2023-06-15</td>
+                <td>
+                  <span class="badge badge-success rounded-pill d-inline">Completed</span>
+                </td>
+              </tr>
+              <tr>
+                <td>#V2023002</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/2.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">Lisa Anderson</p>
+                      <p class="text-muted mb-0">VIP</p>
+                    </div>
+                  </div>
+                </td>
+                <td>Collection</td>
+                <td>$2,500</td>
+                <td>$2,500</td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 150px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                  </div>
+                </td>
+                <td>2023-06-14</td>
+                <td>
+                  <span class="badge badge-primary rounded-pill d-inline">Processing</span>
+                </td>
+              </tr>
+              <tr>
+                <td>#V2023003</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/3.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">David Wilson</p>
+                      <p class="text-muted mb-0">Class B</p>
+                    </div>
+                  </div>
+                </td>
+                <td>Follow Up</td>
+                <td>$3,000</td>
+                <td>$2,800</td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 150px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 93%;" aria-valuenow="93" aria-valuemin="0" aria-valuemax="100">93%</div>
+                  </div>
+                </td>
+                <td>2023-06-13</td>
+                <td>
+                  <span class="badge badge-warning rounded-pill d-inline">Pending</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Pipeline Table -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Customer Pipeline</h5>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Stage</th>
+                <th>Potential Value</th>
+                <th>Last Contact</th>
+                <th>Next Action</th>
+                <th>Probability</th>
+                <th>Expected Close</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/4.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">Michael Clark</p>
+                      <p class="text-muted mb-0">VIP Prospect</p>
+                    </div>
+                  </div>
+                </td>
+                <td>Negotiation</td>
+                <td>$12,000</td>
+                <td>2023-06-14</td>
+                <td>Follow-up Call</td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 150px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                  </div>
+                </td>
+                <td>2023-06-30</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/5.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">Sarah Martinez</p>
+                      <p class="text-muted mb-0">Class A Lead</p>
+                    </div>
+                  </div>
+                </td>
+                <td>Proposal</td>
+                <td>$8,500</td>
+                <td>2023-06-12</td>
+                <td>Send Quote</td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 150px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">45%</div>
+                  </div>
+                </td>
+                <td>2023-07-15</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collections Summary Table -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Collections Summary</h5>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Customer</th>
+                <th>Due Date</th>
+                <th>Total Amount</th>
+                <th>Collected</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#INV2023045</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/6.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">James Wilson</p>
+                      <p class="text-muted mb-0">VIP</p>
+                    </div>
+                  </div>
+                </td>
+                <td>2023-06-30</td>
+                <td>$15,000</td>
+                <td>$10,000</td>
+                <td>$5,000</td>
+                <td><span class="badge badge-warning rounded-pill">Partial</span></td>
+                <td>
+                  <button type="button" class="btn btn-link btn-sm btn-rounded">
+                    Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>#INV2023046</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <img src="https://mdbootstrap.com/img/new/avatars/7.jpg" alt="Customer Avatar" style="width: 45px; height: 45px" class="rounded-circle">
+                    <div class="ms-3">
+                      <p class="fw-bold mb-1">Emma Thompson</p>
+                      <p class="text-muted mb-0">Class A</p>
+                    </div>
+                  </div>
+                </td>
+                <td>2023-06-25</td>
+                <td>$8,000</td>
+                <td>$8,000</td>
+                <td>$0</td>
+                <td><span class="badge badge-success rounded-pill">Paid</span></td>
+                <td>
+                  <button type="button" class="btn btn-link btn-sm btn-rounded">
+                    Details
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.1/mdb.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="/public/js/alertSounds.js"></script>
+
+<script>
+$(document).ready(function() {
+  // Visit Statistics Chart
+  const visitCtx = document.getElementById('visitChart').getContext('2d');
+  new Chart(visitCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Number of Visits',
+        data: [65, 59, 80, 81, 56, 55],
+        fill: false,
+        borderColor: '#3b71ca',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // Visit Types Distribution Chart
+  const typesCtx = document.getElementById('visitTypesChart').getContext('2d');
+  new Chart(typesCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['1st Visit', 'Follow Up', 'Collection', 'Delivery', 'Call'],
+      datasets: [{
+        data: [30, 25, 15, 20, 10],
+        backgroundColor: [
+          '#3b71ca',
+          '#54b4d3',
+          '#14a44d',
+          '#e4a11b',
+          '#dc4c64'
+        ]
+      }],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    }
+  });
+
+  // New Visit Types Over Time Chart
+  const visitTypesTimeChart = new Chart(document.getElementById('visitTypesTimeChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: '1st Visits',
+          data: [20, 25, 18, 22, 20, 24],
+          backgroundColor: '#3b71ca'
+        },
+        {
+          label: 'Follow Ups',
+          data: [15, 18, 12, 14, 16, 15],
+          backgroundColor: '#54b4d3'
+        },
+        {
+          label: 'Collections',
+          data: [10, 12, 8, 9, 11, 10],
+          backgroundColor: '#14a44d'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true }
+      }
+    }
+  });
+
+  // Monthly Collections Trend Chart
+  const collectionsChart = new Chart(document.getElementById('collectionsChart').getContext('2d'), {
+    type: 'line', 
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: 'Expected Purchase',
+          data: [15000, 14000, 18000, 17500, 20000, 19500],
+          borderColor: '#14a44d',
+          fill: false
+        },
+        {
+          label: 'Actual Collections',
+          data: [12500, 11200, 15600, 14800, 18200, 17500],
+          borderColor: '#e4a11b',
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // Revenue by Customer Type Chart
+  const revenueByTypeCtx = document.getElementById('revenueByTypeChart').getContext('2d');
+  new Chart(revenueByTypeCtx, {
+    type: 'bar',
+    data: {
+      labels: ['VIP', 'Class A', 'Class B', 'Class C'],
+      datasets: [{
+        label: 'Revenue',
+        data: [85000, 45000, 25000, 12000],
+        backgroundColor: [
+          '#3b71ca',
+          '#54b4d3', 
+          '#14a44d',
+          '#e4a11b'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Revenue Distribution by Customer Classification'
+        }
+      }
+    }
+  });
+
+  // Customer Growth Chart
+  const growthCtx = document.getElementById('customerGrowthChart').getContext('2d');
+  new Chart(growthCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {
+          label: 'VIP',
+          data: [10, 12, 15, 18, 20, 22],
+          borderColor: '#3b71ca',
+          fill: false
+        },
+        {
+          label: 'Class A',
+          data: [25, 28, 32, 35, 40, 42],
+          borderColor: '#54b4d3',
+          fill: false
+        },
+        {
+          label: 'Class B',
+          data: [40, 45, 48, 52, 55, 58],
+          borderColor: '#14a44d',
+          fill: false
+        },
+        {
+          label: 'Class C',
+          data: [20, 22, 25, 28, 30, 32],
+          borderColor: '#e4a11b',
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Customer Growth by Classification'
+        }
+      }
+    }
+  });
+
+  // Sales Funnel Chart
+  const salesFunnelChart = new Chart(document.getElementById('salesFunnelChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Leads', 'Prospects', 'Negotiations', 'Closed'],
+      datasets: [{
+        data: [1000, 750, 500, 250],
+        backgroundColor: ['#3b71ca', '#54b4d3', '#14a44d', '#e4a11b'],
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // Performance Metrics Chart
+  const performanceChart = new Chart(document.getElementById('performanceChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      datasets: [{
+        label: 'Sales',
+        data: [65, 75, 70, 80],
+        borderColor: '#3b71ca',
+      }, {
+        label: 'Conversions',
+        data: [45, 55, 50, 60],
+        borderColor: '#14a44d',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+
+  // Regional Distribution Chart
+  const regionalChart = new Chart(document.getElementById('regionalChart').getContext('2d'), {
+    type: 'polarArea',
+    data: {
+      labels: ['North', 'South', 'East', 'West', 'Central'],
+      datasets: [{
+        data: [300, 450, 350, 280, 400],
+        backgroundColor: ['#3b71ca', '#54b4d3', '#14a44d', '#e4a11b', '#dc4c64'],
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
+    }
+  });
+});
+</script>
+
+</body></html>

@@ -1,0 +1,1346 @@
+  <title>CRM System</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --secondary: #475569;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --light: #f8fafc;
+      --dark: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: white;
+      padding: 1.5rem;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
+
+    .nav-item {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: var(--secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      transition: 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--light);
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .main-content {
+      padding: 2rem;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .search-bar {
+      padding: 0.5rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      width: 300px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stat-title {
+      color: var(--secondary);
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .data-table {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table th {
+      background: var(--light);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+    }
+
+    .status-active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .btn-secondary.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      width: 95%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--secondary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--secondary);
+    }
+
+    .settings-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+
+    .settings-page {
+      display: none;
+    }
+
+    .kanban-container {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 1rem 0;
+    }
+
+    .kanban-column {
+      flex: 1;
+      min-width: 300px;
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .kanban-column h3 {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--light);
+    }
+
+    .kanban-items {
+      min-height: 100px;
+    }
+
+    .kanban-card {
+      background: var(--light);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      cursor: move;
+    }
+
+    .kanban-card h4 {
+      margin-bottom: 0.5rem;
+    }
+
+    .customer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .customer-list-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+    }
+
+    .customer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .customer-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    #tableView {
+      display: block;
+    }
+
+    #kanbanView {
+      display: none;
+      gap: 1rem;
+      overflow-x: auto;
+      padding: 1rem 0;
+    }
+
+    #listView {
+      display: none;
+    }
+
+    #viewType {
+      padding: 0.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      background: white;
+    }
+
+    .tag-input-container {
+      position: relative;
+    }
+
+    .tag-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    .tag-suggestion-item {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    .tag-suggestion-item:hover {
+      background: var(--light);
+    }
+
+    .selected-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .tag-badge {
+      background: var(--primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .field-item {
+      background: white;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .field-item:hover {
+      background: var(--light);
+    }
+
+    .drag-handle {
+      color: var(--secondary);
+      user-select: none;
+      cursor: move;
+      font-size: 20px;
+      display: inline-block;
+      margin-right: 8px;
+      content: "⋮";
+      transform: rotate(90deg);
+    }
+
+    .field-item.dragging {
+      opacity: 0.5;
+      border: 2px dashed var(--primary);
+    }
+    
+    @media (max-width: 768px) {
+      #customFieldsContainer {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    
+    .delete-field-btn {
+      position: absolute;
+      right: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 5px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="logo">CRM System</div>
+    <nav>
+      <a href="https://example.com/dashboard" class="nav-item active" onclick="event.preventDefault(); showPage(&apos;dashboard&apos;)">Dashboard</a>
+      <a href="https://example.com/customers" class="nav-item" onclick="event.preventDefault(); showPage(&apos;customers&apos;)">Customers</a>
+      <a href="https://example.com/integrations" class="nav-item" onclick="event.preventDefault(); showPage(&apos;integrations&apos;)">Integrations</a>
+      <a href="https://example.com/tasks" class="nav-item">Tasks</a>
+      <a href="https://example.com/reports" class="nav-item">Reports</a>
+      <a href="https://example.com/settings" class="nav-item" onclick="event.preventDefault(); showPage(&apos;settings&apos;)">Settings</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="dashboard-header">
+      <h1>Dashboard Overview</h1>
+      <div>
+        <button class="btn btn-secondary" onclick="refreshDashboard()">Refresh Data</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <!-- Stats will be populated by JavaScript -->
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+      <div class="stat-card" style="height: 300px;">
+        <h3>Customer Growth</h3>
+        <canvas id="customerGrowthChart"></canvas>
+      </div>
+      <div class="stat-card" style="height: 300px;">
+        <h3>Revenue Overview</h3>
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="stat-card" style="height: 300px;">
+        <h3>Customer Status Distribution</h3>
+        <canvas id="statusDistributionChart"></canvas>
+      </div>
+      <div class="stat-card" style="height: 300px;">
+        <h3>Recent Activity</h3>
+        <div id="recentActivity" style="overflow-y: auto; max-height: 250px;">
+          <!-- Activity feed will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <main class="main-content customers-page" style="display: none;">
+    <div class="dashboard-header">
+      <h1>Customers Management</h1>
+      <div>
+        <button class="btn btn-secondary" onclick="showPage(&apos;dashboard&apos;)">Return to Dashboard</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Total Customers</div>
+        <div class="stat-value" id="totalCustomersValue">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Active Customers</div>
+        <div class="stat-value" id="activeCustomersValue">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Inactive Customers</div>
+        <div class="stat-value" id="inactiveCustomersValue">0</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Customer List</h2>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-primary" onclick="openAddCustomerModal()">Add Customer</button>
+        <button class="btn btn-primary" onclick="openFieldManagerModal()">Manage Fields</button>
+        <select id="viewType" class="form-input" onchange="changeView(this.value)">
+          <option value="table">Table View</option>
+          <option value="kanban">Kanban View</option>
+          <option value="list">List View</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="tableView" style="display: block;">
+      <table class="data-table" id="customersManagementTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Tags</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="kanbanView" class="kanban-container" style="display: none;">
+      <div class="kanban-column">
+        <h3>New Leads</h3>
+        <div id="newLeads" class="kanban-items"></div>
+      </div>
+      <div class="kanban-column">
+        <h3>In Progress</h3>
+        <div id="inProgress" class="kanban-items"></div>
+      </div>
+      <div class="kanban-column">
+        <h3>Completed</h3>
+        <div id="completed" class="kanban-items"></div>
+      </div>
+    </div>
+
+    <div id="listView" class="customer-list" style="display: none;">
+      <!-- List items will be populated by JavaScript -->
+    </div>
+  </main>
+
+  <main class="main-content settings-page" style="display: none;">
+    <div class="dashboard-header">
+      <h1>Settings</h1>
+      <button class="btn btn-secondary" onclick="showPage(&apos;dashboard&apos;)">Return to Dashboard</button>
+    </div>
+
+    <div class="settings-container">
+      <form id="settingsForm">
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" class="form-input" name="companyName" value="My Company">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email Notifications</label>
+          <select class="form-input" name="emailNotifications">
+            <option value="all">All notifications</option>
+            <option value="important">Important only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Theme</label>
+          <select class="form-input" name="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Language</label>
+          <select class="form-input" name="language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Default View</label>
+          <select class="form-input" name="defaultView">
+            <option value="table">Table View</option>
+            <option value="kanban">Kanban View</option>
+            <option value="list">List View</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+      </form>
+    </div>
+  </main>
+
+  <main class="main-content integrations-page" style="display: none;">
+    <div class="dashboard-header">
+      <h1>Data Integration</h1>
+      <button class="btn btn-secondary" onclick="showPage(&apos;dashboard&apos;)">Return to Dashboard</button>
+    </div>
+
+    <div class="settings-container">
+      <div class="form-group">
+        <h3>Import Customer Data</h3>
+        <p class="text-secondary" style="margin-bottom: 1rem;">Upload CSV file containing customer information</p>
+        <input type="file" id="csvFileInput" accept=".csv" class="form-input" style="margin-bottom: 1rem;">
+        <button onclick="handleCSVUpload()" class="btn btn-primary">Upload and Process</button>
+      </div>
+
+      <div id="uploadStatus" style="margin-top: 1rem;"></div>
+
+      <div class="form-group" style="margin-top: 2rem;">
+        <h3>Recent Imports</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>File Name</th>
+              <th>Records</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="importHistory">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-group" style="margin-top: 2rem;">
+        <h3>CSV File Format</h3>
+        <p class="text-secondary" style="margin-bottom: 1rem;">Please ensure your CSV file follows this format:</p>
+        
+        <div class="stat-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Column Name</th>
+                <th>Description</th>
+                <th>Required</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>name</td>
+                <td>Customer&apos;s full name</td>
+                <td><span class="status-badge status-active">Yes</span></td>
+                <td>John Smith</td>
+              </tr>
+              <tr>
+                <td>email</td>
+                <td>Customer&apos;s email address</td>
+                <td><span class="status-badge status-active">Yes</span></td>
+                <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="402a2f282e6e332d29342800252d21292c6e232f2d">[email&#160;protected]</a></td>
+              </tr>
+              <tr>
+                <td>phone</td>
+                <td>Contact phone number</td>
+                <td><span class="status-badge status-active">Yes</span></td>
+                <td>+1-555-123-4567</td>
+              </tr>
+              <tr>
+                <td>status</td>
+                <td>Customer status (active/inactive)</td>
+                <td><span class="status-badge status-inactive">No</span></td>
+                <td>active</td>
+              </tr>
+            </tbody>
+          </table>
+          
+          <div style="margin-top: 1.5rem;">
+            <h4>Sample CSV Format:</h4>
+            <pre style="background: var(--light); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem;">
+name,email,phone,status
+John Smith,<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a6ccc9cec888d5cbcfd2cee6c3cbc7cfca88c5c9cb">[email&#160;protected]</a>,+1-555-123-4567,active
+Jane Doe,<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cda7aca3a8e3a9a2a88da8a0aca4a1e3aea2a0">[email&#160;protected]</a>,+1-555-987-6543,active
+Mike Johnson,<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="701d191b155e1a30151d11191c5e131f1d">[email&#160;protected]</a>,+1-555-456-7890,inactive</pre>
+          </div>
+          
+          <div style="margin-top: 1.5rem;">
+            <h4>Important Notes:</h4>
+            <ul style="list-style-type: disc; margin-left: 1.5rem; margin-top: 0.5rem;">
+              <li>The first row must contain the column headers exactly as shown above</li>
+              <li>All fields should be comma-separated</li>
+              <li>If status is not provided, it will default to &quot;active&quot;</li>
+              <li>Maximum file size: 5MB</li>
+              <li>Supported file format: .csv only</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="addCustomerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Customer</h2>
+        <button class="close-button" onclick="closeAddCustomerModal()">&#xd7;</button>
+      </div>
+      <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
+        <div id="customFieldsContainer"></div>
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" name="name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" name="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <div class="tag-input-container">
+            <input type="text" class="form-input" id="tagInput" placeholder="Add tags...">
+            <div class="tag-suggestions" id="tagSuggestions"></div>
+            <div class="selected-tags" id="selectedTags"></div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary">Add Customer</button>
+          <button type="button" class="btn btn-secondary" onclick="closeAddCustomerModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="editCustomerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Customer</h2>
+        <button class="close-button" onclick="closeEditCustomerModal()">&#xd7;</button>
+      </div>
+      <form id="editCustomerForm">
+        <input type="hidden" name="id">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" name="name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" name="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-input" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-secondary" onclick="closeEditCustomerModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="fieldManagerModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Custom Fields</h2>
+        <button class="close-button" onclick="closeFieldManagerModal()">&#xd7;</button>
+      </div>
+      <div class="form-group">
+        <h3>Current Fields</h3>
+        <div id="currentFields"></div>
+      </div>
+      <div class="form-group">
+        <h3>Add New Field</h3>
+        <form id="addFieldForm" onsubmit="addCustomField(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Field Name</label>
+              <input type="text" class="form-input" name="fieldName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Field Type</label>
+              <select class="form-input" name="fieldType" required>
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="email">Email</option>
+                <option value="select">Select</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="optionsGroup" style="display: none;">
+            <label class="form-label">Options (comma-separated)</label>
+            <input type="text" class="form-input" name="options" placeholder="Option1, Option2, Option3">
+          </div>
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" name="required">
+              Required Field
+            </label>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Add Field</button>
+            <button type="button" class="btn btn-primary" onclick="saveFieldChanges()">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    let customFields = JSON.parse(localStorage.getItem('customFields') || '[]');
+    let customerTags = new Set();
+
+    function changeView(viewType) {
+      const tableView = document.getElementById('tableView');
+      const kanbanView = document.getElementById('kanbanView');
+      const listView = document.getElementById('listView');
+      [tableView, kanbanView, listView].forEach(view => {
+        if (view) {
+          view.style.display = 'none';
+        }
+      });
+      switch (viewType) {
+        case 'table':
+          tableView.style.display = 'block';
+          break;
+        case 'kanban':
+          kanbanView.style.display = 'flex';
+          break;
+        case 'list':
+          listView.style.display = 'block';
+          break;
+      }
+      localStorage.setItem('preferredView', viewType);
+    }
+
+    function initializeViewSelection() {
+      const savedView = localStorage.getItem('preferredView') || 'table';
+      const viewSelect = document.getElementById('viewType');
+      if (viewSelect) {
+        viewSelect.value = savedView;
+        changeView(savedView);
+      }
+    }
+
+    function showPage(pageId) {
+      const mainSections = document.querySelectorAll('.main-content');
+      mainSections.forEach(section => {
+        section.style.display = 'none';
+      });
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.classList.remove('active');
+      });
+      switch (pageId) {
+        case 'dashboard':
+          document.querySelector('.main-content:not(.customers-page):not(.settings-page):not(.integrations-page)').style.display = 'block';
+          document.querySelector('a[href="https://example.com/dashboard"]').classList.add('active');
+          break;
+        case 'customers':
+          document.querySelector('.customers-page').style.display = 'block';
+          document.querySelector('a[href="https://example.com/customers"]').classList.add('active');
+          initializeViewSelection();
+          break;
+        case 'settings':
+          document.querySelector('.settings-page').style.display = 'block';
+          document.querySelector('a[href="https://example.com/settings"]').classList.add('active');
+          break;
+        case 'integrations':
+          document.querySelector('.integrations-page').style.display = 'block';
+          document.querySelector('a[href="https://example.com/integrations"]').classList.add('active');
+          break;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      showPage('dashboard');
+      const fieldTypeSelect = document.querySelector('[name="fieldType"]');
+      const optionsGroup = document.getElementById('optionsGroup');
+      fieldTypeSelect.addEventListener('change', function () {
+        optionsGroup.style.display = this.value === 'select' ? 'block' : 'none';
+      });
+      updateFormsWithCustomFields();
+    });
+
+    function renderCustomFieldsInModal() {
+      const container = document.getElementById('customFieldsContainer');
+      const savedLayout = localStorage.getItem('formLayout') || 'single';
+      changeFormLayout(savedLayout);
+      
+      container.innerHTML = `
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" name="name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" name="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" name="phone" required>
+        </div>
+      `;
+
+      customFields.forEach(field => {
+        const fieldContainer = document.createElement('div');
+        fieldContainer.className = 'form-group';
+        fieldContainer.innerHTML = `
+          <label class="form-label">${field.name}${field.required ? ' *' : ''}</label>
+          ${generateFieldInput(field)}
+          <button type="button" class="delete-field-btn" onclick="removeCustomField('${field.name}')">×</button>
+        `;
+        container.appendChild(fieldContainer);
+      });
+    }
+
+    function updateFormsWithCustomFields() {
+      const addForm = document.getElementById('addCustomerForm');
+      const editForm = document.getElementById('editCustomerForm');
+      const addFormCustomFields = addForm.querySelectorAll('[id^="custom-field-"]');
+      const editFormCustomFields = editForm.querySelectorAll('[id^="custom-field-"]');
+      addFormCustomFields.forEach(field => field.remove());
+      editFormCustomFields.forEach(field => field.remove());
+    }
+
+    function generateFieldInput(field) {
+      switch (field.type) {
+        case 'text':
+        case 'email':
+        case 'number':
+        case 'date':
+          return `<input type="${field.type}" class="form-input" name="custom_${field.name}" ${field.required ? 'required' : ''}>`;
+        case 'select':
+          return `
+            <select class="form-input" name="custom_${field.name}" ${field.required ? 'required' : ''}>
+              <option value="">Select...</option>
+              ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+            </select>
+          `;
+        default:
+          return `<input type="text" class="form-input" name="custom_${field.name}" ${field.required ? 'required' : ''}>`;
+      }
+    }
+
+    function handleCSVUpload() {
+      const fileInput = document.getElementById('csvFileInput');
+      const statusDiv = document.getElementById('uploadStatus');
+      if (!fileInput.files.length) {
+        statusDiv.innerHTML = '<div style="color: var(--danger);">Please select a file first</div>';
+        return;
+      }
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        try {
+          const csvData = event.target.result;
+          const records = parseCSV(csvData);
+          processCustomerRecords(records);
+          statusDiv.innerHTML = '<div style="color: var(--success);">File processed successfully</div>';
+          updateImportHistory(file.name, records.length);
+          fileInput.value = '';
+        } catch (error) {
+          statusDiv.innerHTML = `<div style="color: var(--danger);">Error processing file: ${error.message}</div>`;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(csvText) {
+      const lines = csvText.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const records = [];
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim() === '') continue;
+        const values = lines[i].split(',').map(v => v.trim());
+        const record = {};
+        headers.forEach((header, index) => {
+          record[header] = values[index];
+        });
+        records.push(record);
+      }
+      return records;
+    }
+
+    function processCustomerRecords(records) {
+      let customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      records.forEach(record => {
+        const customer = {
+          id: Date.now() + Math.random().toString(36).substr(2, 9),
+          name: record.name || '',
+          email: record.email || '',
+          phone: record.phone || '',
+          status: record.status || 'active',
+          importDate: new Date().toISOString()
+        };
+        customers.push(customer);
+      });
+      localStorage.setItem('customers', JSON.stringify(customers));
+      if (document.querySelector('.customers-page').style.display !== 'none') {
+        refreshCustomerViews();
+      }
+    }
+
+    function updateImportHistory(fileName, recordCount) {
+      let history = JSON.parse(localStorage.getItem('importHistory') || '[]');
+      history.unshift({
+        date: new Date().toISOString(),
+        fileName: fileName,
+        recordCount: recordCount,
+        status: 'Completed'
+      });
+      localStorage.setItem('importHistory', JSON.stringify(history));
+      const historyTable = document.getElementById('importHistory');
+      if (historyTable) {
+        historyTable.innerHTML = history.map(record => `
+          <tr>
+            <td>${new Date(record.date).toLocaleString()}</td>
+            <td>${record.fileName}</td>
+            <td>${record.recordCount}</td>
+            <td><span class="status-badge status-active">${record.status}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function openAddCustomerModal() {
+      const modal = document.getElementById('addCustomerModal');
+      modal.style.display = 'flex';
+      renderCustomFieldsInModal();
+      initializeTagInput();
+    }
+
+    function closeAddCustomerModal() {
+      const modal = document.getElementById('addCustomerModal');
+      modal.style.display = 'none';
+      document.getElementById('addCustomerForm').reset();
+      document.getElementById('selectedTags').innerHTML = '';
+    }
+
+    function renderCustomFields() {
+      const container = document.getElementById('currentFields');
+      const layoutSelect = document.createElement('div');
+      layoutSelect.className = 'form-group';
+      layoutSelect.innerHTML = `
+        <label class="form-label">Form Layout</label>
+        <select class="form-input" onchange="changeFormLayout(this.value)">
+          <option value="single">Single Column</option>
+          <option value="double">Two Columns</option>
+          <option value="triple">Three Columns</option>
+        </select>
+      `;
+      
+      container.innerHTML = `
+        <div class="field-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span>Name</span>
+            <span class="status-badge status-active">Required</span>
+          </div>
+        </div>
+        <div class="field-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span>Email</span>
+            <span class="status-badge status-active">Required</span>
+          </div>
+        </div>
+        <div class="field-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span>Phone</span>
+            <span class="status-badge status-active">Required</span>
+          </div>
+        </div>
+      `;
+
+      customFields.forEach((field, index) => {
+        const fieldElement = document.createElement('div');
+        fieldElement.className = 'field-item';
+        fieldElement.style.display = 'flex';
+        fieldElement.style.alignItems = 'center';
+        fieldElement.style.justifyContent = 'space-between';
+        fieldElement.style.marginBottom = '0.5rem';
+        fieldElement.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span>${field.name}</span>
+            ${field.required ? '<span class="status-badge status-active">Required</span>' : ''}
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="editCustomField('${field.name}')">Edit</button>
+            <button class="btn btn-danger" onclick="deleteCustomField('${field.name}')">Delete</button>
+          </div>
+        `;
+        container.appendChild(fieldElement);
+      });
+
+      container.insertBefore(layoutSelect, container.firstChild);
+    }
+
+    function changeFormLayout(layout) {
+      const form = document.getElementById('addCustomerForm');
+      const formContainer = document.getElementById('customFieldsContainer');
+      
+      switch(layout) {
+        case 'double':
+          formContainer.style.display = 'grid';
+          formContainer.style.gridTemplateColumns = '1fr 1fr';
+          formContainer.style.gap = '1rem';
+          break;
+        case 'triple':
+          formContainer.style.display = 'grid';
+          formContainer.style.gridTemplateColumns = '1fr 1fr 1fr';
+          formContainer.style.gap = '1rem';
+          break;
+        default: // single
+          formContainer.style.display = 'block';
+          break;
+      }
+      
+      localStorage.setItem('formLayout', layout);
+    }
+
+    function handleAddCustomer(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const selectedTags = Array.from(document.getElementById('selectedTags').children).map(tag => tag.dataset.tag);
+      const customer = {
+        id: Date.now() + Math.random().toString(36).substr(2, 9),
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        tags: selectedTags,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
+      let customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      customers.push(customer);
+      localStorage.setItem('customers', JSON.stringify(customers));
+      refreshCustomerViews();
+      closeAddCustomerModal();
+      alert('Customer added successfully!');
+    }
+
+    function refreshCustomerViews() {
+      let customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      updateTableView(customers);
+      updateKanbanView(customers);
+      updateListView(customers);
+      updateCustomerStats(customers);
+    }
+
+    function updateTableView(customers) {
+      const tbody = document.querySelector('#customersManagementTable tbody');
+      tbody.innerHTML = customers.map(customer => `
+        <tr>
+          <td>${customer.name}</td>
+          <td>${customer.email}</td>
+          <td>${customer.phone}</td>
+          <td>
+            <span class="status-badge ${customer.status === 'active' ? 'status-active' : 'status-inactive'}">
+              ${customer.status}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              ${customer.tags?.map(tag => `
+                <span class="tag-badge">${tag}</span>
+              `).join('') || ''}
+            </div>
+          </td>
+          <td>
+            <button class="btn btn-secondary" onclick="editCustomer('${customer.id}')">Edit</button>
+            <button class="btn btn-danger" onclick="deleteCustomer('${customer.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function initializeTagInput() {
+      const tagInput = document.getElementById('tagInput');
+      const suggestionsDiv = document.getElementById('tagSuggestions');
+      tagInput.addEventListener('input', function () {
+        const value = this.value.toLowerCase();
+        if (!value) {
+          suggestionsDiv.style.display = 'none';
+          return;
+        }
+        const suggestions = Array.from(customerTags).filter(tag => tag.toLowerCase().includes(value)).slice(0, 5);
+        if (suggestions.length) {
+          suggestionsDiv.innerHTML = suggestions.map(tag => `
+            <div class="tag-suggestion-item" onclick="addTag('${tag}')">${tag}</div>
+          `).join('');
+          suggestionsDiv.style.display = 'block';
+        } else {
+          suggestionsDiv.style.display = 'none';
+        }
+      });
+      tagInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const value = this.value.trim();
+          if (value) {
+            addTag(value);
+          }
+        }
+      });
+    }
+
+    function addTag(tagName) {
+      const selectedTags = document.getElementById('selectedTags');
+      const tagInput = document.getElementById('tagInput');
+      const suggestionsDiv = document.getElementById('tagSuggestions');
+      if (!Array.from(selectedTags.children).some(tag => tag.dataset.tag === tagName)) {
+        selectedTags.insertAdjacentHTML('beforeend', `
+          <span class="tag-badge" data-tag="${tagName}">
+            ${tagName}
+            <span class="tag-remove" onclick="removeTag(this.parentElement)">×</span>
+          </span>
+        `);
+      }
+      customerTags.add(tagName);
+      tagInput.value = '';
+      suggestionsDiv.style.display = 'none';
+    }
+
+    function removeTag(tagElement) {
+      tagElement.remove();
+    }
+
+    function editCustomField(fieldName) {
+      const field = customFields.find(f => f.name === fieldName);
+      if (!field) return;
+      const form = document.getElementById('addFieldForm');
+      form.fieldName.value = field.name;
+      form.fieldType.value = field.type;
+      form.required.checked = field.required;
+      if (field.type === 'select' && field.options) {
+        form.querySelector('[name="options"]').value = field.options.join(', ');
+        document.getElementById('optionsGroup').style.display = 'block';
+      } else {
+        document.getElementById('optionsGroup').style.display = 'none';
+      }
+      form.onsubmit = function (e) {
+        e.preventDefault();
+        const newFieldName = form.fieldName.value;
+        if (newFieldName !== fieldName && customFields.some(f => f.name.toLowerCase() === newFieldName.toLowerCase() && f.name !== fieldName)) {
+          alert('A field with this name already exists. Please use a different name.');
+          return;
+        }
+        const fieldIndex = customFields.findIndex(f => f.name === fieldName);
+        customFields.splice(fieldIndex, 1);
+        const updatedField = {
+          name: newFieldName,
+          type: form.fieldType.value,
+          required: form.required.checked,
+          options: form.fieldType.value === 'select' ? form.querySelector('[name="options"]').value.split(',').map(opt => opt.trim()) : undefined
+        };
+        customFields.splice(fieldIndex, 0, updatedField);
+        localStorage.setItem('customFields', JSON.stringify(customFields));
+        form.reset();
+        form.onsubmit = addCustomField;
+        document.getElementById('optionsGroup').style.display = 'none';
+        renderCustomFields();
+        updateFormsWithCustomFields();
+      };
+    }
+
+    function addCustomField(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fieldName = form.fieldName.value;
+      if (customFields.some(field => field.name.toLowerCase() === fieldName.toLowerCase())) {
+        alert('A field with this name already exists. Please use a different name.');
+        return;
+      }
+      const fieldType = form.fieldType.value;
+      const required = form.required.checked;
+      const options = fieldType === 'select' ? form.options.value.split(',').map(opt => opt.trim()) : undefined;
+      const newField = {
+        name: fieldName,
+        type: fieldType,
+        required: required,
+        options: fieldType === 'select' ? options : undefined
+      };
+      customFields.unshift(newField);
+      localStorage.setItem('customFields', JSON.stringify(customFields));
+      renderCustomFields();
+      updateFormsWithCustomFields();
+      form.reset();
+      document.getElementById('optionsGroup').style.display = 'none';
+    }
+
+    function deleteCustomField(fieldName) {
+      if (!confirm(`Are you sure you want to delete the field "${fieldName}"?`)) {
+        return;
+      }
+      customFields = customFields.filter(field => field.name !== fieldName);
+      localStorage.setItem('customFields', JSON.stringify(customFields));
+      renderCustomFields();
+      updateFormsWithCustomFields();
+    }
+
+    function saveFieldChanges() {
+      localStorage.setItem('customFields', JSON.stringify(customFields));
+      updateFormsWithCustomFields();
+      renderCustomFieldsInModal();
+      alert('Changes saved successfully!');
+      closeFieldManagerModal();
+    }
+
+    function removeCustomField(fieldName) {
+      if (!confirm(`Are you sure you want to remove the field "${fieldName}" from this form?`)) {
+        return;
+      }
+      customFields = customFields.filter(field => field.name !== fieldName);
+      localStorage.setItem('customFields', JSON.stringify(customFields));
+      renderCustomFieldsInModal();
+    }
+
+    function openFieldManagerModal() {
+      const modal = document.getElementById('fieldManagerModal');
+      modal.style.display = 'flex';
+      renderCustomFields();
+    }
+
+    function closeFieldManagerModal() {
+      const modal = document.getElementById('fieldManagerModal');
+      modal.style.display = 'none';
+    }
+  </script>
+
+</div></body>
+</html>

@@ -1,0 +1,275 @@
+/* Theme-specific styles */
+:root[data-theme="light"] {
+    --bg-color: #f5f5f7;
+    --text-color: #1d1d1f;
+    --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 245, 0.6));
+    --input-bg: rgba(255, 255, 255, 0.7);
+    --input-border: rgba(100, 149, 237, 0.3);
+    --button-gradient: linear-gradient(135deg, #e8e8e8, #d1d1d1);
+    --button-hover: linear-gradient(135deg, #d1d1d1, #e8e8e8);
+    --table-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(240, 240, 245, 0.2));
+    --th-bg: rgba(240, 240, 245, 0.5);
+    --chart-bg: rgba(240, 240, 245, 0.3);
+}
+
+:root[data-theme="dark"] {
+    --bg-color: #0f1011;
+    --text-color: #e4e6eb;
+    --card-gradient: linear-gradient(145deg, rgba(44, 62, 80, 0.6), rgba(52, 73, 94, 0.4));
+    --input-bg: rgba(22, 25, 32, 0.7);
+    --input-border: rgba(100, 149, 237, 0.3);
+    --button-gradient: linear-gradient(135deg, #2c3e50, #34495e);
+    --button-hover: linear-gradient(135deg, #34495e, #2c3e50);
+    --table-bg: linear-gradient(145deg, rgba(44, 62, 80, 0.4), rgba(52, 73, 94, 0.2));
+    --th-bg: rgba(22, 25, 32, 0.5);
+    --chart-bg: rgba(22, 25, 32, 0.3);
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; 
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container-hostmonitor {
+    max-width: 1400px; 
+    margin: 0 auto; 
+    padding: 20px;
+}
+
+.input-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+#hostInput {
+    flex-grow: 0.5;
+    padding: 12px 16px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: #4fc3f7; 
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#hostInput:focus {
+    outline: none;
+    border-color: rgba(100, 149, 237, 0.7);
+    box-shadow: 0 0 10px rgba(100, 149, 237, 0.2);
+}
+
+#addHost {
+    background: var(--button-gradient);
+    color: var(--text-color);
+    border: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#addHost:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.view-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.view-buttons button {
+    background: linear-gradient(135deg, #1e2429, #2c3e50);
+    color: #bdc3c7;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-buttons button:hover {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+}
+
+#mainPContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    background: var(--card-gradient);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    padding: 20px;
+    width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.status-red { background-color: #e74c3c; }
+.status-green { background-color: #2ecc71; }
+.status-yellow { background-color: #f39c12; }
+.status-gray { background-color: #7f8c8d; }
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--table-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid var(--input-border);
+}
+
+th {
+    background-color: var(--th-bg);
+    color: #bdc3c7;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.heartbeat-container {
+    display: flex;
+    align-items: center;
+    background: var(--chart-bg);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.chart-container {
+    background: var(--chart-bg);
+    border-radius: 4px;
+    padding: 8px;
+    position: relative;
+    height: 100px; 
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-top: 8px;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    background: var(--chart-bg);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.chart-thumbnail {
+    /* No styles defined in current code or plan */
+}
+
+.chart-tooltip {
+    pointer-events: none;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border: 1px solid rgba(100, 149, 237, 0.3);
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    color: #4fc3f7 !important;
+}
+
+.data-point {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.data-point:hover {
+    filter: drop-shadow(0 0 3px rgba(79, 195, 247, 0.8));
+}
+
+.grid line {
+    opacity: 0.2;
+}
+
+.bar {
+    transition: all 0.2s ease;
+    shape-rendering: crispEdges;
+}
+
+.buttons-cell {
+  
+    justify-content: center;
+    /*align-items: center;*/
+    gap: 10px;
+    vertical-align: middle;
+ display: table-cell;
+  text-align:center;
+  
+}
+
+#buttons-cell-card.buttons-cell {
+    display:flex;
+    justify-content:center;
+    /*align-items: center;*/
+    gap: 10px;
+    vertical-align: middle;
+  text-align:center;
+}
+
+
+.buttons-cell > button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.buttons-cell > button:hover {
+    transform: scale(1.2);
+}
+
+
+/* Additional subtle improvements */
+* {
+    transition: all 0.2s ease;
+}
+
+#themeToggle {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--button-gradient);
+    color: var(--text-color);
+}
+
+#themeToggle:hover {
+    background: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}

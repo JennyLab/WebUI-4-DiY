@@ -1,0 +1,275 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+  }
+  .dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+  .sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+    color: white;
+    padding: 30px 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  .main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #f0f4f8;
+    overflow-y: auto;
+  }
+  .logo {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+  .nav-item {
+    margin-bottom: 20px;
+  }
+  .nav-item a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: block;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  .nav-item a:hover, .nav-item a.active {
+    background-color: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+  }
+  .widget {
+    background-color: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .widget h2 {
+    margin-top: 0;
+    color: #1a237e;
+    font-size: 22px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1a237e;
+    padding-bottom: 10px;
+  }
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .integration-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  .integration-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+  .integration-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px;
+    background-color: #f0f4f8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .integration-card h3 {
+    margin-top: 0;
+    color: #1a237e;
+    font-size: 18px;
+  }
+  .integration-card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+  }
+  .integration-btn {
+    background-color: #1a237e;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  .integration-btn:hover {
+    background-color: #0d47a1;
+  }
+  .integration-btn.connected {
+    background-color: #4caf50;
+  }
+  .integration-btn.connected:hover {
+    background-color: #45a049;
+  }
+  .ai-assistant {
+    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%);
+    border-radius: 10px;
+    padding: 25px;
+    color: white;
+    margin-top: 30px;
+  }
+  .ai-assistant h3 {
+    margin-top: 0;
+  }
+  .search-bar {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  .search-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+  }
+  .search-btn {
+    background-color: #1a237e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="dashboard">
+    <div class="sidebar">
+      <div class="logo">IntelliBiz AI</div>
+      <nav>
+        <div class="nav-item"><a href="#dashboard">Dashboard</a></div>
+        <div class="nav-item"><a href="#data-import">Data Import</a></div>
+        <div class="nav-item"><a href="#analysis">Analysis</a></div>
+        <div class="nav-item"><a href="#reports">Reports</a></div>
+        <div class="nav-item"><a href="#integrations" class="active">Integrations</a></div>
+        <div class="nav-item"><a href="#settings">Settings</a></div>
+      </nav>
+    </div>
+    <div class="main-content">
+      <div class="widget">
+        <h2>Integrations Hub</h2>
+        <p>Connect IntelliBiz AI with your favorite tools and services to supercharge your business intelligence.</p>
+        
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="Search integrations...">
+          <button class="search-btn">Search</button>
+        </div>
+        
+        <div class="integration-grid">
+          <div class="integration-card">
+            <div class="integration-icon">📊</div>
+            <h3>Salesforce</h3>
+            <p>Sync customer data and sales metrics for comprehensive analysis.</p>
+            <button class="integration-btn connected" onclick="manageIntegration('salesforce')">Manage Connection</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">📈</div>
+            <h3>Google Analytics</h3>
+            <p>Import web traffic data for deeper user behavior insights.</p>
+            <button class="integration-btn connected" onclick="manageIntegration('google-analytics')">Manage Connection</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">💬</div>
+            <h3>Zendesk</h3>
+            <p>Analyze customer support interactions and satisfaction metrics.</p>
+            <button class="integration-btn" onclick="connectIntegration('zendesk')">Connect</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">📱</div>
+            <h3>Mixpanel</h3>
+            <p>Track user engagement and product analytics in real-time.</p>
+            <button class="integration-btn" onclick="connectIntegration('mixpanel')">Connect</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">💳</div>
+            <h3>Stripe</h3>
+            <p>Integrate payment data for revenue analysis and forecasting.</p>
+            <button class="integration-btn connected" onclick="manageIntegration('stripe')">Manage Connection</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">📧</div>
+            <h3>Mailchimp</h3>
+            <p>Analyze email campaign performance and subscriber engagement.</p>
+            <button class="integration-btn" onclick="connectIntegration('mailchimp')">Connect</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">🛒</div>
+            <h3>Shopify</h3>
+            <p>Sync e-commerce data for sales and inventory analysis.</p>
+            <button class="integration-btn" onclick="connectIntegration('shopify')">Connect</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">🗂️</div>
+            <h3>Jira</h3>
+            <p>Track project progress and team productivity metrics.</p>
+            <button class="integration-btn" onclick="connectIntegration('jira')">Connect</button>
+          </div>
+          <div class="integration-card">
+            <div class="integration-icon">🤖</div>
+            <h3>Custom API</h3>
+            <p>Connect your own data sources via custom API integration.</p>
+            <button class="integration-btn" onclick="setupCustomAPI()">Set Up</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ai-assistant">
+        <h3>AI Integration Assistant</h3>
+        <p>Based on your current business needs and data patterns, I recommend the following integration priorities:</p>
+        <ol>
+          <li><strong>Zendesk:</strong> Integrating your customer support data will enhance our churn prediction models and help identify key areas for improving customer satisfaction.</li>
+          <li><strong>Mixpanel:</strong> This integration will provide deeper insights into user engagement, complementing our existing Google Analytics data for a more comprehensive view of user behavior.</li>
+          <li><strong>Mailchimp:</strong> Analyzing your email campaign performance alongside other metrics will help optimize your marketing strategies and improve customer retention.</li>
+        </ol>
+        <p>Would you like me to guide you through setting up these integrations or provide more information on how they can benefit your specific use cases?</p>
+        <button class="integration-btn" onclick="getIntegrationRecommendations()">Get Detailed Recommendations</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function connectIntegration(integration) {
+      alert(`Initiating connection process for ${integration}. In a full implementation, this would open a secure authentication flow to connect the selected service.`);
+    }
+
+    function manageIntegration(integration) {
+      alert(`Opening management interface for ${integration} integration. Here you would be able to configure data sync settings, view sync status, and manage permissions.`);
+    }
+
+    function setupCustomAPI() {
+      alert("Opening custom API setup wizard. This interface would guide you through the process of setting up a secure, custom data integration with IntelliBiz AI.");
+    }
+
+    function getIntegrationRecommendations() {
+      alert("Generating detailed integration recommendations based on your business needs and data usage patterns. This report will include step-by-step integration guides and potential impact analyses for each recommended integration.");
+    }
+
+    // Search functionality
+    document.querySelector('.search-btn').addEventListener('click', function() {
+      var searchTerm = document.querySelector('.search-input').value;
+      alert(`Searching for integrations matching: "${searchTerm}". In a full implementation, this would filter the integration list in real-time.`);
+    });
+  </script>
+</body>
+</html>

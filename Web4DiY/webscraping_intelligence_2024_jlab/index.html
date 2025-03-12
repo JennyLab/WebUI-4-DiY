@@ -1,0 +1,558 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebScraping Intelligence 2024 - Dashboard</title>
+<style>
+  :root {
+    --primary-color: #1e88e5;
+    --secondary-color: #ff4081;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --card-background: #fff;
+    --header-background: #fff;
+    --header-height: 60px;
+  }
+  
+  body.dark-mode {
+    --primary-color: #64b5f6;
+    --secondary-color: #ff80ab;
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --card-background: #1e1e1e;
+    --header-background: #1e1e1e;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .header {
+    background-color: var(--header-background);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .nav {
+    margin-left: auto;
+  }
+  
+  .nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+  }
+  
+  .main-content {
+    margin-top: var(--header-height);
+    padding: 40px 20px;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .dashboard-card {
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .dashboard-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+  }
+  
+  .dashboard-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 15px;
+  }
+  
+  .btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: #1565c0;
+  }
+  
+  #appModal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  
+  .modal-content {
+    background-color: var(--card-background);
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+  }
+
+  .theme-switch input {
+    display: none;
+  }
+
+  .slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+  }
+
+  .slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+  }
+
+  input:checked + .slider {
+    background-color: var(--primary-color);
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <a href="https://webscrapingintelligence.com" class="logo">WebScraping Intelligence</a>
+    <nav class="nav">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/help">Help</a>
+      <a href="/account">Account</a>
+      <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+          <input type="checkbox" id="checkbox" />
+          <div class="slider round"></div>
+        </label>
+      </div>
+    </nav>
+  </header>
+  
+  <main class="main-content">
+    <h1>Dashboard</h1>
+    <p>Welcome to your WebScraping Intelligence dashboard. Access all your tools and features from here.</p>
+    
+    <section id="instructions">
+      <h2>How to Use WebScraping Intelligence</h2>
+      <ol>
+        <li>Start with the AI Scraper to intelligently extract data from websites.</li>
+        <li>Use the Crawler to systematically explore and index web pages.</li>
+        <li>Download assets like images and stylesheets with the Asset Downloader.</li>
+        <li>Reconstruct scraped websites locally using the Site Reconstructor.</li>
+        <li>Clean and analyze your data with the Data Processor.</li>
+        <li>Manage your proxy settings using the Proxy Manager for anonymous scraping.</li>
+      </ol>
+      <p>Click on each tool's "Launch" or "Manage" button to access its full functionality.</p>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>AI Scraper</h3>
+        <p>Start a new AI-powered scraping project</p>
+        <button class="btn" onclick="openApp('ai-scraper')">Launch</button>
+      </div>
+      
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17L21 12L16 7" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12H9" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Crawler</h3>
+        <p>Set up and manage your crawling tasks</p>
+        <button class="btn" onclick="openApp('crawler')">Manage</button>
+      </div>
+      
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7 10L12 15L17 10" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 15V3" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Asset Downloader</h3>
+        <p>Download and organize website assets</p>
+        <button class="btn" onclick="openApp('asset-downloader')">Download</button>
+      </div>
+      
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 3H8C9.06087 3 10.0783 3.42143 10.8284 4.17157C11.5786 4.92172 12 5.93913 12 7V21C12 20.2044 11.6839 19.4413 11.1213 18.8787C10.5587 18.3161 9.79565 18 9 18H2V3Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 3H16C14.9391 3 13.9217 3.42143 13.1716 4.17157C12.4214 4.92172 12 5.93913 12 7V21C12 20.2044 12.3161 19.4413 12.8787 18.8787C13.4413 18.3161 14.2044 18 15 18H22V3Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Site Reconstructor</h3>
+        <p>Rebuild and browse scraped websites locally</p>
+        <button class="btn" onclick="openApp('site-reconstructor')">Reconstruct</button>
+      </div>
+      
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 2V8H20" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 13H8" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17H8" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 9H9H8" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Data Processor</h3>
+        <p>Clean, structure, and analyze your scraped data</p>
+        <button class="btn" onclick="openApp('data-processor')">Process</button>
+      </div>
+      
+      <div class="dashboard-card">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Proxy Manager</h3>
+        <p>Configure and manage your proxy settings</p>
+        <button class="btn" onclick="openApp('proxy-manager')">Configure</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="appModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="appTitle"></h2>
+      <div id="appContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('appModal');
+    const span = document.getElementsByClassName("close")[0];
+    const appTitle = document.getElementById('appTitle');
+    const appContent = document.getElementById('appContent');
+
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function openApp(appName) {
+      appTitle.textContent = appName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      appContent.innerHTML = '';
+      modal.style.display = "block";
+      
+      switch(appName) {
+        case 'ai-scraper':
+          renderAIScraper();
+          break;
+        case 'crawler':
+          renderCrawler();
+          break;
+        case 'asset-downloader':
+          renderAssetDownloader();
+          break;
+        case 'site-reconstructor':
+          renderSiteReconstructor();
+          break;
+        case 'data-processor':
+          renderDataProcessor();
+          break;
+        case 'proxy-manager':
+          renderProxyManager();
+          break;
+      }
+    }
+
+    function renderAIScraper() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Enter URL to Scrape</h3>
+          <input type="text" id="scrapeUrl" placeholder="https://example.com">
+          <button onclick="startAIScrape()">Start AI Scrape</button>
+          <div id="aiScrapeResult"></div>
+        </div>
+      `;
+    }
+
+    function startAIScrape() {
+      const url = document.getElementById('scrapeUrl').value;
+      const resultDiv = document.getElementById('aiScrapeResult');
+      resultDiv.innerHTML = `<p>AI Scraping started for ${url}. Please wait...</p>`;
+      setTimeout(() => {
+        resultDiv.innerHTML += `
+          <p>Scraping completed. Data extracted and processed using AI algorithms.</p>
+          <ul>
+            <li>Title: ${url.split('//')[1]}</li>
+            <li>Number of links: 42</li>
+            <li>Images found: 15</li>
+            <li>Text content: 2500 words</li>
+          </ul>
+        `;
+      }, 3000);
+    }
+
+    function renderCrawler() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Crawler Configuration</h3>
+          <input type="text" id="seedUrl" placeholder="Seed URL">
+          <input type="number" id="maxDepth" placeholder="Max Depth">
+          <button onclick="startCrawl()">Start Crawl</button>
+          <div id="crawlStatus"></div>
+        </div>
+      `;
+    }
+
+    function startCrawl() {
+      const seedUrl = document.getElementById('seedUrl').value;
+      const maxDepth = document.getElementById('maxDepth').value;
+      const statusDiv = document.getElementById('crawlStatus');
+      statusDiv.innerHTML = `<p>Crawl started from ${seedUrl} with max depth ${maxDepth}.</p>`;
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        statusDiv.innerHTML += `<p>Crawl progress: ${progress}%. Pages crawled: ${progress * 5}</p>`;
+        if (progress >= 100) {
+          clearInterval(interval);
+          statusDiv.innerHTML += `<p>Crawl completed. Total pages crawled: 500</p>`;
+        }
+      }, 1000);
+    }
+
+    function renderAssetDownloader() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Asset Download</h3>
+          <input type="text" id="assetUrl" placeholder="Asset URL">
+          <select id="assetType">
+            <option value="image">Image</option>
+            <option value="css">CSS</option>
+            <option value="js">JavaScript</option>
+          </select>
+          <button onclick="downloadAsset()">Download Asset</button>
+          <div id="downloadStatus"></div>
+        </div>
+      `;
+    }
+
+    function downloadAsset() {
+      const assetUrl = document.getElementById('assetUrl').value;
+      const assetType = document.getElementById('assetType').value;
+      const statusDiv = document.getElementById('downloadStatus');
+      statusDiv.innerHTML = `<p>Downloading ${assetType} from ${assetUrl}...</p>`;
+      setTimeout(() => {
+        statusDiv.innerHTML += `
+          <p>${assetType.charAt(0).toUpperCase() + assetType.slice(1)} downloaded successfully.</p>
+          <p>File size: ${Math.floor(Math.random() * 1000) + 50}KB</p>
+          <p>Saved to: /downloads/${assetType}s/${assetUrl.split('/').pop()}</p>
+        `;
+      }, 2000);
+    }
+
+    function renderSiteReconstructor() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Site Reconstruction</h3>
+          <input type="text" id="reconstructUrl" placeholder="URL to reconstruct">
+          <button onclick="reconstructSite()">Reconstruct Site</button>
+          <div id="reconstructStatus"></div>
+        </div>
+      `;
+    }
+
+    function reconstructSite() {
+      const url = document.getElementById('reconstructUrl').value;
+      const statusDiv = document.getElementById('reconstructStatus');
+      statusDiv.innerHTML = `<p>Reconstructing site from ${url}...</p>`;
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 20;
+        statusDiv.innerHTML += `<p>Reconstruction progress: ${progress}%</p>`;
+        if (progress >= 100) {
+          clearInterval(interval);
+          statusDiv.innerHTML += `
+            <p>Site reconstruction completed. You can now browse the site locally.</p>
+            <p>Reconstructed pages: 25</p>
+            <p>Assets downloaded: 150</p>
+            <p>Local path: /reconstructed-sites/${url.split('//')[1]}</p>
+          `;
+        }
+      }, 1000);
+    }
+
+    function renderDataProcessor() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Data Processing</h3>
+          <input type="file" id="dataFile" accept=".csv,.json,.xml">
+          <button onclick="processData()">Process Data</button>
+          <div id="processingStatus"></div>
+        </div>
+      `;
+    }
+
+    function processData() {
+      const file = document.getElementById('dataFile').files[0];
+      const statusDiv = document.getElementById('processingStatus');
+      if (file) {
+        statusDiv.innerHTML = `<p>Processing ${file.name}...</p>`;
+        setTimeout(() => {
+          statusDiv.innerHTML += `
+            <p>Data processed successfully. Clean and structured data is ready for analysis.</p>
+            <p>Rows processed: ${Math.floor(Math.random() * 10000) + 1000}</p>
+            <p>Columns standardized: 15</p>
+            <p>Data quality score: ${(Math.random() * 2 + 8).toFixed(2)}/10</p>
+          `;
+        }, 3000);
+      } else {
+        statusDiv.innerHTML = `<p>Please select a file to process.</p>`;
+      }
+    }
+
+    function renderProxyManager() {
+      appContent.innerHTML = `
+        <div>
+          <h3>Proxy Configuration</h3>
+          <input type="text" id="proxyUrl" placeholder="Proxy URL">
+          <input type="number" id="proxyPort" placeholder="Port">
+          <select id="proxyType">
+            <option value="http">HTTP</option>
+            <option value="https">HTTPS</option>
+            <option value="socks4">SOCKS4</option>
+            <option value="socks5">SOCKS5</option>
+          </select>
+          <button onclick="addProxy()">Add Proxy</button>
+          <div id="proxyList"></div>
+        </div>
+      `;
+    }
+
+    function addProxy() {
+      const url = document.getElementById('proxyUrl').value;
+      const port = document.getElementById('proxyPort').value;
+      const type = document.getElementById('proxyType').value;
+      const listDiv = document.getElementById('proxyList');
+      listDiv.innerHTML += `
+        <p>Added ${type.toUpperCase()} proxy: ${url}:${port}</p>
+        <p>Status: Active</p>
+        <p>Current load: ${Math.floor(Math.random() * 80)}%</p>
+      `;
+    }
+
+    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+
+    function switchTheme(e) {
+      if (e.target.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+      }    
+    }
+
+    toggleSwitch.addEventListener('change', switchTheme, false);
+
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+      document.body.classList[currentTheme === 'dark' ? 'add' : 'remove']('dark-mode');
+
+      if (currentTheme === 'dark') {
+        toggleSwitch.checked = true;
+      }
+    }
+  </script>
+</body></html>

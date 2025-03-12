@@ -1,0 +1,921 @@
+<title>MultiTool Gateway - Enhanced Collaboration Hub</title>
+<style>
+:root {
+  --primary-color: #00ff00;
+  --background-color: #000000;
+  --tile-gap: 0.5rem;
+  --tile-border-radius: 10px;
+  --top-bar-height: 50px;
+  --tile-glow: 0 0 10px var(--primary-color);
+  --tile-glow-highlight: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', monospace;
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+.matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.steampunk-bg, .fallout-bg, .cyberpunk-bg, .windows-dark-bg, .godot-bg, .theme-420-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--top-bar-height);
+  background-color: rgba(0, 255, 0, 0.2);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.search-bar {
+  flex-grow: 1;
+  margin: 0 1rem;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(0, 255, 0, 0.1);
+  color: var(--primary-color);
+}
+
+.nav-buttons button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.theme-selector {
+  margin-left: auto;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--tile-gap);
+  padding: calc(var(--top-bar-height) + 1rem) 1rem 1rem 1rem;
+}
+
+.tile {
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--tile-border-radius);
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--tile-glow);
+}
+
+.tile:hover {
+  transform: scale(1.05);
+  box-shadow: var(--tile-glow-highlight);
+}
+
+.tile-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.tile-icon {
+  font-size: 1.5rem;
+}
+
+.tile-info {
+  flex-grow: 1;
+}
+
+.tile-graph {
+  height: 50px;
+  background: rgba(0, 255, 0, 0.2);
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.tile-graph-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 255, 0, 0.5);
+  animation: graphAnimation 5s infinite alternate;
+}
+
+@keyframes graphAnimation {
+  0% { height: 10%; }
+  100% { height: 90%; }
+}
+
+.tile-meter {
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 255, 0, 0.2);
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.tile-meter-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(0, 255, 0, 0.5);
+  animation: meterAnimation 3s infinite alternate;
+}
+
+@keyframes meterAnimation {
+  0% { width: 20%; }
+  100% { width: 80%; }
+}
+
+.expanded-tile {
+  position: fixed;
+  top: var(--top-bar-height);
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--top-bar-height));
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 100;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.expanded-tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.expanded-tile-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.expanded-tile-section {
+  flex: 1 1 300px;
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: var(--tile-border-radius);
+  padding: 1rem;
+}
+
+.workspaces-panel {
+  display: flex;
+  align-items: center;
+}
+
+.workspace-tile {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.workspace-tile.active {
+  background-color: rgba(0, 255, 0, 0.3);
+}
+
+#extensionManager {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--tile-border-radius);
+  padding: 1rem;
+  z-index: 1001;
+  display: none;
+}
+
+#extensionManager h2 {
+  margin-top: 0;
+}
+
+#extensionList {
+  list-style-type: none;
+  padding: 0;
+}
+
+#extensionList li {
+  margin-bottom: 0.5rem;
+}
+
+#extensionList button {
+  background: none;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+/* Theme variations */
+body[data-theme="matrix-light"] {
+  --primary-color: #0000ff;
+  --background-color: #ffffff;
+}
+
+body[data-theme="matrix-light"] .top-bar {
+  background-color: rgba(173, 216, 230, 0.8);
+}
+
+body[data-theme="matrix-light"] .search-bar input,
+body[data-theme="matrix-light"] .nav-buttons button,
+body[data-theme="matrix-light"] .settings-button {
+  color: #0000ff;
+}
+
+body[data-theme="steampunk"] {
+  --primary-color: #b87333;
+  --background-color: #2b2b2b;
+}
+
+body[data-theme="steampunk"] .top-bar {
+  background-color: rgba(184, 115, 51, 0.8);
+}
+
+body[data-theme="windows-dark"] {
+  --primary-color: #0078d7;
+  --background-color: #1e1e1e;
+}
+
+body[data-theme="windows-dark"] .top-bar {
+  background-color: rgba(0, 120, 215, 0.8);
+}
+
+body[data-theme="cyberpunk"] {
+  --primary-color: #00ffff;
+  --background-color: #120458;
+}
+
+body[data-theme="cyberpunk"] .top-bar {
+  background-color: rgba(0, 255, 255, 0.8);
+}
+
+body[data-theme="fallout"] {
+  --primary-color: #3cff00;
+  --background-color: #0f0f0f;
+}
+
+body[data-theme="fallout"] .top-bar {
+  background-color: rgba(60, 255, 0, 0.8);
+}
+
+body[data-theme="godot"] {
+  --primary-color: #478cbf;
+  --background-color: #333333;
+}
+
+body[data-theme="godot"] .top-bar {
+  background-color: rgba(71, 140, 191, 0.8);
+}
+
+body[data-theme="theme-420"] {
+  --primary-color: #00ff00;
+  --secondary-color: #800080;
+  --background-color: rgba(0, 0, 0, 0.7);
+}
+
+body[data-theme="theme-420"] .top-bar {
+  background-color: rgba(0, 255, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+body[data-theme="theme-420"] .tile {
+  background-color: rgba(0, 255, 0, 0.2);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--secondary-color);
+}
+
+body[data-theme="theme-420"] .tile:hover {
+  box-shadow: 0 0 25px var(--primary-color), 0 0 50px var(--secondary-color);
+}
+
+body[data-theme="theme-420"] .tile-content {
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+@keyframes steamAnimation {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  50% { transform: translateY(-50px) rotate(180deg); opacity: 0.6; }
+}
+
+.steam {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: steamAnimation 3s infinite;
+}
+
+@keyframes falloutRadiation {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.radiation {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(60, 255, 0, 0.2) 0%, rgba(60, 255, 0, 0) 70%);
+  border-radius: 50%;
+  animation: falloutRadiation 4s infinite;
+}
+
+.automation-toggle {
+  margin-top: 10px;
+}
+
+.version-toggle {
+  margin-top: 10px;
+}
+
+</style>
+</head>
+<body>
+<div class="matrix-rain"></div>
+<div class="steampunk-bg"></div>
+<div class="fallout-bg"></div>
+<div class="cyberpunk-bg"></div>
+<div class="windows-dark-bg"></div>
+<div class="godot-bg"></div>
+<div class="theme-420-bg"></div>
+
+<div class="top-bar">
+  <div class="nav-buttons">
+    <button id="backBtn">&#8592;</button>
+    <button id="forwardBtn">&#8594;</button>
+    <button id="refreshBtn">&#8635;</button>
+    <button id="homeBtn">&#8962;</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" placeholder="Search...">
+  </div>
+  <div class="workspaces-panel">
+    <div class="workspace-tile active"></div>
+    <div class="workspace-tile"></div>
+    <div class="workspace-tile"></div>
+  </div>
+  <select class="theme-selector">
+    <option value="matrix-dark">Matrix Dark</option>
+    <option value="matrix-light">Matrix Light</option>
+    <option value="steampunk">Steampunk</option>
+    <option value="windows-dark">Windows Dark</option>
+    <option value="cyberpunk">Cyberpunk</option>
+    <option value="fallout">Fallout</option>
+    <option value="godot">Godot</option>
+    <option value="theme-420">420</option>
+  </select>
+  <button class="settings-button">⚙️</button>
+</div>
+
+<div class="grid-container" id="mainGrid">
+  <!-- Tiles will be dynamically added here -->
+</div>
+
+<div id="extensionManager">
+  <h2>Extension Manager</h2>
+  <ul id="extensionList">
+    <li>
+      Git <button class="toggle-extension" data-extension="git">Enable</button>
+    </li>
+    <li>
+      Godot <button class="toggle-extension" data-extension="godot">Enable</button>
+    </li>
+    <li>
+      VSCode <button class="toggle-extension" data-extension="vscode">Enable</button>
+    </li>
+    <li>
+      Obsidian <button class="toggle-extension" data-extension="obsidian">Enable</button>
+    </li>
+    <li>
+      Unity <button class="toggle-extension" data-extension="unity">Enable</button>
+    </li>
+    <li>
+      GitHub <button class="toggle-extension" data-extension="github">Enable</button>
+    </li>
+    <li>
+      Steam <button class="toggle-extension" data-extension="steam">Enable</button>
+    </li>
+    <li>
+      itch.io <button class="toggle-extension" data-extension="itchio">Enable</button>
+    </li>
+  </ul>
+  <button id="closeExtensionManager">Close</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<script>
+const tools = [
+  { name: "GitHub", category: "Version Control", icon: "🐙", usage: 75, commits: 120, pullRequests: 15 },
+  { name: "Godot", category: "Task Management", icon: "🎮", usage: 60, projects: 5, tasks: 50 },
+  { name: "Unity", category: "Task Management", icon: "🕹️", usage: 80, projects: 3, assets: 100 },
+  { name: "VSCode", category: "Task Management", icon: "📝", usage: 90, extensions: 25, files: 500 },
+  { name: "Obsidian", category: "Documentation", icon: "📚", usage: 70, notes: 200, links: 350 },
+  { name: "Data Server", category: "Data Management", icon: "🖥️", usage: 85, storage: "500GB", queries: 1000 },
+  { name: "React", category: "Front-end Development", icon: "⚛️", usage: 75, components: 50, hooks: 30 },
+  { name: "Angular", category: "Front-end Development", icon: "🅰️", usage: 65, modules: 20, services: 15 },
+  { name: "Vue.js", category: "Front-end Development", icon: "🖖", usage: 70, components: 40, directives: 10 },
+  { name: "Bootstrap", category: "Styling", icon: "🅱️", usage: 80, themes: 5, customizations: 20 },
+  { name: "Tailwind CSS", category: "Styling", icon: "🌬️", usage: 85, classes: 100, utilities: 50 },
+  { name: "Figma", category: "UI/UX Design", icon: "🎨", usage: 75, designs: 30, prototypes: 10 },
+  { name: "Adobe XD", category: "UI/UX Design", icon: "🖌️", usage: 70, artboards: 25, interactions: 40 },
+  { name: "Node.js", category: "Back-end Development", icon: "🟢", usage: 85, packages: 50, endpoints: 30 },
+  { name: "Django", category: "Back-end Frameworks", icon: "🐍", usage: 70, models: 15, views: 25 },
+  { name: "Flask", category: "Back-end Frameworks", icon: "🌶️", usage: 65, routes: 20, extensions: 10 },
+  { name: "Postman", category: "API Development", icon: "📮", usage: 80, collections: 10, requests: 100 },
+  { name: "Unreal Engine", category: "Task Management", icon: "🎭", usage: 60, blueprints: 30, assets: 200 },
+  { name: "Codeium", category: "AI-powered Coding", icon: "🤖", usage: 75, suggestions: 500, accepted: 350 },
+  { name: "Steam", category: "Distribution", icon: "🎮", usage: 50, games: 10, updates: 25 },
+  { name: "itch.io", category: "Distribution", icon: "🕹️", usage: 40, games: 5, downloads: 1000 }
+];
+
+const categories = [...new Set(tools.map(tool => tool.category))];
+
+function createTile(tool) {
+  const usage = tool.usage || Math.floor(Math.random() * 100);
+  const animationClass = `tile-animation-${Math.floor(Math.random() * 5)}`;
+  return `
+    <div class="tile ${animationClass}" data-tool="${tool.name}">
+      <div class="tile-content">
+        <div class="tile-header">
+          <h4>${tool.name}</h4>
+          <span class="tile-icon">${tool.icon}</span>
+        </div>
+        <div class="tile-info">
+          <p>${tool.category}</p>
+          <p>Usage: ${usage}%</p>
+        </div>
+        <div class="tile-graph">
+          <canvas class="tile-chart"></canvas>
+        </div>
+        <div class="tile-meter">
+          <div class="tile-meter-fill" style="width: ${usage}%"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function populateGrid() {
+  const grid = $('#mainGrid');
+  grid.empty();
+  
+  // Add category tiles
+  categories.forEach(category => {
+    const categoryTools = tools.filter(tool => tool.category === category);
+    const avgUsage = categoryTools.reduce((sum, tool) => sum + tool.usage, 0) / categoryTools.length;
+    grid.append(createTile({ name: category, category: "Category", icon: "📊", usage: avgUsage }));
+  });
+  
+  // Add tool tiles
+  tools.forEach(tool => {
+    grid.append(createTile(tool));
+  });
+
+  // Initialize charts
+  $('.tile-chart').each(function() {
+    const ctx = this.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Usage',
+          data: Array.from({length: 6}, () => Math.floor(Math.random() * 100)),
+          borderColor: 'rgba(0, 255, 0, 1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  });
+}
+
+function expandTile(tool) {
+  const expandedTile = $('<div class="expanded-tile"></div>');
+  expandedTile.html(`
+    <div class="expanded-tile-header">
+      <button class="back-button">&#8592; Back</button>
+      <h2>${tool.name}</h2>
+    </div>
+    <div class="expanded-tile-content">
+      <div class="expanded-tile-section">
+        <h3>Overview</h3>
+        <p>${tool.category}</p>
+        <p>Usage: ${tool.usage}%</p>
+        <div class="automation-toggle">
+          <label>
+            <input type="checkbox" id="automate${tool.name}">
+            Enable Automation
+          </label>
+        </div>
+        <div class="version-toggle">
+          <label>
+            <input type="radio" name="${tool.name}Version" value="free" checked> Free
+          </label>
+          <label>
+            <input type="radio" name="${tool.name}Version" value="paid"> Paid
+          </label>
+        </div>
+      </div>
+      <div class="expanded-tile-section">
+        <h3>Statistics</h3>
+        <canvas id="detailedChart"></canvas>
+      </div>
+      <div class="expanded-tile-section">
+        <h3>Integrations</h3>
+        <ul id="${tool.name}Integrations">
+          <!-- Integrations will be dynamically added here -->
+        </ul>
+      </div>
+      <div class="expanded-tile-section">
+        <h3>Settings</h3>
+        <button id="configureBtn">Configure</button>
+        <button id="syncDataBtn">Sync Data</button>
+        <button id="generateReportBtn">Generate Report</button>
+      </div>
+    </div>
+  `);
+  $('body').append(expandedTile);
+  
+  // Initialize detailed chart
+  const ctx = document.getElementById('detailedChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(tool).filter(key => key !== 'name' && key !== 'category' && key !== 'icon' && key !== 'usage'),
+      datasets: [{
+        label: 'Tool Statistics',
+        data: Object.values(tool).filter(value => typeof value === 'number' && value !== tool.usage),
+        backgroundColor: 'rgba(0, 255, 0, 0.6)',
+        borderColor: 'rgba(0, 255, 0, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Add integrations
+  const integrations = ['GitHub', 'Obsidian', 'Data Server', 'Steam', 'itch.io'];
+  const integrationsList = $(`#${tool.name}Integrations`);
+  integrations.forEach(integration => {
+    if (integration !== tool.name) {
+      integrationsList.append(`<li>
+        <label>
+          <input type="checkbox" class="integration-checkbox" data-integration="${integration}">
+          ${integration}
+        </label>
+      </li>`);
+    }
+  });
+
+  $('.back-button').on('click', () => {
+    expandedTile.remove();
+  });
+
+  $('#configureBtn').on('click', () => {
+    alert(`Configuring ${tool.name}...`);
+    // Implement configuration logic here
+  });
+
+  $('#syncDataBtn').on('click', () => {
+    alert(`Syncing data for ${tool.name}...`);
+    // Implement data syncing logic here
+  });
+
+  $('#generateReportBtn').on('click', () => {
+    alert(`Generating report for ${tool.name}...`);
+    // Implement report generation logic here
+  });
+
+  $(`#automate${tool.name}`).on('change', function() {
+    const isAutomated = $(this).is(':checked');
+    alert(`Automation for ${tool.name} is now ${isAutomated ? 'enabled' : 'disabled'}`);
+    // Implement automation logic here
+  });
+
+  $(`input[name="${tool.name}Version"]`).on('change', function() {
+    const version = $(this).val();
+    alert(`Switched to ${version} version of ${tool.name}`);
+    // Implement version switching logic here
+  });
+
+  $('.integration-checkbox').on('change', function() {
+    const integration = $(this).data('integration');
+    const isEnabled = $(this).is(':checked');
+    alert(`Integration with ${integration} is now ${isEnabled ? 'enabled' : 'disabled'}`);
+    // Implement integration logic here
+  });
+}
+
+$(document).ready(() => {
+  populateGrid();
+  
+  $(document).on('click', '.tile', function() {
+    const toolName = $(this).data('tool');
+    const tool = tools.find(t => t.name === toolName) || { name: toolName, category: "Category" };
+    expandTile(tool);
+  });
+  
+  // Matrix rain animation
+  const canvas = document.createElement('canvas');
+  canvas.classList.add('matrix-rain');
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?';
+  const columns = canvas.width / 20;
+  const drops = [];
+
+  for (let i = 0; i < columns; i++) {
+    drops[i] = 1;
+  }
+
+  function drawMatrixRain() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#00ff00';
+    ctx.font = '15px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = characters[Math.floor(Math.random() * characters.length)];
+      ctx.fillText(text, i * 20, drops[i] * 20);
+
+      if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+
+      drops[i]++;
+    }
+  }
+
+  let matrixInterval = setInterval(drawMatrixRain, 50);
+  
+  // Theme selector
+  $('.theme-selector').on('change', function() {
+    const selectedTheme = $(this).val();
+    $('body').attr('data-theme', selectedTheme);
+    
+    // Clear existing animations
+    clearInterval(matrixInterval);
+    $('.steam, .radiation').remove();
+    
+    if (selectedTheme === 'matrix-dark' || selectedTheme === 'matrix-light') {
+      $('.matrix-rain').show();
+      matrixInterval = setInterval(drawMatrixRain, 50);
+      $('.steampunk-bg, .fallout-bg, .cyberpunk-bg, .windows-dark-bg, .godot-bg, .theme-420-bg').css('opacity', 0);
+    } else {
+      $('.matrix-rain').hide();
+      if (selectedTheme === 'steampunk') {
+        $('.steampunk-bg').css('opacity', 1);
+        createSteamAnimation();
+      } else if (selectedTheme === 'fallout') {
+        $('.fallout-bg').css('opacity', 1);
+        createFalloutAnimation();
+      } else if (selectedTheme === 'cyberpunk') {
+        $('.cyberpunk-bg').css('opacity', 1);
+        createCyberpunkAnimation();
+      } else if (selectedTheme === 'windows-dark') {
+        $('.windows-dark-bg').css('opacity', 1);
+      } else if (selectedTheme === 'godot') {
+        $('.godot-bg').css('opacity', 1);
+        createGodotAnimation();
+      } else if (selectedTheme === 'theme-420') {
+        $('.theme-420-bg').css('opacity', 1);
+        create420Animation();
+      } else {
+        $('.steampunk-bg, .fallout-bg, .cyberpunk-bg, .windows-dark-bg, .godot-bg, .theme-420-bg').css('opacity', 0);
+      }
+    }
+  });
+  
+  function createSteamAnimation() {
+    for (let i = 0; i < 10; i++) {
+      const steam = $('<div class="steam"></div>');
+      steam.css({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 3}s`
+      });
+      $('.steampunk-bg').append(steam);
+    }
+  }
+  
+  function createFalloutAnimation() {
+    for (let i = 0; i < 5; i++) {
+      const radiation = $('<div class="radiation"></div>');
+      radiation.css({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 4}s`
+      });
+      $('.fallout-bg').append(radiation);
+    }
+  }
+  
+  function createCyberpunkAnimation() {
+    // Add cyberpunk-themed animation here
+  }
+  
+  function createGodotAnimation() {
+    // Add Godot-themed animation here
+  }
+  
+  function create420Animation() {
+    // Add 420-themed animation here
+  }
+  
+  // Workspace switching
+  $('.workspace-tile').on('click', function() {
+    $('.workspace-tile').removeClass('active');
+    $(this).addClass('active');
+    // Implement workspace switching logic here
+    alert('Switched to workspace ' + ($(this).index() + 1));
+  });
+
+  // Settings button
+  $('.settings-button').on('click', function() {
+    $('#extensionManager').toggle();
+  });
+
+  // Extension manager
+  $('.toggle-extension').on('click', function() {
+    const extension = $(this).data('extension');
+    const isEnabled = $(this).text() === 'Disable';
+    $(this).text(isEnabled ? 'Enable' : 'Disable');
+    // Implement extension enabling/disabling logic here
+    alert(`${extension} has been ${isEnabled ? 'disabled' : 'enabled'}`);
+  });
+
+  $('#closeExtensionManager').on('click', function() {
+    $('#extensionManager').hide();
+  });
+
+  // Navigation buttons
+  $('#backBtn').on('click', function() {
+    window.history.back();
+  });
+
+  $('#forwardBtn').on('click', function() {
+    window.history.forward();
+  });
+
+  $('#refreshBtn').on('click', function() {
+    location.reload();
+  });
+
+  $('#homeBtn').on('click', function() {
+    window.location.href = '/';
+  });
+
+  // Search functionality
+  $('.search-bar input').on('keyup', function(e) {
+    if (e.key === 'Enter') {
+      const searchTerm = $(this).val().toLowerCase();
+      $('.tile').each(function() {
+        const toolName = $(this).find('h4').text().toLowerCase();
+        if (toolName.includes(searchTerm)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    }
+  });
+
+  // Implement data fetching and syncing
+  function fetchData() {
+    // Simulating data fetch from various tools
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          github: { commits: 150, pullRequests: 20 },
+          godot: { tasks: 60 },
+          unity: { assets: 120 },
+          vscode: { files: 550 },
+          obsidian: { notes: 220, links: 380 }
+        });
+      }, 1000);
+    });
+  }
+
+  function syncData() {
+    fetchData().then((data) => {
+      tools.forEach((tool) => {
+        if (data[tool.name.toLowerCase()]) {
+          Object.assign(tool, data[tool.name.toLowerCase()]);
+        }
+      });
+      populateGrid();
+    });
+  }
+
+  // Auto-sync data every 5 minutes
+  setInterval(syncData, 300000);
+
+  // Initial data sync
+  syncData();
+});
+
+// Add this line at the end of your script to ensure the matrix rain starts on page load
+drawMatrixRain();
+</script>
+</body>
+</html>

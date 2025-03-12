@@ -1,0 +1,423 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>msgs - Modern Chat Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.3/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css">
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+    }
+    .channel:hover {
+      background-color: #1e293b;
+    }
+    .message:hover {
+      background-color: #1e293b;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .markdown * {
+      all: revert;
+      color: inherit;
+    }
+    .markdown pre {
+      background: #1e293b;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+    }
+    .markdown code {
+      background: #1e293b;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+    }
+    .markdown h1,
+    .markdown h2,
+    .markdown h3 {
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+    .markdown p {
+      margin: 0.5rem 0;
+    }
+    .markdown ul,
+    .markdown ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    .markdown blockquote {
+      border-left: 4px solid #3b82f6;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #94a3b8;
+    }
+    .emoji-mart {
+      background: #0a0f1a !important;
+      border-color: #334155 !important;
+      width: 320px !important;
+      border-radius: 1rem !important;
+      box-shadow: 0 8px 16px -4px rgb(0 0 0 / 0.5) !important;
+    }
+    
+    .emoji-mart-bar {
+      border-color: #334155 !important;
+      background: #0a0f1a !important;
+    }
+    
+    .emoji-mart-category-label span {
+      background: #0a0f1a !important;
+      color: #94a3b8 !important;
+      font-family: 'Inter', sans-serif !important;
+      font-weight: 500 !important;
+    }
+    
+    .emoji-mart-search {
+      margin: 0.5rem !important;
+    }
+    
+    .emoji-mart-search input {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+      color: white !important;
+      border-radius: 0.75rem !important;
+      padding: 0.5rem 1rem !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+    
+    .emoji-mart-search-icon svg {
+      fill: #64748b !important;
+    }
+
+    .emoji-mart-scroll {
+      background: #0a0f1a !important;
+      border-radius: 0 0 1rem 1rem !important;
+    }
+
+    .emoji-mart-category .emoji-mart-emoji:hover:before {
+      background: #1e293b !important;
+      border-radius: 0.5rem !important;
+    }
+
+    .emoji-mart-anchor {
+      color: #94a3b8 !important;
+      padding: 0.5rem 0 !important;
+    }
+
+    .emoji-mart-anchor:hover,
+    .emoji-mart-anchor-selected {
+      color: #6366f1 !important;
+    }
+
+    .emoji-mart-anchor-selected .emoji-mart-anchor-bar {
+      background: #6366f1 !important;
+    }
+
+    #message-input {
+      min-height: 44px;
+      max-height: 200px;
+      resize: none;
+      overflow-y: auto;
+      line-height: 1.5;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      padding-left: 4px;
+      word-wrap: break-word;
+      font-size: 0.9375rem;
+      margin: 0;
+    }
+
+    .message-content img {
+      border-radius: 0.5rem;
+      max-width: 400px;
+      max-height: 300px;
+      object-fit: contain;
+      margin: 0.5rem 0;
+    }
+
+    .message-content video {
+      border-radius: 0.5rem;
+      max-width: 400px;
+      max-height: 300px;
+      margin: 0.5rem 0;
+    }
+
+    /* Add drag & drop styles */
+    .drag-over {
+      background: rgba(99, 102, 241, 0.1) !important;
+      border: 2px dashed #6366f1 !important;
+    }
+
+    /* Add loading spinner for file uploads */
+    .upload-loading {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 50%;
+      border-top-color: #6366f1;
+      animation: spin 1s linear infinite;
+    }
+
+    .uploads-container {
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .message .delete-msg-btn {
+      visibility: hidden;
+    }
+
+    .message:hover .delete-msg-btn {
+      visibility: visible;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .line-clamp-1 {
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .reply-preview {
+      margin: -0.5rem 0.5rem 0.5rem 0.5rem;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+  <!-- Servers sidebar -->
+  <div class="w-20 bg-[#0a0f1a] border-r border-slate-800/50 flex flex-col items-center py-3 space-y-2">
+    <button id="create-server-btn" class="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-indigo-600 cursor-pointer transition-all duration-200">
+      <span class="material-icons text-white">add</span>
+    </button>
+    <div class="w-12 h-[2px] bg-slate-800/50"></div>
+    <div id="server-list" class="space-y-3 overflow-y-auto scrollbar-hide">
+    </div>
+  </div>
+
+  <!-- Channels sidebar -->
+  <div class="w-72 bg-[#0a0f1a] border-r border-slate-800/50 flex flex-col">
+    <div class="p-4 border-b border-slate-800/50 flex items-center justify-between">
+      <h1 id="server-name" class="text-white font-bold text-lg truncate">Select a Server</h1>
+      <button id="server-settings-btn" class="text-slate-400 hover:text-white hidden">
+        <span class="material-icons">settings</span>
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto scrollbar-hide">
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-slate-400 text-sm uppercase font-semibold tracking-wider">Channels</h2>
+          <button id="create-channel-btn" class="text-slate-400 hover:text-white">
+            <span class="material-icons text-xl">add</span>
+          </button>
+        </div>
+        <div id="channel-list" class="space-y-1">
+        </div>
+      </div>
+
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-slate-400 text-sm uppercase font-semibold tracking-wider">Roles</h2>
+          <button id="create-role-btn" class="text-slate-400 hover:text-white">
+            <span class="material-icons text-xl">add</span>
+          </button>
+        </div>
+        <div id="role-list" class="space-y-1">
+        </div>
+      </div>
+    </div>
+
+    <!-- User profile -->
+    <div id="current-user" class="p-4 border-t border-slate-800/50 bg-[#0a0f1a]">
+    </div>
+  </div>
+
+  <!-- Main chat area -->
+  <div class="flex-1 flex flex-col bg-[#0f172a] min-w-0">
+    <div class="p-4 border-b border-slate-800/50 flex items-center justify-between">
+      <div class="flex items-center">
+        <span class="material-icons mr-2 text-slate-400">#</span>
+        <h2 id="channel-name" class="font-bold">Select a channel</h2>
+      </div>
+      <div id="channel-actions" class="hidden">
+        <button id="delete-channel-btn" class="text-red-500 hover:text-red-400 transition-colors">
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+    </div>
+
+    <!-- Message input -->
+    <div class="p-4 bg-slate-800/30">
+      <div class="flex items-end bg-slate-800/80 rounded-xl relative">
+        <div class="flex items-center pl-2">
+          <button id="emoji-btn" class="p-2 text-slate-400 hover:text-white transition-colors">
+            <span class="material-icons">mood</span>
+          </button>
+          <button id="upload-btn" class="p-2 text-slate-400 hover:text-white transition-colors">
+            <span class="material-icons">attach_file</span>
+          </button>
+          <input type="file" id="file-input" class="hidden" multiple>
+        </div>
+        <textarea id="message-input" 
+          placeholder="Send a message... (Markdown supported, Shift+Enter for new line)" 
+          class="flex-1 bg-transparent py-3 pr-4 focus:outline-none text-slate-200 placeholder-slate-500 leading-relaxed align-middle"
+          rows="1"></textarea>
+        <div id="emoji-picker" class="hidden absolute bottom-full left-0 mb-2 z-50"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members sidebar -->
+  <div class="w-72 bg-[#0a0f1a] border-l border-slate-800/50 p-4">
+    <h2 class="text-slate-400 text-sm uppercase font-semibold tracking-wider mb-4">Online Members</h2>
+    <div id="online-users" class="space-y-2">
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="create-server-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+    <div class="bg-slate-900 p-6 rounded-xl w-96 border border-slate-800/50">
+      <h2 class="text-xl font-bold mb-4">Create a Server</h2>
+      <input type="text" id="server-name-input" placeholder="Server name" 
+        class="w-full p-3 mb-4 bg-slate-800/50 rounded-xl border border-slate-700/50 text-white focus:outline-none focus:border-indigo-500">
+      <div class="flex justify-end space-x-3">
+        <button id="cancel-server-btn" class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
+        <button id="confirm-server-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="create-channel-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+    <div class="bg-slate-900 p-6 rounded-xl w-96 border border-slate-800/50">
+      <h2 class="text-xl font-bold mb-4">Create a Channel</h2>
+      <input type="text" id="channel-name-input" placeholder="Channel name" 
+        class="w-full p-3 mb-4 bg-slate-800/50 rounded-xl border border-slate-700/50 text-white focus:outline-none focus:border-indigo-500">
+      <div class="flex justify-end space-x-3">
+        <button id="cancel-channel-btn" class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
+        <button id="confirm-channel-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="server-settings-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+    <div class="bg-slate-900 p-6 rounded-xl w-[32rem] border border-slate-800/50">
+      <h2 class="text-xl font-bold mb-4">Server Settings</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Server Name</label>
+          <input type="text" id="edit-server-name" placeholder="Server name" 
+            class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Server Icon</label>
+          <input type="text" id="edit-server-icon" placeholder="Icon name (e.g. groups, school, work)" 
+            class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 text-white focus:outline-none focus:border-indigo-500">
+        </div>
+      </div>
+      <div class="flex justify-end space-x-3 mt-6">
+        <button id="cancel-server-settings-btn" class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
+        <button id="save-server-settings-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="create-role-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+    <div class="bg-slate-900 p-6 rounded-xl w-96 border border-slate-800/50">
+      <h2 class="text-xl font-bold mb-4">Create Role</h2>
+      <div class="space-y-4">
+        <input type="text" id="role-name-input" placeholder="Role name" 
+          class="w-full p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 text-white focus:outline-none focus:border-indigo-500">
+        <input type="color" id="role-color-input" class="w-full h-12 rounded cursor-pointer">
+      </div>
+      <div class="flex justify-end space-x-3 mt-6">
+        <button id="cancel-role-btn" class="px-4 py-2 text-slate-300 hover:text-white">Cancel</button>
+        <button id="confirm-role-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/models/Server.js" type="module"></script>
+  <script src="js/models/Channel.js" type="module"></script>
+  <script src="js/models/Role.js" type="module"></script>
+  <script src="js/ui/ServerUI.js" type="module"></script>
+  <script src="js/ui/ChannelUI.js" type="module"></script>
+  <script src="js/ui/MessageUI.js" type="module"></script>
+  <script src="js/ui/RoleUI.js" type="module"></script>
+  <script src="js/main.js" type="module"></script>
+
+  <script>
+    const messageInput = document.querySelector('.flex.items-end');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      messageInput.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      messageInput.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+      messageInput.classList.add('drag-over');
+    }
+
+    function unhighlight(e) {
+      messageInput.classList.remove('drag-over');
+    }
+
+    messageInput.addEventListener('drop', handleDrop, false);
+
+    async function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = [...dt.files];
+
+      for (const file of files) {
+        // Access the MessageUI instance 
+        const messageUI = document.querySelector('#message-input').__messageUI;
+        await messageUI.handleFileUpload(file);
+      }
+    }
+  </script>
+</body>
+</html>

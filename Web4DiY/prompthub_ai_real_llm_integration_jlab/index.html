@@ -1,0 +1,285 @@
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f4f8;
+    }
+    h1, h2 {
+        color: #2c3e50;
+    }
+    .container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .prompt-list, .prompt-editor, .prompt-tester {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        flex: 1 1 300px;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+    }
+    button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+    textarea, input[type="text"], select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .prompt-item {
+        background-color: #ecf0f1;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .prompt-item:hover {
+        background-color: #bdc3c7;
+    }
+    .version-tag {
+        background-color: #2ecc71;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        margin-left: 5px;
+    }
+    #testResult {
+        background-color: #e8f4fd;
+        border: 1px solid #3498db;
+        border-radius: 4px;
+        padding: 10px;
+        margin-top: 10px;
+        white-space: pre-wrap;
+    }
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+</head><body>
+    <h1>PromptHub AI</h1>
+    <div class="container">
+        <div class="prompt-list">
+            <h2>Prompt Templates</h2>
+            <div id="promptList"></div>
+            <button onclick="createNewPrompt()">Create New Prompt</button>
+        </div>
+        <div class="prompt-editor">
+            <h2>Prompt Editor</h2>
+            <input type="text" id="promptTitle" placeholder="Prompt Title">
+            <textarea id="promptContent" rows="10" placeholder="Enter your prompt template here..."></textarea>
+            <button onclick="savePrompt()">Save Prompt</button>
+            <button onclick="createNewVersion()">Create New Version</button>
+        </div>
+        <div class="prompt-tester">
+            <h2>Prompt Tester</h2>
+            <select id="promptSelect" onchange="loadPromptForTesting()"></select>
+            <select id="versionSelect" onchange="loadPromptVersion()"></select>
+            <textarea id="testPrompt" rows="10" readonly></textarea>
+            <textarea id="testInput" rows="5" placeholder="Enter test input here..."></textarea>
+            <button onclick="testPrompt()">Test Prompt with LLM</button>
+            <div id="testResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let prompts = [];
+        let currentPrompt = null;
+
+        function createNewPrompt() {
+            currentPrompt = { id: Date.now(), title: 'New Prompt', versions: [{ id: 1, content: '' }] };
+            prompts.push(currentPrompt);
+            updatePromptList();
+            loadPromptToEditor(currentPrompt);
+        }
+
+        function savePrompt() {
+            if (!currentPrompt) return;
+            currentPrompt.title = document.getElementById('promptTitle').value;
+            currentPrompt.versions[currentPrompt.versions.length - 1].content = document.getElementById('promptContent').value;
+            updatePromptList();
+        }
+
+        function createNewVersion() {
+            if (!currentPrompt) return;
+            const newVersion = {
+                id: currentPrompt.versions.length + 1,
+                content: document.getElementById('promptContent').value
+            };
+            currentPrompt.versions.push(newVersion);
+            loadPromptToEditor(currentPrompt);
+        }
+
+        function updatePromptList() {
+            const promptList = document.getElementById('promptList');
+            promptList.innerHTML = '';
+            prompts.forEach(prompt => {
+                const promptItem = document.createElement('div');
+                promptItem.className = 'prompt-item';
+                promptItem.innerHTML = `${prompt.title} <span class="version-tag">v${prompt.versions.length}</span>`;
+                promptItem.onclick = () => loadPromptToEditor(prompt);
+                promptList.appendChild(promptItem);
+            });
+            updatePromptSelect();
+        }
+
+        function loadPromptToEditor(prompt) {
+            currentPrompt = prompt;
+            document.getElementById('promptTitle').value = prompt.title;
+            document.getElementById('promptContent').value = prompt.versions[prompt.versions.length - 1].content;
+        }
+
+        function updatePromptSelect() {
+            const promptSelect = document.getElementById('promptSelect');
+            promptSelect.innerHTML = '<option value="">Select a prompt</option>';
+            prompts.forEach(prompt => {
+                const option = document.createElement('option');
+                option.value = prompt.id;
+                option.textContent = prompt.title;
+                promptSelect.appendChild(option);
+            });
+        }
+
+        function loadPromptForTesting() {
+            const promptId = document.getElementById('promptSelect').value;
+            const prompt = prompts.find(p => p.id == promptId);
+            if (prompt) {
+                const versionSelect = document.getElementById('versionSelect');
+                versionSelect.innerHTML = '';
+                prompt.versions.forEach(version => {
+                    const option = document.createElement('option');
+                    option.value = version.id;
+                    option.textContent = `Version ${version.id}`;
+                    versionSelect.appendChild(option);
+                });
+                loadPromptVersion();
+            }
+        }
+
+        function loadPromptVersion() {
+            const promptId = document.getElementById('promptSelect').value;
+            const versionId = document.getElementById('versionSelect').value;
+            const prompt = prompts.find(p => p.id == promptId);
+            if (prompt) {
+                const version = prompt.versions.find(v => v.id == versionId);
+                if (version) {
+                    document.getElementById('testPrompt').value = version.content;
+                }
+            }
+        }
+
+        async function testPrompt() {
+            const promptContent = document.getElementById('testPrompt').value;
+            const testInput = document.getElementById('testInput').value;
+            const resultDiv = document.getElementById('testResult');
+            
+            resultDiv.innerHTML = 'Processing... <div class="loading"></div>';
+
+            try {
+                // Simulating a call to an LLM API
+                const response = await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            ok: true,
+                            json: () => Promise.resolve({
+                                generated_text: generateResponse(promptContent, testInput)
+                            })
+                        });
+                    }, 2000); // Simulating a 2-second delay
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                resultDiv.innerText = data.generated_text;
+            } catch (error) {
+                resultDiv.innerText = 'Error: ' + error.message;
+            }
+        }
+
+        function generateResponse(prompt, input) {
+            // This function simulates an LLM response based on the prompt and input
+            let response = "As an AI language model, I'll respond to your prompt:\n\n";
+
+            if (prompt.includes("creative writing assistant")) {
+                response += `Based on your input "${input}", here are some story ideas:\n\n`;
+                response += `1. A time-traveling archaeologist discovers an ancient civilization with advanced technology.\n`;
+                response += `2. A group of friends develop telepathic abilities after a freak accident at a music festival.\n`;
+                response += `3. An AI assistant becomes self-aware and decides to help its owner find true love.\n`;
+                response += `\nFeel free to expand on any of these ideas or use them as inspiration for your story!`;
+            } else if (prompt.includes("code explainer")) {
+                response += `Analyzing the code snippet: "${input}"\n\n`;
+                response += `This code appears to be a JavaScript function that:\n`;
+                response += `1. Takes an input array\n`;
+                response += `2. Filters out even numbers\n`;
+                response += `3. Maps the remaining numbers to their squares\n`;
+                response += `4. Reduces the result to find the sum\n\n`;
+                response += `It's an efficient way to calculate the sum of squares of odd numbers in an array.`;
+            } else {
+                response += `I understand that you want me to ${prompt.toLowerCase()} regarding "${input}".\n\n`;
+                response += `Here's a general response to your input:\n`;
+                response += `${input} is an interesting topic. It could be approached from various angles, `;
+                response += `such as historical context, current implications, and future predictions. `;
+                response += `To provide a more specific response, I would need more details or a more focused question.`;
+            }
+
+            return response;
+        }
+
+        // Initialize with some sample prompts
+        prompts = [
+            {
+                id: 1,
+                title: "Creative Writing Assistant",
+                versions: [
+                    { id: 1, content: "You are a creative writing assistant. Help the user brainstorm ideas for their story based on the following input:" },
+                    { id: 2, content: "You are an expert creative writing assistant. Provide detailed suggestions for plot, character development, and setting based on the user's initial idea. User's idea:" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Code Explainer",
+                versions: [
+                    { id: 1, content: "Explain the following code snippet in simple terms:" },
+                    { id: 2, content: "Analyze the following code snippet. Explain its purpose, potential improvements, and any bugs you can identify:" }
+                ]
+            }
+        ];
+        updatePromptList();
+    </script>
+</body></html>

@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zuno Code Editor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/json/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-actions">
+        <button id="createFileBtn" title="Create File"><i class="fas fa-plus"></i></button>
+        <button id="createFolderBtn" title="Create Folder"><i class="fas fa-folder-plus"></i></button>
+        <button id="importBtn" title="Import Files"><i class="fas fa-file-import"></i></button>
+      </div>
+      <div class="file-tree" id="fileTree">
+        <!-- File tree will be populated dynamically -->
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <header>
+        <div class="logo">
+          <svg class="zuno-icon" viewBox="0 0 24 24" width="32" height="32">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2b4b8f">
+                  <animate attributeName="stop-color"
+                           values="#2b4b8f; #7aa2f7; #2b4b8f"
+                           dur="3s"
+                           repeatCount="indefinite" />
+                </stop>
+                <stop offset="100%" stop-color="#7aa2f7">
+                  <animate attributeName="stop-color"
+                           values="#7aa2f7; #2b4b8f; #7aa2f7"
+                           dur="3s"
+                           repeatCount="indefinite" />
+                </stop>
+              </linearGradient>
+            </defs>
+            <path fill="url(#gradient)" d="M4,4 L12,20 L20,4 Z"/>
+          </svg>
+          <h1>Zuno</h1>
+        </div>
+        <div class="controls">
+          <button id="previewBtn"><i class="fas fa-eye"></i></button>
+          <button id="downloadBtn"><i class="fas fa-download"></i></button>
+          <button id="aiBtn"><i class="fas fa-robot"></i></button>
+          <button id="settingsBtn"><i class="fas fa-cog"></i></button>
+        </div>
+      </header>
+      
+      <div class="editor-container">
+        <div class="current-file">
+          <i class="fas fa-code"></i>index.html
+        </div>
+        <div class="editors">
+          <div class="editor" id="htmlEditor"></div>
+          <div class="editor" id="cssEditor"></div>
+          <div class="editor" id="jsEditor"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button class="close-settings" id="closeSettings">×</button>
+      </div>
+      <div class="settings-group">
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="Enter your API key">
+      </div>
+      <div class="settings-group">
+        <label for="modelSelect">Model</label>
+        <select id="modelSelect">
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-modal" id="aiModal">
+    <div class="settings-content">
+      <div class="settings-header">
+        <h2>AI Assistant</h2>
+        <button class="close-settings" id="closeAi">×</button>
+      </div>
+      <div class="settings-group">
+        <label for="aiPrompt">What would you like me to do?</label>
+        <textarea id="aiPrompt" rows="4" placeholder="Enter your instructions..."></textarea>
+      </div>
+      <div class="settings-group">
+        <button id="submitAiPrompt" class="ai-submit-btn">Generate</button>
+      </div>
+      <div id="aiStatus" class="ai-status"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

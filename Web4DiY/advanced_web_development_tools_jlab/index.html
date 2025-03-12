@@ -1,0 +1,1245 @@
+  <title>Advanced Web Development Tools</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #0f0f13;
+      color: #e4e4e7;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 16px;
+    }
+
+    h1 {
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1.2em;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .categories-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .category-link {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 15px;
+      border-radius: 8px;
+      color: #93c5fd;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .category-link.active {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .category-link:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tool-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 25px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tool-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .tool-card:hover .tool-features {
+      max-height: none;
+      opacity: 1;
+    }
+
+    .tool-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      margin-right: 20px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      stroke: #8b5cf6;
+      transition: transform 0.3s ease;
+    }
+
+    .tool-card:hover .tool-icon {
+      transform: scale(1.1);
+    }
+
+    .tool-name {
+      font-size: 1.4em;
+      font-weight: 600;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tool-description {
+      color: #94a3b8;
+      line-height: 1.6;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
+
+    .tool-features {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .feature-tag {
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      margin-left: auto;
+      background: rgba(139, 92, 246, 0.1);
+      color: #c4b5fd;
+    }
+
+    .status-badge::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #8b5cf6;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .tool-card:active {
+      animation: pulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1; 
+        transform: translateY(0);
+      }
+    }
+
+    .debug-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(15,15,19,0.95);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      z-index: 100;
+      display: none;
+    }
+
+    .debug-panel.active {
+      display: block;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      color: #93c5fd;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+
+    .debug-content {
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.9em;
+      color: #e4e4e7;
+    }
+
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .log-time {
+      color: #8b5cf6;
+      margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .tools-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+      }
+      
+      .tool-card {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+    }
+
+    .plugin-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin-left: 8px;
+      background: rgba(52, 211, 153, 0.1); 
+      color: #34D399;
+    }
+
+    .plugin-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #34D399;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .plugin-settings {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+
+    .plugin-settings.active {
+      display: block;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .settings-label {
+      flex: 1;
+      color: #94a3b8;
+    }
+
+    .settings-control {
+      flex: 2;
+    }
+
+    .plugin-version {
+      font-size: 0.8em;
+      color: #64748b;
+      margin-left: auto;
+    }
+
+    .plugin-manager {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(15,15,19,0.95);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e4e4e7;
+      z-index: 1000;
+      display: none;
+    }
+
+    .plugin-manager.active {
+      display: block;
+    }
+
+    .plugin-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .plugin-item {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .plugin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .plugin-status {
+      font-size: 0.8em;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+    }
+
+    .advanced-config {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      display: none;
+    }
+
+    .advanced-config.active {
+      display: block;
+    }
+
+    .config-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .config-label {
+      flex: 1;
+      color: #94a3b8;
+    }
+
+    .config-control {
+      flex: 2;
+    }
+
+    .config-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .config-section-title {
+      color: #93c5fd;
+      margin-bottom: 10px;
+    }
+
+    .generate-doc-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(139, 92, 246, 0.1);
+      color: #c4b5fd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .generate-doc-btn:hover {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    .ci-cd-options {
+      margin-top: 15px;
+    }
+
+    .ci-cd-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(52, 211, 153, 0.1);
+      color: #34D399;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .ci-cd-btn:hover {
+      background: rgba(52, 211, 153, 0.2);
+    }
+
+    .tool-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .tool-btn {
+      padding: 8px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-size: 0.85em;
+    }
+
+    .tool-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Advanced Web Development Tools</h1>
+    <p class="subtitle">Powerful AI-driven tools to streamline your web development workflow</p>
+  </div>
+
+  <nav class="categories-nav" id="categoriesNav">
+    <!-- Categories will be inserted here -->
+  </nav>
+
+  <div class="tools-grid" id="toolsContainer">
+  </div>
+
+  <div class="debug-panel" id="debugPanel">
+    <div class="panel-header">
+      <span class="panel-title">Debug Console</span>
+      <button class="close-btn" onclick="toggleDebugPanel()">&#xd7;</button>
+    </div>
+    <div class="debug-content" id="debugContent"></div>
+  </div>
+
+  <div class="plugin-manager" id="pluginManager">
+    <div class="plugin-header">
+      <span>Plugin Manager</span>
+      <button class="close-btn" onclick="togglePluginManager()">&#xd7;</button>
+    </div>
+    <div class="plugin-list" id="pluginList"></div>
+  </div>
+
+  <script>
+    const tools = [
+      {
+        name: "AI Code Generator",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6M3 3l18 18"/></svg>`,
+        description: "Generate production-ready code with AI assistance. Supports multiple frameworks and languages.",
+        features: ["Multi-language support", "Code optimization", "Auto-documentation"],
+        command: "!code.generate",
+        status: "Active",
+        category: "Development",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          language: {
+            type: 'select',
+            label: 'Language',
+            value: 'JavaScript',
+            options: [
+              { label: 'JavaScript', value: 'JavaScript' },
+              { label: 'Python', value: 'Python' },
+              { label: 'Java', value: 'Java' },
+              { label: 'C#', value: 'C#' }
+            ]
+          },
+          framework: {
+            type: 'select',
+            label: 'Framework',
+            value: 'React',
+            options: [
+              { label: 'React', value: 'React' },
+              { label: 'Vue', value: 'Vue' },
+              { label: 'Angular', value: 'Angular' },
+              { label: 'None', value: 'None' }
+            ]
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Component Builder",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M12 3v18M3 12h18M18.7 3H5.3a2 2 0 00-1.4.6L3 4.5"/></svg>`,
+        description: "Create reusable UI components with built-in best practices and accessibility features.",
+        features: ["Accessibility", "Responsive design", "Performance optimized"],
+        command: "!build.component",
+        status: "Active",
+        category: "Design",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          componentType: {
+            type: 'select',
+            label: 'Component Type',
+            value: 'Button',
+            options: [
+              { label: 'Button', value: 'Button' },
+              { label: 'Card', value: 'Card' },
+              { label: 'Modal', value: 'Modal' },
+              { label: 'Form', value: 'Form' }
+            ]
+          },
+          styleFramework: {
+            type: 'select',
+            label: 'Style Framework',
+            value: 'Tailwind CSS',
+            options: [
+              { label: 'Tailwind CSS', value: 'Tailwind CSS' },
+              { label: 'Bootstrap', value: 'Bootstrap' },
+              { label: 'Material UI', value: 'Material UI' },
+              { label: 'None', value: 'None' }
+            ]
+          }
+        }
+      },
+      {
+        name: "API Designer",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M20 14.66V20a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h5.34M18 2h4M14 6l8-8"/></svg>`,
+        description: "Design and document APIs with automatic documentation generation and testing tools.",
+        features: ["OpenAPI support", "Auto-documentation", "Test suite generation"],
+        command: "!design.api",
+        status: "Active",
+        category: "Development",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          baseUrl: {
+            type: 'text',
+            label: 'Base URL',
+            value: 'https://api.example.com'
+          },
+          authentication: {
+            type: 'select',
+            label: 'Authentication',
+            value: 'API Key',
+            options: [
+              { label: 'None', value: 'None' },
+              { label: 'API Key', value: 'API Key' },
+              { label: 'OAuth 2.0', value: 'OAuth 2.0' }
+            ]
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Performance Optimizer",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`,
+        description: "Analyze and optimize web performance with automated suggestions and fixes.",
+        features: ["Load time analysis", "Resource optimization", "Performance monitoring"],
+        command: "!optimize.performance",
+        status: "Active",
+        category: "Performance",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          optimizationLevel: {
+            type: 'select',
+            label: 'Optimization Level',
+            value: 'Standard',
+            options: [
+              { label: 'Standard', value: 'Standard' },
+              { label: 'Aggressive', value: 'Aggressive' },
+              { label: 'Custom', value: 'Custom' }
+            ]
+          },
+          reportFormat: {
+            type: 'select',
+            label: 'Report Format',
+            value: 'HTML',
+            options: [
+              { label: 'HTML', value: 'HTML' },
+              { label: 'PDF', value: 'PDF' },
+              { label: 'JSON', value: 'JSON' }
+            ]
+          }
+        }
+      },
+      {
+        name: "Security Scanner",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+        description: "Scan for security vulnerabilities and receive actionable recommendations.",
+        features: ["Vulnerability detection", "Security best practices", "Automated fixes"],
+        command: "!scan.security",
+        status: "Active",
+        category: "Security",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          scanDepth: {
+            type: 'number',
+            label: 'Scan Depth',
+            value: 3
+          },
+          complianceStandards: {
+            type: 'select',
+            label: 'Compliance Standards',
+            value: 'OWASP',
+            options: [
+              { label: 'OWASP', value: 'OWASP' },
+              { label: 'PCI DSS', value: 'PCI DSS' },
+              { label: 'HIPAA', value: 'HIPAA' }
+            ]
+          }
+        }
+      },
+      {
+        name: "Transformer Models",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M10 2L2 10h3v4h4v3l8-8h-3V6h-4V2z"></path></svg>`,
+        description: "Implement and utilize transformer models for natural language processing tasks.",
+        features: ["NLP", "Sequence Modeling", "Attention Mechanism"],
+        command: "!models.transformer",
+        status: "Active",
+        category: "AI Models",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          modelType: {
+            type: 'select',
+            label: 'Model Type',
+            value: 'BERT',
+            options: [
+              { label: 'BERT', value: 'BERT' },
+              { label: 'GPT-2', value: 'GPT-2' },
+              { label: 'GPT-3', value: 'GPT-3' },
+              { label: 'TransformerXL', value: 'TransformerXL' }
+            ]
+          },
+          trainingData: {
+            type: 'text',
+            label: 'Training Data Path',
+            value: ''
+          },
+          epochs: {
+            type: 'number',
+            label: 'Epochs',
+            value: 5
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Sentence Transformers",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M5 3v12h2V7h8V5H5zM17 9v2h2V3h-6v2h4v4h-2zM5 17h2v2H5zM9 17h2v2H9zM13 17h2v2h-2z"></path></svg>`,
+        description: "Leverage sentence embeddings for semantic similarity, clustering, and classification.",
+        features: ["Semantic Similarity", "Embedding Generation", "Clustering"],
+        command: "!models.sentenceTransformer",
+        status: "Active",
+        category: "AI Models",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          modelName: {
+            type: 'select',
+            label: 'Model Name',
+            value: 'all-MiniLM-L6-v2',
+            options: [
+              { label: 'all-MiniLM-L6-v2', value: 'all-MiniLM-L6-v2' },
+              { label: 'paraphrase-MiniLM-L12-v2', value: 'paraphrase-MiniLM-L12-v2' },
+              { label: 'distiluse-base-multilingual-cased-v1', value: 'distiluse-base-multilingual-cased-v1' }
+            ]
+          },
+          batchSize: {
+            type: 'number',
+            label: 'Batch Size',
+            value: 32
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Audio Processing",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M3 12h3l3 8v-16l3 16 3-16 3 8h3"></path></svg>`,
+        description: "Process and analyze audio files for features like transcription and recognition.",
+        features: ["Transcription", "Audio Analysis", "Signal Processing"],
+        command: "!process.audio",
+        status: "Active",
+        category: "Media",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          inputFormat: {
+            type: 'select',
+            label: 'Input Format',
+            value: 'WAV',
+            options: [
+              { label: 'WAV', value: 'WAV' },
+              { label: 'MP3', value: 'MP3' },
+              { label: 'FLAC', value: 'FLAC' }
+            ]
+          },
+          outputFormat: {
+            type: 'select',
+            label: 'Output Format',
+            value: 'Text',
+            options: [
+              { label: 'Text', value: 'Text' },
+              { label: 'Spectrogram', value: 'Spectrogram' },
+              { label: 'Features', value: 'Features' }
+            ]
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Video Processing",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>`,
+        description: "Edit and analyze videos for features like compression and object detection.",
+        features: ["Compression", "Object Detection", "Frame Extraction"],
+        command: "!process.video",
+        status: "Active",
+        category: "Media",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          resolution: {
+            type: 'select',
+            label: 'Resolution',
+            value: '1080p',
+            options: [
+              { label: '480p', value: '480p' },
+              { label: '720p', value: '720p' },
+              { label: '1080p', value: '1080p' },
+              { label: '4K', value: '4K' }
+            ]
+          },
+          codec: {
+            type: 'select',
+            label: 'Codec',
+            value: 'H.264',
+            options: [
+              { label: 'H.264', value: 'H.264' },
+              { label: 'H.265', value: 'H.265' },
+              { label: 'VP9', value: 'VP9' }
+            ]
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Python Playground",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><path d="M12 20h9"></path><path d="M12 14h9"></path><path d="M12 8h9"></path><rect x="3" y="4" width="6" height="6" rx="1"></rect><rect x="3" y="14" width="6" height="6" rx="1"></rect></svg>`,
+        description: "Execute Python code in a sandboxed environment directly in your browser.",
+        features: ["Python 3 Support", "Package Management", "Code Sharing"],
+        command: "!playground.python",
+        status: "Active",
+        category: "Development",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          interpreter: {
+            type: 'select',
+            label: 'Interpreter Version',
+            value: '3.8',
+            options: [
+              { label: '3.6', value: '3.6' },
+              { label: '3.7', value: '3.7' },
+              { label: '3.8', value: '3.8' },
+              { label: '3.9', value: '3.9' }
+            ]
+          },
+          packages: {
+            type: 'text',
+            label: 'Packages',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Language Models",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>`,
+        description: "Utilize pre-trained language models for NLP tasks like text generation and summarization.",
+        features: ["Text Generation", "Summarization", "Language Understanding"],
+        command: "!models.language",
+        status: "Active",
+        category: "AI Models",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          modelChoice: {
+            type: 'select',
+            label: 'Model',
+            value: 'GPT-3',
+            options: [
+              { label: 'GPT-2', value: 'GPT-2' },
+              { label: 'GPT-3', value: 'GPT-3' },
+              { label: 'BART', value: 'BART' },
+              { label: 'T5', value: 'T5' }
+            ]
+          },
+          maxTokens: {
+            type: 'number',
+            label: 'Max Tokens',
+            value: 150
+          },
+          temperature: {
+            type: 'number',
+            label: 'Temperature',
+            value: 0.7
+          },
+          apiKey: {
+            type: 'text',
+            label: 'API Key',
+            value: ''
+          }
+        }
+      },
+      {
+        name: "Data Visualizer",
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tool-icon"><polyline points="3 3 12 12 21 3"></polyline><path d="M21 21h-6a2 2 0 1 1 0-4h6"></path></svg>`,
+        description: "Create interactive data visualizations with customizable charts and graphs.",
+        features: ["Charts", "Graphs", "Interactive"],
+        command: "!visualize.data",
+        status: "Active",
+        category: "Design",
+        isPlugin: true,
+        version: "1.0.0",
+        settings: {
+          chartType: {
+            type: 'select',
+            label: 'Chart Type',
+            value: 'Bar',
+            options: [
+              { label: 'Bar', value: 'Bar' },
+              { label: 'Line', value: 'Line' },
+              { label: 'Pie', value: 'Pie' }
+            ]
+          },
+          dataSource: {
+            type: 'text',
+            label: 'Data Source URL',
+            value: ''
+          }
+        }
+      }
+    ];
+
+    // Get unique categories
+    const categories = ['All', ...new Set(tools.map(tool => tool.category))];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCategories();
+      renderTools('All');
+    });
+
+    function renderCategories() {
+      const categoriesNav = document.getElementById('categoriesNav');
+      categoriesNav.innerHTML = categories.map(category => `
+        <div class="category-link" onclick="filterTools('${category}', this)">${category}</div>
+      `).join('');
+      const allLink = categoriesNav.querySelector('.category-link');
+      allLink.classList.add('active');
+    }
+
+    function filterTools(category, element) {
+      const categoriesNav = document.getElementById('categoriesNav');
+      categoriesNav.querySelectorAll('.category-link').forEach(link => link.classList.remove('active'));
+      element.classList.add('active');
+      renderTools(category);
+    }
+
+    function renderTools(category) {
+      const container = document.getElementById('toolsContainer');
+      const filteredTools = category === 'All' ? tools : tools.filter(tool => tool.category === category);
+      container.innerHTML = filteredTools.map(createToolCard).join('');
+    }
+
+    class PluginSystem {
+      constructor() {
+        this.plugins = new Map();
+        this.hooks = new Map();
+      }
+      registerPlugin(name, plugin) {
+        this.plugins.set(name, {
+          ...plugin,
+          enabled: false,
+          settings: plugin.defaultSettings || {}
+        });
+      }
+      enablePlugin(name) {
+        const plugin = this.plugins.get(name);
+        if (plugin) {
+          plugin.enabled = true;
+          if (plugin.onEnable) plugin.onEnable(plugin.settings);
+        }
+      }
+      disablePlugin(name) {
+        const plugin = this.plugins.get(name);
+        if (plugin) {
+          plugin.enabled = false;
+          if (plugin.onDisable) plugin.onDisable();
+        }
+      }
+      updatePluginSettings(name, settings) {
+        const plugin = this.plugins.get(name);
+        if (plugin) {
+          plugin.settings = {
+            ...plugin.settings,
+            ...settings
+          };
+          if (plugin.onSettingsUpdate) plugin.onSettingsUpdate(plugin.settings);
+        }
+      }
+      registerHook(event, callback) {
+        if (!this.hooks.has(event)) {
+          this.hooks.set(event, new Set());
+        }
+        this.hooks.get(event).add(callback);
+      }
+      triggerHook(event, data) {
+        const hooks = this.hooks.get(event);
+        if (hooks) {
+          for (const callback of hooks) {
+            callback(data);
+          }
+        }
+      }
+      getPluginInfo(name) {
+        return this.plugins.get(name);
+      }
+      getEnabledPlugins() {
+        return Array.from(this.plugins.entries())
+          .filter(([_, plugin]) => plugin.enabled)
+          .map(([name, plugin]) => ({name, ...plugin}));
+      }
+      initializePlugins() {
+        for (const [name, plugin] of this.plugins.entries()) {
+          if (plugin.enabled && plugin.onInit) {
+            plugin.onInit(plugin.settings);
+          }
+        }
+      }
+      hasPlugin(name) {
+        return this.plugins.has(name);
+      }
+      pluginStatus(name) {
+        const plugin = this.plugins.get(name);
+        if (!plugin) return 'not_found';
+        return plugin.enabled ? 'enabled' : 'disabled';
+      }
+    }
+
+    function generateAdvancedConfig(tool) {
+      return `
+        <div class="advanced-config" id="config-${tool.command}">
+          <div class="config-section">
+            <div class="config-section-title">Configuration</div>
+            ${Object.entries(tool.settings).map(([key, setting]) => `
+              <div class="config-row">
+                <label class="config-label">${setting.label}</label>
+                <div class="config-control">
+                  ${generateSettingControl(tool.command, key, setting)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="config-section">
+            <div class="config-section-title">CI/CD Integration</div>
+            <button class="ci-cd-btn" onclick="generateCICDConfig('${tool.command}')">Generate CI/CD Config</button>
+          </div>
+          <div class="config-section">
+            <div class="config-section-title">Documentation</div>
+            <button class="generate-doc-btn" onclick="generateDocumentation('${tool.command}')">Generate Documentation</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateSettingControl(command, key, setting) {
+      switch (setting.type) {
+        case 'boolean':
+          return `<input type="checkbox" 
+            ${setting.value ? 'checked' : ''} 
+            onchange="updatePluginSetting('${command}', '${key}', this.checked)">`;
+        case 'select':
+          return `
+            <select onchange="updatePluginSetting('${command}', '${key}', this.value)">
+              ${setting.options.map(opt => `
+                <option value="${opt.value}" ${opt.value === setting.value ? 'selected' : ''}>
+                  ${opt.label}
+                </option>
+              `).join('')}
+            </select>`;
+        case 'number':
+          return `<input type="number" value="${setting.value}"
+            onchange="updatePluginSetting('${command}', '${key}', this.value)">`;
+        case 'text':
+          return `<input type="text" value="${setting.value}"
+            onchange="updatePluginSetting('${command}', '${key}', this.value)">`;
+        default:
+          return `<input type="${setting.type}" value="${setting.value}"
+            onchange="updatePluginSetting('${command}', '${key}', this.value)">`;
+      }
+    }
+
+    function createToolCard(tool) {
+      const features = tool.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('');
+      const pluginBadge = tool.isPlugin ? `<span class="plugin-badge">Plugin v${tool.version || '1.0.0'}</span>` : '';
+      const advancedConfig = generateAdvancedConfig(tool);
+      return `
+        <div class="tool-card">
+          <div class="tool-header">
+            ${tool.icon}
+            <span class="tool-name">${tool.name}</span>
+            <span class="status-badge">${tool.status}</span>
+            ${pluginBadge}
+          </div>
+          <div class="tool-description">${tool.description}</div>
+          <div class="tool-features">${features}</div>
+          <div class="tool-actions">
+            <button class="tool-btn" onclick="event.stopPropagation(); toggleAdvancedConfig('${tool.command}')">Configure</button>
+            <button class="tool-btn" onclick="event.stopPropagation(); debugTool('${tool.command}')">Debug</button>
+            <button class="tool-btn" onclick="event.stopPropagation(); showDocs('${tool.name}')">Docs</button>
+          </div>
+          ${advancedConfig}
+        </div>
+      `;
+    }
+
+    function toggleAdvancedConfig(command) {
+      const configDiv = document.getElementById(`config-${command}`);
+      configDiv.classList.toggle('active');
+    }
+
+    function updatePluginSetting(command, key, value) {
+      const tool = tools.find(t => t.command === command);
+      if (tool && tool.settings) {
+        tool.settings[key].value = value;
+      }
+    }
+
+    const pluginSystem = new PluginSystem();
+
+    function executeCommand(command) {
+      console.log(`Executing command: ${command}`);
+      
+      const plugin = pluginSystem.getPluginInfo(command);
+      if (plugin && plugin.enabled) {
+        plugin.execute?.(plugin.settings);
+      }
+
+      const debugContent = document.getElementById('debugContent');
+      const timestamp = new Date().toLocaleTimeString();
+      const pluginStatus = plugin ? 
+        `Plugin Status: ${plugin.enabled ? 'Enabled' : 'Disabled'}\n` +
+        `Settings: ${JSON.stringify(plugin.settings, null, 2)}` : 
+        'No plugin data';
+
+      debugContent.innerHTML += `
+        <div class="log-entry">
+          <span class="log-time">${timestamp}</span>
+          Command: ${command}<br>
+          ${pluginStatus}
+        </div>
+      `;
+    }
+
+    function togglePluginManager() {
+      const manager = document.getElementById('pluginManager');
+      manager.classList.toggle('active');
+      if (manager.classList.contains('active')) {
+        renderPluginList();
+      }
+    }
+
+    function renderPluginList() {
+      const pluginList = document.getElementById('pluginList');
+      const plugins = pluginSystem.getEnabledPlugins();
+      
+      pluginList.innerHTML = plugins.map(plugin => `
+        <div class="plugin-item">
+          <div class="plugin-header">
+            <span>${plugin.name}</span>
+            <span class="plugin-status">${plugin.enabled ? 'Enabled' : 'Disabled'}</span>
+          </div>
+          <div class="plugin-version">v${plugin.version}</div>
+        </div>
+      `).join('');
+    }
+
+    function debugTool(command) {
+      const debugPanel = document.getElementById('debugPanel');
+      debugPanel.classList.add('active');
+      
+      const plugin = pluginSystem.getPluginInfo(command);
+      const debugContent = document.getElementById('debugContent');
+      const timestamp = new Date().toLocaleTimeString();
+      
+      debugContent.innerHTML += `
+        <div class="log-entry">
+          <span class="log-time">${timestamp}</span>
+          Debugging tool: ${command}<br>
+          Plugin Info: ${plugin ? JSON.stringify(plugin.settings, null, 2) : 'No plugin data'}
+        </div>
+      `;
+    }
+
+    function toggleDebugPanel() {
+      const debugPanel = document.getElementById('debugPanel');
+      debugPanel.classList.toggle('active');
+    }
+
+    function showDocs(toolName) {
+      console.log(`Showing documentation for ${toolName}`);
+      // Implementation for showing tool documentation
+      // Generate documentation dynamically
+      const tool = tools.find(t => t.name === toolName);
+      if (tool) {
+        generateDocumentation(tool.command);
+      }
+    }
+
+    function generateDocumentation(command) {
+      const tool = tools.find(t => t.command === command);
+      if (tool) {
+        const documentation = {
+          name: tool.name,
+          description: tool.description,
+          features: tool.features,
+          settings: Object.entries(tool.settings).reduce((acc, [key, setting]) => {
+            acc[key] = {
+              label: setting.label,
+              type: setting.type,
+              value: setting.value
+            };
+            return acc;
+          }, {})
+        };
+        console.log(`Documentation for ${tool.name}:`, documentation);
+
+        const debugPanel = document.getElementById('debugPanel');
+        debugPanel.classList.add('active');
+        const debugContent = document.getElementById('debugContent');
+        const timestamp = new Date().toLocaleTimeString();
+        debugContent.innerHTML += `
+          <div class="log-entry">
+            <span class="log-time">${timestamp}</span>
+            Generated Documentation for ${tool.name}:<br>
+            <pre>${JSON.stringify(documentation, null, 2)}</pre>
+          </div>
+        `;
+      }
+    }
+
+    function generateCICDConfig(command) {
+      const tool = tools.find(t => t.command === command);
+      if (tool) {
+        const ciConfig = `
+name: ${tool.name} CI Pipeline
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run ${tool.name}
+        run: |
+          echo "Executing ${tool.name} command..."
+          # Command logic here
+        `;
+
+        console.log(`CI/CD Config for ${tool.name}:`, ciConfig);
+
+        const debugPanel = document.getElementById('debugPanel');
+        debugPanel.classList.add('active');
+        const debugContent = document.getElementById('debugContent');
+        const timestamp = new Date().toLocaleTimeString();
+        debugContent.innerHTML += `
+          <div class="log-entry">
+            <span class="log-time">${timestamp}</span>
+            Generated CI/CD Config for ${tool.name}:<br>
+            <pre>${ciConfig}</pre>
+          </div>
+        `;
+      }
+    }
+
+  </script>
+</body>
+</html>

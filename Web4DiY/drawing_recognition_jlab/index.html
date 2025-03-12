@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Recognition</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="audio-controls">
+        <button id="muteBtn" class="mute-btn">🔊 Sound On</button>
+        <audio id="bgMusic" src="Wii Party Soundtrack - Main Menu Music.mp3" loop></audio>
+    </div>
+    <div class="container">
+        <h1>Draw Something!</h1>
+        <p>Draw an object in the box below and I'll try to guess what it is!</p>
+        
+        <div class="canvas-container">
+            <canvas id="drawingCanvas" width="400" height="400"></canvas>
+            <div id="result" class="result-hidden">
+                <h2>I think you drew...</h2>
+                <p id="guess"></p>
+                <button id="tryAgain">Try Again</button>
+                <button id="copyBtn">Generate AI Image</button>
+            </div>
+        </div>
+        
+        <div class="import-container">
+            <label for="imageInput" class="import-label">📁 Import Image</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+        
+        <div class="layers-container">
+            <div class="layer-controls">
+                <div class="history-buttons">
+                    <button id="undoBtn" class="history-btn" disabled>↩️ Undo</button>
+                    <button id="redoBtn" class="history-btn" disabled>↪️ Redo</button>
+                </div>
+                <button id="addLayerBtn" class="action-btn">Add Layer</button>
+            </div>
+            <div class="layer-list" id="layersList">
+                <!-- Layers will be added dynamically -->
+            </div>
+        </div>
+        
+        <div class="tools">
+            <div class="tool-group">
+                <button id="pen" class="tool active">✏️ Pen</button>
+                <button id="eraser" class="tool">🧽 Eraser</button>
+                <button id="paint" class="tool">🪣 Paint</button>
+                <div class="size-selector">
+                    <span class="size-label">Size:</span>
+                    <input type="range" id="sizeInput" class="size-input" min="1" max="50" value="5">
+                </div>
+            </div>
+            <div class="color-picker">
+                <button class="color-btn" data-color="#000000" style="background-color: #000000"></button>
+                <button class="color-btn" data-color="#ff0000" style="background-color: #ff0000"></button>
+                <button class="color-btn" data-color="#00ff00" style="background-color: #00ff00"></button>
+                <button class="color-btn" data-color="#0000ff" style="background-color: #0000ff"></button>
+                <button class="color-btn" data-color="#ffff00" style="background-color: #ffff00"></button>
+                <button class="color-btn" data-color="#ff00ff" style="background-color: #ff00ff"></button>
+                <button class="color-btn" data-color="#00ffff" style="background-color: #00ffff"></button>
+                <button class="color-btn" data-color="#ffffff" style="background-color: #ffffff; border: 2px solid #ccc;"></button>
+            </div>
+            <button id="clearBtn" class="action-btn">Clear</button>
+            <button id="guessBtn" class="action-btn primary">Guess My Drawing!</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

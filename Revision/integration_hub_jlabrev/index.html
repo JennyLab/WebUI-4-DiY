@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integration Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="hub-container">
+    <h1>Integration Hub</h1>
+    <div id="integration-grid">
+      <!-- Integration cards will be added here by JavaScript -->
+    </div>
+    <div id="pagination">
+      <button id="prev-page">Previous</button>
+      <div id="page-numbers"></div>
+      <button id="next-page">Next</button>
+    </div>
+  </div>
+  <div id="info-panel" class="hidden">
+    <div class="panel-content">
+      <span class="close-button">&times;</span>
+      <h2 id="panel-title"></h2>
+      <div id="panel-details"></div>
+    </div>
+  </div>
+  <script src="script.js" type="module"></script>
+</body>
+</html>

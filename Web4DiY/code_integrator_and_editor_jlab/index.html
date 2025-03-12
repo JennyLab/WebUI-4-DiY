@@ -1,0 +1,2918 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.0/ace.js"></script>
+<style>
+/* Existing styles */
+.code-editor {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Monaco', 'Menlo', monospace;
+    background: linear-gradient(135deg, #1a2b3d 0%, #2d2d2d 100%);
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-left: 80px; /* Adjust main container to accommodate nav bar */
+}
+
+.page-title {
+    font-weight: bold;
+    font-size: 24px;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    border-bottom: 1px solid #4a5d75;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.code-block {
+    position: relative;
+    margin: 10px 0;
+    padding: 10px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    border-radius: 4px;
+    overflow: hidden;
+    scroll-margin: 20px; /* Adds some space when scrolling to elements */
+}
+
+.collapsed { max-height: 30px; cursor: pointer; }
+.expanded { max-height: none; }
+
+.label {
+    padding: 4px 8px;
+    background: linear-gradient(90deg, #233447 0%, #2d2d2d 100%);
+    border-left: 3px solid #64b5f6;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px; /* Add padding for scrollbar */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.controls input[type="file"] {
+    display: none;
+}
+
+.controls button {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-right: 8px;
+    white-space: nowrap;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.controls button:hover {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+button {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover { background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); }
+
+.ai-analysis {
+    background: linear-gradient(145deg, #1e2c3d 0%, #2d2d2d 100%);
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    color: #ffffff;
+}
+
+.editor-content {
+    padding: 10px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ffffff;
+}
+
+.reference-tag {
+    display: inline-block;
+    background: #264f78;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 2px;
+    font-size: 0.85em;
+}
+
+/* New Chat Window Styles */
+.chat-window {
+    margin-top: 20px;
+    background: linear-gradient(145deg, #1a2b3d 0%, #252526 100%);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.user-message {
+    background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+    color: #ffffff;
+    margin-left: 20px;
+}
+
+.ai-message {
+    background: linear-gradient(135deg, #233447 0%, #3c3c3c 100%);
+    color: #ffffff;
+    margin-right: 20px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #3c3c3c 100%);
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #3c3c3c 100%);
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    margin-right: 10px;
+}
+
+.chat-input button {
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+/* New CSS rules */
+#codeContainer {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+#aceEditorContainer {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin: 10px 0;
+    border: 1px solid #3c3c3c;
+    border-radius: 4px;
+}
+
+.highlight-change {
+    position: absolute;
+    background-color: rgba(86, 156, 214, 0.2);
+    pointer-events: none;
+    animation: highlight-pulse 2s;
+}
+
+@keyframes highlight-pulse {
+    0% { background-color: rgba(86, 156, 214, 0.4); }
+    100% { background-color: rgba(86, 156, 214, 0.2); }
+}
+
+/* Add a subtle scrollbar styling for better aesthetics */
+#codeContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+#codeContainer::-webkit-scrollbar-track {
+    background: linear-gradient(90deg, #1a2b3d 0%, #2d2d2d 100%);
+    border-radius: 4px;
+}
+
+#codeContainer::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #1e88e5 0%, #1565c0 100%);
+    border-radius: 4px;
+}
+
+#codeContainer::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
+}
+
+.changed-block {
+    animation: highlight-fade 3s ease-out;
+}
+
+@keyframes highlight-fade {
+    from {
+        background-color: rgba(86, 156, 214, 0.2);
+    }
+    to {
+        background-color: transparent;
+    }
+}
+
+.copy-success {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #0e639c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    animation: fade-out 2s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+#processedView {
+    scroll-behavior: smooth;
+}
+
+/* Navigation Bar Styles */
+.nav-bar {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.nav-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #233447 0%, #3c3c3c 100%);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    color: #ffffff;
+}
+
+.nav-item:hover {
+    background: linear-gradient(145deg, #1e88e5 0%, #1565c0 100%);
+    transform: scale(1.1);
+}
+
+.nav-item.active {
+    background: linear-gradient(145deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+}
+
+/* Add these styles for disabled state */
+.nav-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Add these styles for undo/redo tooltips */
+.nav-item {
+    position: relative;
+}
+
+.nav-item::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #2d2d2d;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    margin-left: 8px;
+    z-index: 1000;
+}
+
+.nav-item:hover::after {
+    opacity: 1;
+}
+
+/* Smooth scrolling for sections */
+.section {
+    scroll-margin-top: 20px;
+}
+
+/* Add styles for the test dialog */
+.test-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95); /* Darker background for better focus */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.test-dialog {
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    width: 100%;  /* Make it full width */
+    height: 100%; /* Make it full height */
+    max-width: none;  /* Remove max-width constraint */
+    max-height: none; /* Remove max-height constraint */
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 0;  /* Remove border radius since it's full screen */
+}
+
+.test-dialog-header {
+    padding: 15px 20px;
+    background: linear-gradient(145deg, #233447 0%, #2d2d2d 100%);
+    border-bottom: 1px solid #4a5d75;
+}
+
+.test-dialog-content {
+    flex: 1;
+    padding: 0;  /* Remove padding to maximize iframe space */
+    min-height: 0;  /* Allow flex to control height properly */
+}
+
+.test-dialog iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+}
+
+/* New Search Styles */
+.search-container {
+    margin: 20px 0;
+    position: relative;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #3c3c3d 100%);
+    border: 1px solid #4a5d75;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    border: 1px solid #4a5d75;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-result-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-result-item:hover {
+    background: linear-gradient(145deg, #233447 0%, #3c3c3c 100%);
+}
+
+.similarity-score {
+    font-size: 0.8em;
+    color: #b0bec5;
+    padding: 2px 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+}
+
+.highlight-match {
+    background-color: rgba(86, 156, 214, 0.3);
+}
+
+/* Add styles for function update modal */
+.function-update-modal {
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    max-width: 90%;
+    width: 1200px;
+    margin: 40px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.function-update-header {
+    padding: 15px 20px;
+    background: linear-gradient(145deg, #233447 0%, #2d2d2d 100%);
+    border-bottom: 1px solid #4a5d75;
+}
+
+.function-update-header h3 {
+    margin: 0;
+    color: #ffffff;
+}
+
+.function-update-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.function-update-footer {
+    padding: 15px 20px;
+    background: linear-gradient(145deg, #233447 0%, #2d2d2d 100%);
+    border-top: 1px solid #4a5d75;
+    text-align: right;
+}
+
+.update-item {
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.update-list:empty::after {
+    content: 'No functions found';
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: #888;
+}
+
+.update-item:only-child:not(:has(input[type="checkbox"])) {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+}
+
+.update-preview pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.update-item-header {
+    padding: 10px;
+    background: linear-gradient(145deg, #233447 0%, #2d2d2d 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.update-item-header label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.update-item-header input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.update-preview {
+    padding: 15px;
+    background: #1e1e1e;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.preview-old,
+.preview-new {
+    margin: 10px 0;
+}
+
+.preview-old h4,
+.preview-new h4 {
+    color: #ffffff;
+    margin: 5px 0;
+}
+
+.preview-old pre,
+.preview-new pre {
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+    max-height: 200px;
+    margin: 5px 0;
+}
+
+.update-item-header .similarity-score {
+    font-size: 0.8em;
+    color: #b0bec5;
+    padding: 2px 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    margin-left: 10px;
+}
+
+.function-update-modal .search-container {
+    position: relative;
+    margin: 10px 0;
+}
+
+.function-update-modal .search-container input {
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #3c3c3d 100%);
+    border: 1px solid #4a5d75;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.function-update-modal .search-container input:focus {
+    outline: none;
+    border-color: #64b5f6;
+}
+
+.highlight-match {
+    background-color: rgba(86, 156, 214, 0.3);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.update-item {
+    transition: opacity 0.3s ease;
+}
+
+.similarity-score {
+    float: right;
+    font-size: 0.8em;
+    color: #b0bec5;
+    padding: 2px 6px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    margin-left: 10px;
+}
+
+.update-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.code-editor-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    color: #ffffff;
+    border: 1px solid #4a5d75;
+    padding: 8px;
+    font-family: monospace;
+    resize: vertical;
+    margin: 5px 0;
+}
+
+.preview-result {
+    margin-top: 10px;
+    border-top: 1px solid #4a5d75;
+}
+
+.update-preview button {
+    margin: 5px 0;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.update-preview button:hover {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+/* Add styles for the edit button and editing state */
+.code-block .edit-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #1e88e5;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.code-block:hover .edit-button {
+    opacity: 1;
+}
+
+.code-block.editing {
+    padding-bottom: 20px;
+}
+
+.code-block.editing .editor-content {
+    display: none;
+}
+
+.code-block .edit-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    color: #ffffff;
+    border: 1px solid #4a5d75;
+    padding: 8px;
+    font-family: monospace;
+    resize: vertical;
+    margin: 5px 0;
+    display: none;
+}
+
+.code-block.editing .edit-textarea {
+    display: block;
+}
+
+.edit-actions {
+    display: none;
+    margin-top: 10px;
+    text-align: right;
+    gap: 10px;
+}
+
+.code-block.editing .edit-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* New Style for Test Code Dialog */
+.test-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.test-dialog {
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    width: 100%;  /* Make it full width */
+    height: 100%; /* Make it full height */
+    max-width: none;  /* Remove max-width constraint */
+    max-height: none; /* Remove max-height constraint */
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;  /* Remove border radius since it's full screen */
+}
+
+.test-dialog-header {
+    padding: 15px;
+    background: linear-gradient(145deg, #233447 0%, #2d2d2d 100%);
+    border-bottom: 1px solid #4a5d75;
+}
+
+.test-dialog-content {
+    flex: 1;
+    padding: 0;  /* Remove padding to maximize iframe space */
+    min-height: 0;  /* Allow flex to control height properly */
+}
+
+.test-dialog iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+}
+
+/* New styles added as per plan */
+.project-scroll {
+    background: linear-gradient(145deg, #1a2b3d 0%, #2d2d2d 100%);
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.project-list {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.project-item {
+    flex: 0 0 auto;
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    padding: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #4a5d75;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.project-item:hover {
+    border-color: #1e88e5;
+    transform: translateY(-2px);
+}
+
+.project-item h3 {
+    margin: 0 0 10px 0;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.project-meta {
+    font-size: 12px;
+    color: #b0bec5;
+}
+
+.project-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+.project-scroll::-webkit-scrollbar-track {
+    background: linear-gradient(90deg, #1a2b3d 0%, #2d2d2d 100%);
+    border-radius: 4px;
+}
+
+.project-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #1e88e5 0%, #1565c0 100%);
+    border-radius: 4px;
+}
+
+.project-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
+}
+
+.analysis-section {
+    margin-top: 15px;
+    padding: 15px;
+    border-left: 3px solid #1e88e5;
+    background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%);
+    border-radius: 4px;
+}
+
+.analysis-section h4 {
+    color: #ffffff;
+    margin: 0 0 10px 0;
+}
+
+.analysis-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.analysis-section li {
+    color: #ffffff; 
+    margin: 5px 0;
+}
+</style>
+
+<div class="code-editor">
+    <div class="nav-title">Jenny Navigation</div>
+    <div class="page-title">//Code {Integrator}</div>
+    <div class="project-scroll">
+        <div class="project-list" id="projectList">
+            <!-- Projects will be loaded here -->
+        </div>
+    </div>
+    <div class="nav-bar">
+        <div class="nav-item" onclick="showSearchNav()" title="Search">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="m16 16 4 4"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="scrollToSection('controls')" title="Controls">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21v-7m0 0V3m0 11h16m0 0V3m0 11v7"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="scrollToSection('editor')" title="Code Editor">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="scrollToSection('blocks')" title="Code Blocks">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="scrollToSection('chat')" title="Chat">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="editor.undo()" title="Undo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 10h10.5a6.5 6.5 0 0 1 0 13H11"/>
+                <path d="m3 10 4-4M3 10l4 4"/>
+            </svg>
+        </div>
+        <div class="nav-item" onclick="editor.redo()" title="Redo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10H10.5a6.5 6.5 0 1 0 0 13H13"/>
+                <path d="m21 10-4-4m4 4-4 4"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search functions..." onkeyup="searchLabels()">
+        <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <div class="controls">
+        <input type="file" id="fullCodeUpload" accept=".html,.txt" style="display: none;" onchange="handleFullCodeUpload(event)">
+        <button onclick="document.getElementById('fullCodeUpload').click()">Upload Full Code</button>
+        <input type="file" id="previousCodeUpload" accept=".html,.txt" style="display: none;" onchange="handlePreviousCodeUpload(event)">
+        <button onclick="uploadPreviousVersion()">Upload Previous Version</button>
+        <button onclick="processCode()">Process Code</button>
+        <button onclick="downloadCode()">Download Code</button>
+        <button onclick="copyFullCode()">Copy Full Code</button>
+        <button onclick="executeAIAnalysis()">AI Analysis</button>
+        <button onclick="testCode()">Test Code</button>
+        <button onclick="updateFunctionHandler()">Update Functions from Clipboard</button>
+        <button onclick="showManualUpdateDialog()">Manual Update</button>
+    </div>
+    
+    <div id="aceEditorContainer"></div>
+    
+    <div id="codeContainer">
+        <div id="rawCodeView">
+            <textarea id="codeInput" style="width: 100%; height: 200px;"></textarea>
+        </div>
+        <div id="processedView" style="display: none;"></div>
+    </div>
+    <div id="aiAnalysis" class="ai-analysis"></div>
+    
+    <div class="chat-window">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Ask the AI to edit the code..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveCodeToLocalStorage() {
+    try {
+        localStorage.setItem('websimEditorCode', editor.getValue());
+        console.log('Code saved to localStorage');
+    } catch (error) {
+        console.error('Error saving code to localStorage:', error);
+    }
+}
+
+function loadCodeFromLocalStorage() {
+    try {
+        const savedCode = localStorage.getItem('websimEditorCode');
+        if (savedCode) {
+            editor.setValue(savedCode, -1);
+            fullCodeContent = savedCode;
+            processCode();
+            console.log('Code loaded from localStorage');
+        }
+    } catch (error) {
+        console.error('Error loading code from localStorage:', error);
+    }
+}
+
+function extractFunctionDefinitions(code) {
+    const functionDefRegex = /function\s+([a-zA-Z0-9_]+)\s*\([^)]*\)\s*\{/g;
+    const map = new Map();
+    let match;
+    
+    while ((match = functionDefRegex.exec(code)) !== null) {
+        const funcName = match[1];
+        const startIndex = match.index;
+        let openBraces = 1;
+        let currentIndex = startIndex + match[0].length;
+        
+        // Scan through code tracking brace depth until we find matching closing brace
+        while (openBraces > 0 && currentIndex < code.length) {
+            if (code[currentIndex] === '{') openBraces++;
+            if (code[currentIndex] === '}') openBraces--;
+            currentIndex++;
+        }
+        
+        // Extract complete function including all nested braces
+        const fullDef = code.substring(startIndex, currentIndex);
+        map.set(funcName, fullDef);
+    }
+    
+    return map;
+}
+
+function extractFunctionNames(code) {
+    const functionNameRegex = /function\s+([a-zA-Z0-9_]+)/g;
+    const names = new Set();
+    let match;
+    while ((match = functionNameRegex.exec(code)) !== null) {
+        names.add(match[1]);
+    }
+    return names;
+}
+
+function handlePreviousCodeUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const previousCode = e.target.result;
+        const currentCode = editor.getValue();
+
+        // Extract function names from current code
+        const currentFunctions = extractFunctionNames(currentCode);
+
+        // Extract complete function definitions from previous code
+        const previousFunctionsMap = extractFunctionDefinitions(previousCode);
+
+        // Extract function usages from current code
+        const functionUsages = extractFunctionUsages(currentCode);
+
+        // Find functions used but not defined
+        const missingFunctions = [...functionUsages].filter(fn => fn && !currentFunctions.has(fn));
+
+        // Find definitions of missing functions from previous code
+        const functionsToAdd = missingFunctions.map(fn => previousFunctionsMap.get(fn)).filter(def => def);
+
+        if (functionsToAdd.length === 0) {
+            addMessage('AI', 'No missing functions found to add from the previous version.');
+            return;
+        }
+
+        // Find the script tag to insert into
+        const scriptStartMatch = currentCode.match(/<script>/);
+        if (!scriptStartMatch) {
+            addMessage('AI', 'No script tag found in current code. Please ensure there is a script tag.');
+            return;
+        }
+
+        // Insert functions after script tag
+        const scriptStartIndex = scriptStartMatch.index + scriptStartMatch[0].length;
+        const updatedCode = 
+            currentCode.slice(0, scriptStartIndex) + 
+            '\n\n// Functions added from previous version:\n' +
+            functionsToAdd.join('\n\n') +
+            '\n' +
+            currentCode.slice(scriptStartIndex);
+
+        // Update editor with new code
+        editor.setValue(updatedCode, -1);
+        fullCodeContent = updatedCode;
+
+        // Reprocess the code
+        processCode();
+
+        // Show which functions were added with details about their size
+        const addedFunctionDetails = functionsToAdd
+            .map(fn => {
+                const name = fn.match(/function\s+([a-zA-Z0-9_]+)/)[1];
+                const lines = fn.split('\n').length;
+                return `${name} (${lines} lines)`;
+            })
+            .join(', ');
+        
+        addMessage('AI', `Added the following complete functions from previous version: ${addedFunctionDetails}`);
+    };
+
+    reader.onerror = function(e) {
+        console.error('Error reading file:', e);
+        addMessage('AI', 'Error reading the previous version file. Please try again.');
+    };
+
+    reader.readAsText(file);
+}
+
+function uploadPreviousVersion() {
+    const fileInput = document.getElementById('previousCodeUpload');
+    if (fileInput) {
+        fileInput.click();
+    } else {
+        console.error('Previous code upload input not found');
+        addMessage('AI', 'Error: File upload element not found. Please try again.');
+    }
+}
+
+function extractFunctionUsages(code) {
+    const functionCallRegex = /(\w+)\s*\(/g;
+    const usages = new Set();
+    let match;
+    
+    while ((match = functionCallRegex.exec(code)) !== null) {
+        // Don't include built-in functions 
+        const functionName = match[1];
+        if (!['if', 'for', 'while', 'switch'].includes(functionName)) {
+            usages.add(functionName);
+        }
+    }
+    
+    return usages;
+}
+
+function calculateSimilarity(str1, str2) {
+    // Convert both strings to lowercase for case-insensitive comparison
+    str1 = str1.toLowerCase();
+    str2 = str2.toLowerCase();
+
+    // Handle empty strings
+    if (str1.length === 0 || str2.length === 0) {
+        return 0;
+    }
+
+    // Perfect match
+    if (str1 === str2) {
+        return 1;
+    }
+
+    // Check if one string contains the other
+    if (str1.includes(str2) || str2.includes(str1)) {
+        const longer = str1.length > str2.length ? str1 : str2;
+        const shorter = str1.length > str2.length ? str2 : str1;
+        return shorter.length / longer.length;
+    }
+
+    // Calculate Levenshtein Distance
+    const matrix = Array(str2.length + 1).fill().map(() => Array(str1.length + 1).fill(0));
+
+    for (let i = 0; i <= str1.length; i++) {
+        matrix[0][i] = i;
+    }
+    for (let j = 0; j <= str2.length; j++) {
+        matrix[j][0] = j;
+    }
+
+    for (let j = 1; j <= str2.length; j++) {
+        for (let i = 1; i <= str1.length; i++) {
+            const substitutionCost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            matrix[j][i] = Math.min(
+                matrix[j][i - 1] + 1, // deletion
+                matrix[j - 1][i] + 1, // insertion
+                matrix[j - 1][i - 1] + substitutionCost // substitution
+            );
+        }
+    }
+
+    // Convert distance to similarity score between 0 and 1
+    const maxLength = Math.max(str1.length, str2.length);
+    const distance = matrix[str2.length][str1.length];
+    return 1 - (distance / maxLength);
+}
+
+let fullCodeContent = '';
+
+let codeStructure = {
+    blocks: [],
+    labels: {},
+    references: {}
+};
+
+let chatHistory = [];
+let recentlyChangedBlocks = new Set();
+let editor;
+let highlightMarkers = [];
+
+function initializeEditor() {
+    const container = document.getElementById('codeContainer');
+    container.innerHTML = '<div id="rawCodeView"><textarea id="codeInput" style="width: 100%; height: 200px;"></textarea></div><div id="processedView" style="display: none;"></div>';
+}
+
+function initializeAceEditor() {
+    editor = ace.edit("aceEditorContainer");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/html");
+    editor.setFontSize(14);
+    editor.setShowPrintMargin(false);
+    editor.getSession().setUseWrapMode(true);
+    
+    // Add keyboard shortcuts for undo/redo
+    editor.commands.addCommand({
+        name: 'undo',
+        bindKey: {win: 'Ctrl-Z', mac: 'Command-Z'},
+        exec: function(editor) {
+            editor.undo();
+            saveCodeToLocalStorage(); // Save after undo
+        }
+    });
+    
+    editor.commands.addCommand({
+        name: 'redo',
+        bindKey: {win: 'Ctrl-Shift-Z|Ctrl-Y', mac: 'Command-Shift-Z|Command-Y'},
+        exec: function(editor) {
+            editor.redo();
+            saveCodeToLocalStorage(); // Save after redo
+        }
+    });
+    
+    // Listen for changes in the editor
+    editor.getSession().on('change', function() {
+        fullCodeContent = editor.getValue();
+        // Debounce the save operation to prevent too frequent saves
+        clearTimeout(editor.saveTimeout);
+        editor.saveTimeout = setTimeout(saveCodeToLocalStorage, 1000);
+    });
+}
+
+function showSearchNav() {
+    const searchInput = document.querySelector('.search-container');
+    if (searchInput) {
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Optional: focus the input after scrolling
+        searchInput.querySelector('#searchInput').focus();
+    }
+}
+
+function searchLabels() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    const query = searchInput.value.toLowerCase().trim();
+
+    // Clear previous results
+    searchResults.innerHTML = '';
+
+    if (query === '') {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    // Search through code blocks with enhanced matching including innerText
+    const results = codeStructure.blocks
+        .map(block => {
+            let similarity = calculateSimilarity(
+                codeStructure.labels[block.id].toLowerCase(),
+                query
+            );
+
+            // For HTML blocks, check for innerText matches
+            if (block.code.includes('<div')) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = block.code;
+                const div = tempDiv.querySelector('div');
+                
+                if (div) {
+                    // Check classes
+                    const classes = div.className.split(' ').filter(c => c);
+                    for (const className of classes) {
+                        const classSimilarity = calculateSimilarity(className.toLowerCase(), query);
+                        similarity = Math.max(similarity, classSimilarity);
+                    }
+                    
+                    // Check ID
+                    if (div.id) {
+                        const idSimilarity = calculateSimilarity(div.id.toLowerCase(), query);
+                        similarity = Math.max(similarity, idSimilarity);
+                    }
+
+                    // Check innerText
+                    const innerText = div.textContent.trim();
+                    if (innerText) {
+                        // Split innerText by lines and check each line
+                        const textLines = innerText.split('\n');
+                        textLines.forEach(line => {
+                            const lineTrimmed = line.trim();
+                            if (lineTrimmed) {
+                                const textSimilarity = calculateSimilarity(lineTrimmed.toLowerCase(), query);
+                                similarity = Math.max(similarity, textSimilarity);
+                            }
+                        });
+                    }
+                }
+            }
+
+            return {
+                block,
+                label: codeStructure.labels[block.id],
+                similarity,
+                text: (() => {
+                    if (block.code.includes('<div')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = block.code;
+                        return tempDiv.textContent.trim();
+                    }
+                    return '';
+                })()
+            };
+        })
+        .filter(result => result.similarity > 0.3) // Filter out low-relevance results
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, 5); // Show top 5 results
+
+    if (results.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    // Show results with enhanced information including matching text
+    results.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        
+        // Extract additional information for HTML blocks
+        let additionalInfo = '';
+        if (result.block.code.includes('<div')) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = result.block.code;
+            const div = tempDiv.querySelector('div');
+            
+            if (div) {
+                if (div.className) {
+                    additionalInfo += `<br><small>Classes: ${div.className}</small>`;
+                }
+                if (div.id) {
+                    additionalInfo += `<br><small>ID: ${div.id}</small>`;
+                }
+                // Add text content if it matched the search
+                if (result.text && result.text.toLowerCase().includes(query.toLowerCase())) {
+                    additionalInfo += `<br><small>Matching text: "${highlightMatchingText(result.text, query)}"</small>`;
+                }
+            }
+        }
+        
+        // Highlight matching parts of the label
+        const labelHtml = result.label.replace(
+            new RegExp(query, 'gi'),
+            match => `<span class="highlight-match">${match}</span>`
+        );
+        
+        resultItem.innerHTML = `
+            <div>
+                <span>${labelHtml}</span>
+                ${additionalInfo}
+            </div>
+            <span class="similarity-score">${Math.round(result.similarity * 100)}%</span>
+        `;
+        
+        resultItem.onclick = () => {
+            // Scroll to the block
+            const blockElement = document.getElementById(result.block.id);
+            if (blockElement) {
+                blockElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Expand the block if it's collapsed
+                if (result.block.isCollapsed) {
+                    toggleBlock(result.block.id);
+                }
+                
+                // Highlight the block temporarily
+                blockElement.classList.add('changed-block');
+                setTimeout(() => {
+                    blockElement.classList.remove('changed-block');
+                }, 3000);
+            }
+            
+            // Hide search results
+            searchResults.style.display = 'none';
+            searchInput.value = '';
+        };
+        
+        searchResults.appendChild(resultItem);
+    });
+
+    searchResults.style.display = 'block';
+}
+
+// Add helper function to highlight matching text
+function highlightMatchingText(text, query) {
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(
+        new RegExp(`(${escapedQuery})`, 'gi'),
+        '<span class="highlight-match">$1</span>'
+    );
+}
+
+async function getClipboardContent() {
+    try {
+        const text = await navigator.clipboard.readText();
+        return text;
+    } catch (err) {
+        console.error('Failed to read clipboard:', err);
+        addMessage('AI', 'Failed to read clipboard. Please make sure you have copied the code and granted clipboard permissions.');
+        return null;
+    }
+}
+
+// Update the button click handler
+function updateFunctionHandler() {
+    getClipboardContent().then(content => {
+        if (content) {
+            showFunctionUpdateModal(content);
+        }
+    });
+}
+
+function findPositionInEditor(code) {
+    const editorContent = editor.getValue();
+    const startIndex = editorContent.indexOf(code);
+    if (startIndex === -1) return null;
+    
+    // Convert index to row and column
+    const textBefore = editorContent.substring(0, startIndex);
+    const row = textBefore.split('\n').length - 1;
+    const column = startIndex - textBefore.lastIndexOf('\n') - 1;
+    
+    return { row, column };
+}
+
+function splitCodeByLanguage(code) {
+    const segments = {
+        html: [],
+        css: [],
+        javascript: []
+    };
+    
+    // Extract HTML tags
+    const htmlRegex = /<([a-zA-Z][a-zA-Z0-9]*)[^>]*>[\s\S]*?<\/\1>/g;
+    let htmlMatch;
+    while ((htmlMatch = htmlRegex.exec(code)) !== null) {
+        segments.html.push({
+            type: 'html',
+            content: htmlMatch[0]
+        });
+    }
+
+    // Extract single HTML tags without closing tags
+    const singleTagRegex = /<([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
+    let singleTagMatch;
+    while ((singleTagMatch = singleTagRegex.exec(code)) !== null) {
+        // Check if this tag wasn't already captured in complete tags
+        if (!segments.html.some(seg => seg.content.includes(singleTagMatch[0]))) {
+            segments.html.push({
+                type: 'html',
+                content: singleTagMatch[0]
+            });
+        }
+    }
+
+    // Rest of the function remains unchanged
+    const cssRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+    let cssMatch;
+    while ((cssMatch = cssRegex.exec(code)) !== null) {
+        segments.css.push({
+            type: 'css',
+            content: cssMatch[1].trim()
+        });
+    }
+
+    const jsRegex = /<script[^>]*>([\s\S]*?)<\/script>/g;
+    let jsMatch;
+    while ((jsMatch = jsRegex.exec(code)) !== null) {
+        segments.javascript.push({
+            type: 'javascript',
+            content: jsMatch[1].trim()
+        });
+    }
+
+    return segments;
+}
+
+function parseHTMLSegments(html) {
+    const segments = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    function processNode(node, depth = 0) {
+        if (node.nodeType === 1 && node.tagName.toLowerCase() !== 'body') { // Skip body tag
+            let label = `HTML - ${node.tagName.toLowerCase()}`;
+            
+            // Add class info
+            if (node.className) {
+                label += ` ${node.className}`;
+            }
+            
+            // Add ID info if present
+            if (node.id) {
+                label += ` #${node.id}`;
+            }
+
+            // Add innerText if it exists and is on the same line
+            const inlineText = node.textContent.trim().split('\n')[0];  // Get only first line
+            if (inlineText) {
+                // Only include text content if it's relatively short (prevent huge labels)
+                const truncatedText = inlineText.length > 30 ? 
+                    inlineText.substring(0, 30) + '...' : 
+                    inlineText;
+                label += ` "${truncatedText}"`;
+            }
+            
+            segments.push({
+                id: `html-${segments.length}`,
+                label: label,
+                code: node.outerHTML,
+                references: Array.from(node.children)
+                    .map(child => child.tagName.toLowerCase())
+            });
+        }
+    }
+    
+    const traverse = (node) => {
+        // Only process non-body nodes for the initial call
+        if (node === doc.body) {
+            Array.from(node.children).forEach(traverse);
+        } else {
+            processNode(node);
+            Array.from(node.children).forEach(traverse);
+        }
+    };
+    
+    traverse(doc.body);
+    return segments;
+}
+
+function parseCSSSegments(css) {
+    const segments = [];
+    const rules = css.split('}').filter(rule => rule.trim());
+    
+    rules.forEach((rule, index) => {
+        rule = rule.trim() + '}';
+        const selector = rule.split('{')[0].trim();
+        
+        segments.push({
+            id: `css-${index}`,
+            label: `CSS - ${selector}`,
+            code: rule,
+            references: []
+        });
+    });
+    
+    return segments;
+}
+
+function parseJavaScriptSegments(js) {
+    const segments = [];
+    let currentIndex = 0;
+
+    // Updated regex to match function declarations
+    const functionStartRegex = /(async\s+)?function\s+(\w+)\s*\([^)]*\)\s*\{/g;
+
+    let match;
+    while ((match = functionStartRegex.exec(js)) !== null) {
+        const funcStart = match.index;
+        const funcName = match[2];
+        let openBraces = 1;
+        let closeIndex = match.index + match[0].length;
+
+        // Scan through the code to find matching closing brace
+        while (openBraces > 0 && closeIndex < js.length) {
+            if (js[closeIndex] === '{') openBraces++;
+            if (js[closeIndex] === '}') openBraces--;
+            closeIndex++;
+        }
+
+        // Extract the complete function code including all nested brackets
+        const functionCode = js.substring(funcStart, closeIndex);
+
+        segments.push({
+            id: `js-${segments.length}`,
+            label: `JavaScript - ${funcName}()`,
+            code: functionCode,
+            references: []
+        });
+
+        currentIndex = closeIndex;
+    }
+
+    return segments;
+}
+
+function handleFullCodeUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        editor.setValue(content); // Update Ace editor
+        editor.clearSelection();
+        processCode();
+        saveCodeToLocalStorage();
+        addMessage('AI', `File "${file.name}" has been loaded successfully. Processing the code...`);
+    };
+    reader.onerror = function(e) {
+        console.error('Error reading file:', e);
+        addMessage('AI', 'Error reading the file. Please try again.');
+    };
+    reader.readAsText(file);
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        editor.setValue(content); // Update Ace editor
+        editor.clearSelection();
+        processCode();
+        saveCodeToLocalStorage();
+        addMessage('AI', `File "${file.name}" has been loaded successfully. Processing the code...`);
+    };
+    reader.onerror = function(e) {
+        console.error('Error reading file:', e);
+        addMessage('AI', 'Error reading the file. Please try again.');
+    };
+    reader.readAsText(file);
+}
+
+async function processCode() {
+    if (!editor.getValue().trim()) {
+        addMessage('AI', 'Please enter or upload some code first.');
+        return;
+    }
+
+    fullCodeContent = editor.getValue(); // Get code from Ace editor
+    
+    try {
+        const languageSegments = splitCodeByLanguage(fullCodeContent);
+        
+        const htmlSegments = languageSegments.html.flatMap(seg => parseHTMLSegments(seg.content));
+        const cssSegments = languageSegments.css.flatMap(seg => parseCSSSegments(seg.content));
+        const jsSegments = languageSegments.javascript.flatMap(seg => parseJavaScriptSegments(seg.content));
+        
+        const allSegments = [...htmlSegments, ...cssSegments, ...jsSegments];
+        
+        updateCodeStructure({
+            segments: allSegments
+        });
+        
+        // Show processed view and hide raw view
+        document.getElementById('rawCodeView').style.display = 'none';
+        document.getElementById('processedView').style.display = 'block';
+        document.getElementById('processedView').innerHTML = ''; // Clear previous content
+        
+        renderProcessedCode(document.getElementById('processedView'));
+        saveCodeToLocalStorage();
+        addMessage('AI', 'Code processed and segmented by language successfully. You can now ask me to make specific edits.');
+    } catch (error) {
+        console.error('Error processing code:', error);
+        addMessage('AI', 'Error processing code. Please try again.');
+    }
+}
+
+function updateCodeStructure(analysis) {
+    codeStructure.blocks = [];
+    codeStructure.labels = {};
+    codeStructure.references = {};
+    
+    const segmentMap = new Map();
+    analysis.segments.forEach(segment => {
+        segmentMap.set(segment.id, segment);
+    });
+    
+    analysis.segments.forEach(segment => {
+        codeStructure.blocks.push({
+            id: segment.id,
+            code: segment.code,
+            isCollapsed: true
+        });
+        
+        codeStructure.labels[segment.id] = segment.label;
+        
+        const references = new Set();
+        segment.references.forEach(ref => {
+            analysis.segments.forEach(otherSegment => {
+                if (otherSegment.label.toLowerCase().includes(ref.toLowerCase())) {
+                    references.add(otherSegment.id);
+                }
+            });
+        });
+        
+        codeStructure.references[segment.id] = Array.from(references);
+    });
+
+    // Update the full code content
+    fullCodeContent = editor.getValue();
+}
+
+// Update the renderProcessedCode function to include edit functionality
+function renderProcessedCode(container = document.getElementById('processedView')) {
+    if (!container) return;
+
+    container.innerHTML = '';
+    let updatedFullCode = editor.getValue();
+
+    codeStructure.blocks.forEach(block => {
+        const blockElement = document.createElement('div');
+        blockElement.className = `code-block ${block.isCollapsed ? 'collapsed' : 'expanded'}`;
+        if (recentlyChangedBlocks.has(block.id)) {
+            blockElement.classList.add('changed-block');
+        }
+        blockElement.id = block.id;
+
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = codeStructure.labels[block.id];
+
+        const content = document.createElement('div');
+        content.className = 'editor-content';
+        content.textContent = block.code;
+
+        const editButton = document.createElement('button');
+        editButton.className = 'edit-button';
+        editButton.textContent = 'Edit';
+        editButton.onclick = (e) => {
+            e.stopPropagation();
+            startEditing(block.id);
+        };
+
+        const editTextarea = document.createElement('textarea');
+        editTextarea.className = 'edit-textarea';
+        editTextarea.value = block.code;
+
+        const editActions = document.createElement('div');
+        editActions.className = 'edit-actions';
+        editActions.innerHTML = `
+            <button onclick="cancelEditing('${block.id}')">Cancel</button>
+            <button onclick="saveEditing('${block.id}')">Save</button>
+        `;
+
+        const references = document.createElement('div');
+        references.className = 'references';
+        codeStructure.references[block.id].forEach(ref => {
+            const refTag = document.createElement('span');
+            refTag.className = 'reference-tag';
+            refTag.textContent = ref;
+            references.appendChild(refTag);
+        });
+
+        blockElement.appendChild(label);
+        blockElement.appendChild(editButton);
+        blockElement.appendChild(content);
+        blockElement.appendChild(editTextarea);
+        blockElement.appendChild(editActions);
+        blockElement.appendChild(references);
+
+        blockElement.onclick = () => toggleBlock(block.id);
+
+        container.appendChild(blockElement);
+    });
+}
+
+function toggleBlock(blockId) {
+    const blockElement = document.getElementById(blockId);
+    if (!blockElement) return;
+    
+    // Find the block in codeStructure
+    const block = codeStructure.blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    // Toggle collapsed state
+    block.isCollapsed = !block.isCollapsed;
+    blockElement.classList.toggle('collapsed');
+    blockElement.classList.toggle('expanded');
+
+    // When expanding, also ensure the block is in view
+    if (!block.isCollapsed) {
+        blockElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Also update the ace editor to show this section
+        const fullCode = editor.getValue();
+        const position = fullCode.indexOf(block.code);
+        if (position !== -1) {
+            const lines = fullCode.substring(0, position).split('\n');
+            editor.scrollToLine(lines.length, true, true);
+            
+            // Highlight the section temporarily
+            const Range = ace.require('ace/range').Range;
+            const startRow = lines.length;
+            const endRow = startRow + block.code.split('\n').length;
+            
+            const marker = editor.session.addMarker(
+                new Range(startRow, 0, endRow - 1, 0),
+                'highlight-change',
+                'fullLine'
+            );
+            
+            // Remove highlight after a delay
+            setTimeout(() => {
+                editor.session.removeMarker(marker);
+            }, 3000);
+        }
+    }
+}
+
+function startEditing(blockId) {
+    const blockElement = document.getElementById(blockId);
+    if (!blockElement) return;
+
+    blockElement.classList.add('editing');
+    blockElement.classList.remove('collapsed');
+}
+
+function cancelEditing(blockId) {
+    const blockElement = document.getElementById(blockId);
+    if (!blockElement) return;
+
+    const textarea = blockElement.querySelector('.edit-textarea');
+    const block = codeStructure.blocks.find(b => b.id === blockId);
+    if (textarea && block) {
+        textarea.value = block.code;
+    }
+
+    blockElement.classList.remove('editing');
+}
+
+function saveEditing(blockId) {
+    const blockElement = document.getElementById(blockId);
+    if (!blockElement) return;
+
+    const textarea = blockElement.querySelector('.edit-textarea');
+    const block = codeStructure.blocks.find(b => b.id === blockId);
+
+    if (textarea && block) {
+        const newCode = textarea.value;
+        const oldCode = block.code;
+
+        // Update the block in codeStructure
+        block.code = newCode;
+        recentlyChangedBlocks.add(blockId);
+
+        // Update the full code content
+        const escapedOldCode = oldCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const replaceRegex = new RegExp(escapedOldCode, 'g');
+        const updatedFullCode = editor.getValue().replace(replaceRegex, newCode);
+
+        // Update editor with new code
+        editor.setValue(updatedFullCode, -1);
+        fullCodeContent = updatedFullCode;
+
+        // Reprocess the code
+        processCode();
+
+        // Highlight changes in editor
+        highlightChangesInEditor(oldCode, newCode);
+
+        // Show success message
+        addMessage('AI', `Successfully updated code block: ${codeStructure.labels[blockId]}`);
+
+        // Clear changed blocks after delay
+        setTimeout(() => {
+            recentlyChangedBlocks.clear();
+            renderProcessedCode();
+        }, 3000);
+    }
+}
+
+function addMessage(sender, text) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender.toLowerCase()}-message`;
+    messageDiv.textContent = text;
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const message = input.value.trim();
+
+    if (message) {
+        addMessage('User', message);
+        input.value = '';
+        await handleCodeEdit(message);
+    }
+}
+
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+async function findRelevantBlocks(message) {
+    try {
+        // Get all available blocks with their labels
+        const blockInfo = codeStructure.blocks.map(block => ({
+            id: block.id,
+            label: codeStructure.labels[block.id],
+            code: block.code
+        }));
+
+        // Ask the LLM to identify relevant blocks
+        const response = await fetch('/api/ai_completion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: `Given the user's request: "${message}", analyze these code blocks and identify which ones are most relevant to the requested changes.
+                Consider the context, purpose, and content of each block.
+                Return the IDs of the most relevant blocks (maximum 3) with explanations.
+                
+                <typescript-interface>
+                interface RelevantBlock {
+                    blockId: string;
+                    explanation: string;
+                    confidence: number; // 0-1 scale
+                }
+                
+                interface BlockAnalysis {
+                    relevantBlocks: RelevantBlock[];
+                }
+                </typescript-interface>
+                
+                <example>
+                {
+                    "relevantBlocks": [
+                        {
+                            "blockId": "css-0",
+                            "explanation": "This block contains button styling which matches the user's request to modify button appearance",
+                            "confidence": 0.95
+                        }
+                    ]
+                }
+                </example>`,
+                data: {
+                    userRequest: message,
+                    availableBlocks: blockInfo
+                }
+            }),
+        });
+
+        const analysis = await response.json();
+        
+        // Add a message showing which blocks were identified
+        addMessage('AI', `I've identified these relevant code sections:
+            ${analysis.relevantBlocks.map(block => 
+                `\n- ${codeStructure.labels[block.blockId]} (${Math.round(block.confidence * 100)}% confidence): ${block.explanation}`
+            ).join('')}`);
+
+        // Return the actual block objects, filtered and sorted by confidence
+        return analysis.relevantBlocks
+            .filter(analysis => analysis.confidence > 0.5) // Only include blocks with >50% confidence
+            .sort((a, b) => b.confidence - a.confidence)
+            .map(analysis => codeStructure.blocks.find(block => block.id === analysis.blockId));
+
+    } catch (error) {
+        console.error('Error in AI block analysis:', error);
+        addMessage('AI', 'Error analyzing code blocks. Falling back to basic matching.');
+        return [];
+    }
+}
+
+async function handleCodeEdit(message) {
+    try {
+        addMessage('AI', 'Analyzing your request...');
+        
+        const relevantBlocks = await findRelevantBlocks(message);
+        
+        if (relevantBlocks.length === 0) {
+            addMessage('AI', 'I could not identify which parts of the code to edit. Please be more specific about what you want to change.');
+            return;
+        }
+
+        const response = await fetch('/api/ai_completion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: `Given the user's request: "${message}", analyze the code blocks and suggest specific edits.
+                Provide specific code changes, not just descriptions.
+                The edited code must be a complete, valid replacement for the original code.
+                
+                <typescript-interface>
+                interface CodeEdit {
+                    blockId: string;
+                    originalCode: string;
+                    editedCode: string;
+                    explanation: string;
+                }
+
+                interface EditResponse {
+                    edits: CodeEdit[];
+                }
+                </typescript-interface>
+                
+                <example>
+                {
+                    "edits": [
+                        {
+                            "blockId": "css-0",
+                            "originalCode": ".button { background: red; }",
+                            "editedCode": ".button { background: blue; color: white; }",
+                            "explanation": "Changed button color to blue"
+                        }
+                    ]
+                }
+                </example>`,
+                data: {
+                    request: message,
+                    blocks: relevantBlocks.map(block => ({
+                        id: block.id,
+                        code: block.code,
+                        label: codeStructure.labels[block.id]
+                    }))
+                }
+            }),
+        });
+
+        const editSuggestions = await response.json();
+
+        // Store the original full code before making any changes
+        const originalCode = editor.getValue();
+        let updatedCode = originalCode;
+
+        // Apply the suggested edits
+        for (const edit of editSuggestions.edits) {
+            const blockIndex = codeStructure.blocks.findIndex(b => b.id === edit.blockId);
+            if (blockIndex !== -1) {
+                // Get the original block code for replacement
+                const originalBlockCode = codeStructure.blocks[blockIndex].code;
+                
+                // Update the block in codeStructure
+                codeStructure.blocks[blockIndex].code = edit.editedCode;
+                codeStructure.blocks[blockIndex].isCollapsed = false;
+                recentlyChangedBlocks.add(edit.blockId);
+                
+                // Replace the code in the full content
+                // Escape special characters in the original code for proper regex matching
+                const escapedOriginalCode = originalBlockCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const replaceRegex = new RegExp(escapedOriginalCode, 'g');
+                updatedCode = updatedCode.replace(replaceRegex, edit.editedCode);
+                
+                addMessage('AI', `Applied change to ${codeStructure.labels[edit.blockId]}: ${edit.explanation}`);
+            }
+        }
+        
+        // Update the full code content
+        fullCodeContent = updatedCode;
+        
+        // Update the Ace editor with the modified full code content
+        editor.setValue(updatedCode, -1); // -1 moves cursor to the start
+        
+        // Save to localStorage after updates
+        saveCodeToLocalStorage();
+        
+        // Highlight the changes in the editor
+        highlightChangesInEditor(originalCode, updatedCode);
+        
+        // Update the processed view
+        renderProcessedCode();
+        
+        // Clear the changed blocks after 3 seconds
+        setTimeout(() => {
+            recentlyChangedBlocks.clear();
+            renderProcessedCode();
+        }, 3000);
+
+        // Get a summary of changes from the AI
+        const summaryResponse = await fetch('/api/ai_completion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: `Summarize the changes made to the code in a clear, concise way.
+                
+                <typescript-interface>
+                interface SummaryResponse {
+                    summary: string;
+                }
+                </typescript-interface>
+                
+                <example>
+                {
+                    "summary": "Updated button styling to use blue background and white text for better visibility."
+                }
+                </example>`,
+                data: editSuggestions.edits
+            }),
+        });
+
+        const summary = await summaryResponse.json();
+        addMessage('AI', `${summary.summary}\n\nThe full code has been updated with these changes.`);
+
+    } catch (error) {
+        console.error('Error handling code edit:', error);
+        addMessage('AI', 'An error occurred while processing your request. Please try again.');
+    }
+}
+
+function highlightChangesInEditor(originalCode, newCode) {
+    // Clear previous highlights
+    highlightMarkers.forEach(marker => editor.getSession().removeMarker(marker));
+    highlightMarkers = [];
+    
+    // Find the line numbers where changes occurred
+    const originalLines = originalCode.split('\n');
+    const newLines = newCode.split('\n');
+    
+    const Range = ace.require('ace/range').Range;
+    
+    // Create a map of the original lines for faster lookup
+    const originalLinesMap = new Map(originalLines.map((line, index) => [line, index]));
+    
+    for (let i = 0; i < newLines.length; i++) {
+        if (i >= originalLines.length || newLines[i] !== originalLines[i]) {
+            // Highlight the full line
+            const marker = editor.getSession().addMarker(
+                new Range(i, 0, i, newLines[i].length),
+                'highlight-change',
+                'fullLine',
+                false
+            );
+            highlightMarkers.push(marker);
+        }
+    }
+    
+    // Ensure the changed lines are visible in the editor
+    const firstChange = highlightMarkers[0];
+    if (firstChange) {
+        editor.scrollToLine(editor.getSession().getMarkers()[firstChange].range.start.row, true, true);
+    }
+    
+    // Remove highlights after 3 seconds
+    setTimeout(() => {
+        highlightMarkers.forEach(marker => editor.getSession().removeMarker(marker));
+        highlightMarkers = [];
+    }, 3000);
+}
+
+function downloadCode() {
+    const blob = new Blob([fullCodeContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'processed-code.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+async function copyFullCode() {
+    try {
+        await navigator.clipboard.writeText(fullCodeContent);
+        
+        // Show success message
+        const message = document.createElement('div');
+        message.className = 'copy-success';
+        message.textContent = 'Code copied to clipboard!';
+        document.body.appendChild(message);
+        
+        // Remove message after animation
+        setTimeout(() => {
+            document.body.removeChild(message);
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy code:', err);
+        alert('Failed to copy code to clipboard');
+    }
+}
+
+function scrollToSection(sectionId) {
+    const sections = {
+        'controls': document.querySelector('.controls'),
+        'editor': document.getElementById('aceEditorContainer'),
+        'blocks': document.getElementById('processedView'),
+        'chat': document.querySelector('.chat-window')
+    };
+    
+    const section = sections[sectionId];
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Update active state of nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`[onclick="scrollToSection('${sectionId}')"]`).classList.add('active');
+    }
+}
+
+// Add intersection observer to update active nav item based on scroll position
+function setupScrollObserver() {
+    const sections = {
+        'controls': document.querySelector('.controls'),
+        'editor': document.getElementById('aceEditorContainer'),
+        'blocks': document.getElementById('processedView'),
+        'chat': document.querySelector('.chat-window')
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const sectionId = Object.keys(sections).find(key => sections[key] === entry.target);
+                if (sectionId) {
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.querySelector(`[onclick="scrollToSection('${sectionId}')"]`).classList.add('active');
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    Object.values(sections).forEach(section => {
+        if (section) observer.observe(section);
+    });
+}
+
+function generatePlacementOptions(newSegment) {
+    const similarBlocks = codeStructure.blocks
+        .filter(b => b.id.startsWith(newSegment.type))
+        .map(b => ({
+            block: b,
+            similarity: calculateSimilarity(
+                codeStructure.labels[b.id],
+                newSegment.label
+            )
+        }))
+        .filter(match => match.similarity > 0.3)
+        .sort((a, b) => b.similarity - a.similarity);
+
+    if (similarBlocks.length === 0) {
+        // If no similar blocks found, show default option at end of type section
+        return `<option value="end">At end of ${newSegment.type} section</option>`;
+    }
+
+    return similarBlocks
+        .map(match => `<option value="${match.block.id}">
+            ${codeStructure.labels[match.block.id]} 
+            (${Math.round(match.similarity * 100)}% similar)
+        </option>`)
+        .join('');
+}
+
+function showFunctionUpdateModal(newCode) {
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'test-dialog-overlay';
+    
+    const modal = document.createElement('div');
+    modal.className = 'function-update-modal';
+    modal.innerHTML = `
+        <div class="function-update-header">
+            <h3>Select Code to Update or Add</h3>
+            <div class="search-container" style="margin: 10px 0;">
+                <input type="text" 
+                       id="updateSearchInput" 
+                       placeholder="Search existing functions..." 
+                       style="width: 100%; padding: 8px; background: #3c3c3c; border: 1px solid #4a5d75; border-radius: 4px; color: #ffffff;">
+            </div>
+            <button class="test-dialog-close" onclick="document.body.removeChild(this.closest('.test-dialog-overlay'))">×</button>
+        </div>
+        <div class="function-update-content">
+            <div class="update-list"></div>
+        </div>
+        <div class="function-update-footer">
+            <button onclick="applySelectedUpdates()">Apply Selected Updates</button>
+        </div>
+    `;
+    
+    modalOverlay.appendChild(modal);
+    document.body.appendChild(modalOverlay);
+
+    // Update search handler with new logic
+    const searchInput = modal.querySelector('#updateSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+
+            // Get existing blocks from codeStructure
+            const existingBlocks = codeStructure.blocks.map(block => ({
+                id: block.id,
+                label: codeStructure.labels[block.id],
+                code: block.code
+            }));
+
+            const updateList = modal.querySelector('.update-list');
+            if (!updateList) return;
+
+            updateList.innerHTML = ''; // Clear existing results
+            
+            if (!query.trim()) {
+                updateList.innerHTML = '<div class="update-item">Type to search for code blocks...</div>';
+                return;
+            }
+
+            // Find matching blocks using similarity
+            const matches = existingBlocks
+                .map(block => ({
+                    block,
+                    similarity: calculateSimilarity(block.label.toLowerCase(), query)
+                }))
+                .sort((a, b) => b.similarity - a.similarity);
+
+            if (matches.length === 0) {
+                updateList.innerHTML = '<div class="update-item">No matching code found.</div>';
+                return;
+            }
+
+            // Display matches with editable areas
+            matches.forEach(match => {
+                const updateItem = document.createElement('div');
+                updateItem.className = 'update-item';
+                
+                updateItem.innerHTML = `
+                    <div class="update-item-header">
+                        <span>${match.block.label}</span>
+                        <span class="similarity-score">${Math.round(match.similarity * 100)}% match</span>
+                    </div>
+                    <div class="update-preview">
+                        <div class="preview-old">
+                            <h4>Current Code:</h4>
+                            <textarea class="code-editor-textarea" 
+                                data-block-id="${match.block.id}"
+                                style="width: 100%; min-height: 100px; background: linear-gradient(145deg, #1e2c3d 0%, #252526 100%); color: #ffffff; border: 1px solid #4a5d75; padding: 8px; font-family: monospace;"
+                            >${escapeHtml(match.block.code)}</textarea>
+                        </div>
+                    </div>
+                    <div style="text-align: right; padding: 10px;">
+                        <button onclick="previewChange(this)" data-block-id="${match.block.id}">Preview</button>
+                    </div>
+                `;
+                
+                updateList.appendChild(updateItem);
+            });
+        });
+    }
+
+    try {
+        const segments = [];
+        const languageSegments = splitCodeByLanguage(newCode);
+        
+        // Process HTML elements - Allow partial matches
+        languageSegments.html.forEach((segment, index) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(segment.content, 'text/html');
+            const element = doc.body.firstElementChild;
+            
+            if (element) {
+                segments.push({
+                    type: 'html',
+                    label: `HTML - ${element.tagName.toLowerCase()}${element.id ? '#' + element.id : ''}${element.className ? '.' + element.className.split(' ').join('.') : ''}`,
+                    code: segment.content,
+                    original: segment.content,
+                    attributes: {
+                        tag: element.tagName.toLowerCase(),
+                        id: element.id || '',
+                        classes: (element.className || '').split(' ').filter(c => c)
+                    }
+                });
+            }
+        });
+
+        // Process CSS rules
+        languageSegments.css.forEach(segment => {
+            const rules = segment.content.split('}').filter(rule => rule.trim());
+            rules.forEach(rule => {
+                if (rule.trim()) {
+                    const selector = rule.split('{')[0].trim();
+                    segments.push({
+                        type: 'css',
+                        label: `CSS - ${selector}`,
+                        code: rule.trim() + '}',
+                        original: rule.trim() + '}'
+                    });
+                }
+            });
+        });
+
+        // Process JavaScript (keep existing JavaScript processing)
+        let functionMatches = [...newCode.matchAll(/(async\s+)?function\s+(\w+)\s*\([^)]*\)\s*\{/g)];
+        let lastIndex = 0;
+        
+        functionMatches.forEach((match) => {
+            if (match.index > lastIndex) {
+                const nonFunctionCode = newCode.substring(lastIndex, match.index).trim();
+                if (nonFunctionCode) {
+                    segments.push({
+                        type: 'non-function',
+                        label: `Non-function code block ${segments.length + 1}`,
+                        code: nonFunctionCode,
+                        original: nonFunctionCode
+                    });
+                }
+            }
+            
+            const funcStart = match.index;
+            const funcName = match[2];
+            let openBraces = 1;
+            let closeIndex = match.index + match[0].length;
+
+            while (openBraces > 0 && closeIndex < newCode.length) {
+                if (newCode[closeIndex] === '{') openBraces++;
+                if (newCode[closeIndex] === '}') openBraces--;
+                closeIndex++;
+            }
+
+            const functionCode = newCode.substring(funcStart, closeIndex);
+
+            segments.push({
+                type: 'javascript',
+                label: `JavaScript - ${funcName}()`,
+                code: functionCode,
+                original: functionCode
+            });
+
+            lastIndex = closeIndex;
+        });
+
+        // Show segments in modal
+        const updateList = modal.querySelector('.update-list');
+        updateList.innerHTML = '';
+
+        if (segments.length === 0) {
+            updateList.innerHTML = '<div class="update-item">No code segments found.</div>';
+            return;
+        }
+
+        segments.forEach(newSegment => {
+            const updateItem = document.createElement('div');
+            updateItem.className = 'update-item';
+            
+            const matches = codeStructure.blocks
+                .map(block => ({
+                    block,
+                    similarity: calculateSimilarity(
+                        codeStructure.labels[block.id],
+                        newSegment.label
+                    )
+                }));
+
+            // Lowered threshold for HTML matches
+            const bestMatch = matches.sort((a, b) => b.similarity - a.similarity).find(match => match.similarity > 0.3);
+            if (bestMatch) {
+                // Show match with both update and add options
+                updateItem.innerHTML = `
+                    <div class="update-item-header">
+                        <div>
+                            ${bestMatch.similarity === 1 ? `
+                                <label>
+                                    <input type="radio" 
+                                           name="action_${encodeURIComponent(newSegment.label)}"  
+                                           data-new-code="${encodeURIComponent(newSegment.code)}"
+                                           data-target-block="${bestMatch.block.id}"
+                                           data-original-code="${encodeURIComponent(bestMatch.block.code)}"
+                                           data-is-new="false"
+                                           data-type="${newSegment.type}"
+                                           checked>
+                                    Update Existing (100% match)
+                                </label>
+                                <div class="update-preview">
+                                    <div class="preview-old">
+                                        <h4>Current Code:</h4>
+                                        <pre>${escapeHtml(bestMatch.block.code)}</pre>
+                                    </div>
+                                    <div class="preview-new">
+                                        <h4>New Code:</h4>
+                                        <pre>${escapeHtml(newSegment.code)}</pre>
+                                    </div>
+                                </div>
+                            ` : `
+                                <label>
+                                    <input type="radio"
+                                           name="action_${encodeURIComponent(newSegment.label)}"
+                                           data-new-code="${encodeURIComponent(newSegment.code)}"
+                                           data-is-new="true"
+                                           data-type="${newSegment.type}">
+                                    Add as New (${Math.round(bestMatch.similarity * 100)}% similar to existing)
+                                </label>
+                                <div class="update-preview">
+                                    <div class="preview-new">
+                                        <h4>New Code:</h4>
+                                        <pre>${escapeHtml(newSegment.code)}</pre>
+                                    </div>
+                                    <div class="placement-selector">
+                                        <h4>Place next to:</h4>
+                                        <select class="placement-select" style="width: 100%; padding: 8px; margin-top: 5px; background: #2d2d2d; color: #ffffff; border: 1px solid #4a5d75;">
+                                            ${generatePlacementOptions(newSegment)}
+                                        </select>
+                                        <label style="display: block; margin-top: 10px;">
+                                            <input type="radio" name="placement_${encodeURIComponent(newSegment.label)}" value="before" checked> Place Before
+                                        </label>
+                                        <label style="display: block; margin-top: 5px;">
+                                            <input type="radio" name="placement_${encodeURIComponent(newSegment.label)}" value="after"> Place After
+                                        </label>
+                                    </div>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // For entirely new components without matches
+                updateItem.innerHTML = `
+                    <div class="update-item-header">
+                        <label>
+                            <input type="checkbox" 
+                                   data-new-code="${encodeURIComponent(newSegment.code)}" 
+                                   data-is-new="true"
+                                   data-type="${newSegment.type}">
+                            Add as New ${newSegment.type.charAt(0).toUpperCase() + newSegment.type.slice(1)}
+                        </label>
+                    </div>
+                    <div class="update-preview">
+                        <div class="preview-new">
+                            <h4>New Code:</h4>
+                            <pre>${escapeHtml(newSegment.code)}</pre>
+                        </div>
+                        <div class="placement-selector">
+                            <h4>Place next to:</h4>
+                            <select class="placement-select" style="width: 100%; padding: 8px; margin-top: 5px; background: #2d2d2d; color: #ffffff; border: 1px solid #4a5d75;">
+                                ${generatePlacementOptions(newSegment)}
+                            </select>
+                            <label style="display: block; margin-top: 10px;">
+                                <input type="radio" name="placement_${encodeURIComponent(newSegment.label)}" value="before" checked> Place Before
+                            </label>
+                            <label style="display: block; margin-top: 5px;">
+                                <input type="radio" name="placement_${encodeURIComponent(newSegment.label)}" value="after"> Place After
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            updateList.appendChild(updateItem);
+        });
+
+    } catch (error) {
+        console.error('Error parsing code:', error);
+        const updateList = modal.querySelector('.update-list');
+        updateList.innerHTML = `<div class="update-item">Error parsing code: ${error.message}</div>`;
+    }
+}
+
+// Add helper function to escape HTML
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Updated applySelectedUpdates function
+function applySelectedUpdates() {
+    const updateList = document.querySelector('.update-list');
+    const inputs = updateList.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
+    
+    if (!inputs || inputs.length === 0) {
+        addMessage('AI', 'No updates selected to apply.');
+        return;
+    }
+
+    const originalCode = editor.getValue();
+    let updatedCode = originalCode;
+    let updateCount = 0;
+
+    // Find the first script tag in the code
+    const scriptStartMatch = updatedCode.match(/<script[^>]*>/);
+    
+    // Collect all JavaScript code (both functions and non-functions) to add them together
+    const newJavaScriptCode = [];
+
+    inputs.forEach(input => {
+        const newCode = decodeURIComponent(input.dataset.newCode);
+        const isNew = input.dataset.isNew === 'true';
+        const type = input.dataset.type;
+        
+        if (isNew) {
+            if (type === 'javascript' || type === 'non-function') {
+                // Collect all JavaScript code (both functions and non-functions) to add at script tag
+                newJavaScriptCode.push(newCode);
+            } else {
+                // Handle non-JavaScript new code as before
+                const newId = `${type}-${codeStructure.blocks.length}`;
+                const updateItem = input.closest('.update-item');
+                const placementSelect = updateItem.querySelector('.placement-select');
+                const placementRadios = updateItem.querySelectorAll('input[type="radio"][name^="placement_"]');
+                const selectedPlacement = Array.from(placementRadios).find(radio => radio.checked)?.value || 'after';
+                const targetBlockId = placementSelect.value;
+
+                if (targetBlockId === 'end') {
+                    const lastSectionBlock = codeStructure.blocks
+                        .filter(b => b.id.startsWith(type))
+                        .pop();
+                        
+                    if (lastSectionBlock) {
+                        const targetPosition = updatedCode.indexOf(lastSectionBlock.code) + lastSectionBlock.code.length;
+                        updatedCode = updatedCode.slice(0, targetPosition) + 
+                            '\n' + newCode + '\n' +
+                            updatedCode.slice(targetPosition);
+                    } else {
+                        updatedCode = updatedCode + '\n' + newCode + '\n';
+                    }
+                } else {
+                    const targetBlock = codeStructure.blocks.find(block => block.id === targetBlockId);
+                    if (targetBlock) {
+                        const targetPosition = updatedCode.indexOf(targetBlock.code) + targetBlock.code.length;
+                        updatedCode = updatedCode.slice(0, targetPosition) + 
+                            '\n' + newCode + '\n' +
+                            updatedCode.slice(targetPosition);
+                    }
+                }
+            }
+        } else {
+            // Update existing block (unchanged)
+            const targetBlockId = input.dataset.targetBlock;
+            const originalCode = decodeURIComponent(input.dataset.originalCode);
+            const block = codeStructure.blocks.find(b => b.id === targetBlockId);
+            
+            if (block) {
+                block.code = newCode;
+                recentlyChangedBlocks.add(targetBlockId);
+                const escapedOriginalCode = originalCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const replaceRegex = new RegExp(escapedOriginalCode, 'g');
+                updatedCode = updatedCode.replace(replaceRegex, newCode);
+            }
+        }
+    });
+
+    // Add all JavaScript code (functions and non-functions) after the first script tag
+    if (newJavaScriptCode.length > 0 && scriptStartMatch) {
+        const scriptStartIndex = scriptStartMatch.index + scriptStartMatch[0].length;
+        const newJS = '\n' + newJavaScriptCode.join('\n\n') + '\n';
+        updatedCode = 
+            updatedCode.slice(0, scriptStartIndex) + 
+            newJS +
+            updatedCode.slice(scriptStartIndex);
+        updateCount += newJavaScriptCode.length;
+    }
+
+    // Update editor with new code
+    editor.setValue(updatedCode, -1);
+    fullCodeContent = updatedCode;
+    
+    // Remove modal
+    const overlay = document.querySelector('.test-dialog-overlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
+    
+    // Highlight changes and process code
+    highlightChangesInEditor(originalCode, updatedCode);
+    processCode();
+    
+    addMessage('AI', `Successfully applied ${updateCount} updates to the code.`);
+    
+    setTimeout(() => {
+        recentlyChangedBlocks.clear();
+        renderProcessedCode();
+    }, 3000);
+}
+
+// New function to test code
+function testCode() {
+    // Create test dialog overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'test-dialog-overlay';
+    
+    // Create dialog content
+    const dialog = document.createElement('div');
+    dialog.className = 'test-dialog';
+    
+    dialog.innerHTML = `
+        <div class="test-dialog-header">
+            <h3>Testing Code</h3>
+            <button class="test-dialog-close" onclick="this.closest('.test-dialog-overlay').remove()">×</button>
+        </div>
+        <div class="test-dialog-content">
+            <iframe id="testFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    // Get current code from editor
+    const code = editor.getValue();
+    
+    // Write code to iframe
+    const iframe = document.getElementById('testFrame');
+    const iframeDoc = iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(code);
+    iframeDoc.close();
+}
+
+// Add the showManualUpdateDialog function
+function showManualUpdateDialog() {
+    // Create modal overlay
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'test-dialog-overlay';
+    
+    // Create dialog content
+    const modal = document.createElement('div');
+    modal.className = 'function-update-modal';
+    modal.innerHTML = `
+        <div class="function-update-header">
+            <h3>Manually Update Code</h3>
+            <button class="test-dialog-close" onclick="document.body.removeChild(this.closest('.test-dialog-overlay'))">×</button>
+        </div>
+        <div class="function-update-content">
+            <p>Paste your code update below:</p>
+            <textarea 
+                id="manualUpdateInput"
+                class="code-editor-textarea"
+                style="width: 100%; min-height: 200px;"
+                placeholder="Paste your code here..."></textarea>
+        </div>
+        <div class="function-update-footer">
+            <button onclick="handleManualUpdate()">Process Update</button>
+        </div>
+    `;
+    
+    modalOverlay.appendChild(modal);
+    document.body.appendChild(modalOverlay);
+}
+
+// Add helper function to handle the manual update
+function handleManualUpdate() {
+    const textarea = document.getElementById('manualUpdateInput');
+    const newCode = textarea.value.trim();
+    
+    if (!newCode) {
+        addMessage('AI', 'Please enter some code to update.');
+        return;
+    }
+    
+    // Close the manual update dialog
+    const overlay = document.querySelector('.test-dialog-overlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
+    
+    // Use the existing update interface to process the manual update
+    showFunctionUpdateModal(newCode);
+}
+
+// New AI analysis function
+async function executeAIAnalysis() {
+    try {
+        addMessage('AI', 'Analyzing code structure and content...');
+        
+        // Get current code from editor
+        const code = editor.getValue();
+        
+        // Send code for comprehensive analysis
+        const response = await fetch('/api/ai_completion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: `Perform a detailed code analysis and provide clear insights:
+                
+                <typescript-interface>
+                interface CodeAnalysis {
+                    summary: {
+                        mainPurpose: string;
+                        keyFeatures: string[];
+                        technologiesUsed: string[];
+                    };
+                    structureAnalysis: {
+                        htmlStructure: string;
+                        cssOrganization: string;
+                        javascriptArchitecture: string;
+                        componentCount: {
+                            html: number;
+                            css: number;
+                            javascript: number;
+                        };
+                    };
+                    qualityMetrics: {
+                        modularity: string;
+                        maintainability: string;
+                        reusability: string;
+                        complexity: string;
+                    };
+                    potentialIssues: {
+                        category: string;
+                        description: string;
+                        severity: 'low' | 'medium' | 'high';
+                        recommendation: string;
+                    }[];
+                    improvements: {
+                        category: string;
+                        suggestion: string;
+                        benefit: string;
+                        priority: 'low' | 'medium' | 'high';
+                    }[];
+                }
+                </typescript-interface>`,
+                data: {
+                    code: code,
+                    blocks: codeStructure.blocks.map(block => ({
+                        id: block.id,
+                        label: codeStructure.labels[block.id],
+                        code: block.code
+                    }))
+                }
+            }),
+        });
+
+        const analysis = await response.json();
+        
+        // Display comprehensive analysis results
+        const aiAnalysis = document.getElementById('aiAnalysis');
+        aiAnalysis.innerHTML = `
+            <h3>Code Analysis Report</h3>
+            
+            <div class="analysis-section">
+                <h4>Summary</h4>
+                <p>${analysis.summary.mainPurpose}</p>
+                <h5>Key Features:</h5>
+                <ul>${analysis.summary.keyFeatures.map(f => `<li>${f}</li>`).join('')}</ul>
+                <h5>Technologies Used:</h5>
+                <ul>${analysis.summary.technologiesUsed.map(t => `<li>${t}</li>`).join('')}</ul>
+            </div>
+            
+            <div class="analysis-section">
+                <h4>Structure Analysis</h4>
+                <h5>HTML Structure:</h5>
+                <p>${analysis.structureAnalysis.htmlStructure}</p>
+                <h5>CSS Organization:</h5>
+                <p>${analysis.structureAnalysis.cssOrganization}</p>
+                <h5>JavaScript Architecture:</h5>
+                <p>${analysis.structureAnalysis.javascriptArchitecture}</p>
+                <h5>Component Count:</h5>
+                <ul>
+                    <li>HTML Elements: ${analysis.structureAnalysis.componentCount.html}</li>
+                    <li>CSS Rules: ${analysis.structureAnalysis.componentCount.css}</li>
+                    <li>JavaScript Functions: ${analysis.structureAnalysis.componentCount.javascript}</li>
+                </ul>
+            </div>
+            
+            <div class="analysis-section">
+                <h4>Quality Metrics</h4>
+                <ul>
+                    <li><strong>Modularity:</strong> ${analysis.qualityMetrics.modularity}</li>
+                    <li><strong>Maintainability:</strong> ${analysis.qualityMetrics.maintainability}</li>
+                    <li><strong>Reusability:</strong> ${analysis.qualityMetrics.reusability}</li>
+                    <li><strong>Complexity:</strong> ${analysis.qualityMetrics.complexity}</li>
+                </ul>
+            </div>
+            
+            <div class="analysis-section">
+                <h4>Potential Issues</h4>
+                ${analysis.potentialIssues.map(issue => `
+                    <div style="margin-bottom: 10px;">
+                        <strong>${issue.category}</strong> (${issue.severity} severity)
+                        <p>${issue.description}</p>
+                        <p><em>Recommendation: ${issue.recommendation}</em></p>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="analysis-section">
+                <h4>Suggested Improvements</h4>
+                ${analysis.improvements.map(improvement => `
+                    <div style="margin-bottom: 10px;">
+                        <strong>${improvement.category}</strong> (${improvement.priority} priority)
+                        <p>${improvement.suggestion}</p>
+                        <p><em>Benefit: ${improvement.benefit}</em></p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        addMessage('AI', 'Code analysis complete. The detailed report has been generated above.');
+        
+        // Scroll to analysis section
+        aiAnalysis.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+    } catch (error) {
+        console.error('Error executing AI analysis:', error);
+        addMessage('AI', 'An error occurred while analyzing the code. Please try again.');
+    }
+}
+
+window.onload = function() {
+    initializeEditor();
+    initializeAceEditor();
+    setupScrollObserver();
+    loadCodeFromLocalStorage(); // This loads saved code when the page loads
+    loadUserProjects();
+};
+
+// New function to load user projects
+async function loadUserProjects() {
+    try {
+        // Get the current user
+        const user = await window.websim.getUser();
+        if (!user) {
+            console.error('No user found');
+            return;
+        }
+
+        // Fetch user's projects
+        const response = await fetch(`/api/v1/users/${user.username}/projects?posted=true`);
+        const data = await response.json();
+
+        const projectList = document.getElementById('projectList');
+        projectList.innerHTML = ''; // Clear existing projects
+
+        // Add projects to the scroll
+        data.projects.data.forEach(item => {
+            const projectDiv = document.createElement('div');
+            projectDiv.className = 'project-item';
+            projectDiv.innerHTML = `
+                <h3>${item.project.title || 'Untitled Project'}</h3>
+                <div class="project-meta">
+                    Updated: ${new Date(item.project.updated_at).toLocaleDateString()}
+                </div>
+            `;
+
+            projectDiv.onclick = () => loadProjectCode(item.project.id);
+            projectList.appendChild(projectDiv);
+        });
+
+    } catch (error) {
+        console.error('Error loading projects:', error);
+        addMessage('AI', 'Error loading projects. Please try again.');
+    }
+}
+
+async function loadProjectCode(projectId) {
+    try {
+        addMessage('AI', 'Loading project code...');
+
+        // Fetch project details
+        const response = await fetch(`/api/v1/projects/${projectId}`);
+        const data = await response.json();
+
+        // Fetch the HTML content
+        const htmlResponse = await fetch(`/api/v1/projects/${projectId}/html`);
+        const codeContent = await htmlResponse.text();
+
+        // Update the editor with the new code
+        editor.setValue(codeContent, -1);
+        fullCodeContent = codeContent;
+
+        // Process the code
+        processCode();
+        
+        // Save to localStorage
+        saveCodeToLocalStorage();
+
+        addMessage('AI', `Successfully loaded project: ${data.project.title || 'Untitled Project'}`);
+
+    } catch (error) {
+        console.error('Error loading project code:', error);
+        addMessage('AI', 'Error loading project code. Please try again.');
+    }
+}
+</script>
+</html>

@@ -1,0 +1,121 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Text Animation</title>
+  <link href="styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Roboto+Mono&family=Fira+Code&family=Ubuntu+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="editor">
+      <h2>Text Animation Editor</h2>
+      
+      <div class="presets">
+        <h3>Try these examples:</h3>
+        <div class="preset-grid">
+          <button onclick="loadPreset('greeting')" class="preset-btn">
+            👋 Welcome Message
+          </button>
+          <button onclick="loadPreset('hacker')" class="preset-btn">
+            👨‍💻 Hacker Effect
+          </button>
+          <button onclick="loadPreset('typing')" class="preset-btn">
+            ⌨️ Typing Practice
+          </button>
+          <button onclick="loadPreset('story')" class="preset-btn">
+            📖 Story Time
+          </button>
+          <button onclick="loadPreset('glitch')" class="preset-btn">
+            🐛 Glitch Effect
+          </button>
+          <button onclick="loadPreset('countdown')" class="preset-btn">
+            🚀 Countdown
+          </button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Enter text and commands:</label>
+        <small>Commands:
+          <br>/pause[ms] or /p[s] - Pause for milliseconds or seconds
+          <br>/speed[n] or /s[n] - Set typing speed multiplier
+          <br>/remove[n] or /r[n] - Remove n characters
+          <br>/r[all] - Remove all characters
+          <br>/r[tillbreak] - Remove characters until last line break
+          <br>// - Insert line break
+          <br>/ - Insert space
+        </small>
+        <input type="text" id="text" placeholder="Type text or commands (e.g: Hello // World /p[1] /r[5])">
+        <button onclick="addStep()">Add Step</button>
+      </div>
+      
+      <div class="sequence-list">
+        <h3>Animation Sequence</h3>
+        <div class="list-controls">
+          <button onclick="clearSteps()">Clear All</button>
+        </div>
+        <ul id="steps"></ul>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="terminal">
+        <div class="scanline"></div>
+        <div class="terminal-content" id="output"></div>
+      </div>
+      <div class="controls">
+        <button onclick="preview()">Preview</button>
+        <button class="sound-toggle" onclick="toggleSound()" title="Toggle typing sounds">🔊</button>
+        <select onchange="soundManager.setSoundType(this.value)" class="sound-type">
+          <option value="mechanical">⌨️ Mechanical</option>
+          <option value="typewriter">📝 Typewriter</option>
+        </select>
+        <select onchange="changeFont(this.value)" class="font-select">
+          <option value="vt323">🔤 VT323</option>
+          <option value="press-start">🔤 Press Start 2P</option>
+          <option value="roboto-mono">🔤 Roboto Mono</option>
+          <option value="fira-code">🔤 Fira Code</option>
+          <option value="ubuntu-mono">🔤 Ubuntu Mono</option>
+        </select>
+        <input type="number" class="text-size" min="12" max="32" value="20" onchange="changeTextSize(this.value)" placeholder="Size">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function changeFont(fontName) {
+      const terminal = document.querySelector('.terminal-content');
+      terminal.className = 'terminal-content font-' + fontName;
+      
+      // Save preference
+      localStorage.setItem('selectedFont', fontName);
+    }
+
+    function changeTextSize(size) {
+      const terminal = document.querySelector('.terminal-content');
+      terminal.style.fontSize = size + 'px';
+      
+      // Save preference
+      localStorage.setItem('textSize', size);
+    }
+
+    // Initialize font preference
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedFont = localStorage.getItem('selectedFont');
+      if (savedFont) {
+        document.querySelector('.font-select').value = savedFont;
+        changeFont(savedFont);
+      }
+      const savedSize = localStorage.getItem('textSize');
+      if (savedSize) {
+        document.querySelector('.text-size').value = savedSize;
+        changeTextSize(savedSize);
+      }
+    });
+  </script>
+  <script src="sound.js"></script>
+  <script src="terminal.js"></script>
+</body>
+</html>

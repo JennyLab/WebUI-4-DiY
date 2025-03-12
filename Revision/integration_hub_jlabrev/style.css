@@ -1,0 +1,143 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7fa;
+  color: #333;
+}
+
+#hub-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #3498db;
+}
+
+#integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+.integration-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.integration-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card-logo {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-weight: bold;
+  text-align: center;
+  font-size: 1em;
+}
+
+#pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#pagination button,
+#pagination #page-numbers {
+  margin: 0 10px;
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+#pagination button:hover {
+  background-color: #eee;
+}
+
+#pagination #page-numbers {
+  display: flex;
+  gap: 5px;
+}
+
+#pagination #page-numbers span {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#pagination #page-numbers span.current-page {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+
+#info-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#info-panel.hidden {
+  display: none;
+}
+
+.panel-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+#panel-details {
+  margin-top: 15px;
+  line-height: 1.6;
+}

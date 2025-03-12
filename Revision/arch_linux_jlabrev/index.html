@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Linux Desktop Simulator</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="A Linux desktop simulator with script sharing capabilities via websim.ai">
+</head>
+<body>
+  <div id="desktop-environment">
+    <div id="gnome-shell" class="desktop-shell hidden">
+      <div class="top-bar">
+        <div class="activities">Activities</div>
+        <div class="task-bar"></div>
+        <div class="clock">12:00</div>
+        <div class="system-tray">
+          <span class="wifi">📶</span>
+          <span class="volume">🔊</span>
+          <span class="battery">🔋</span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="kde-shell" class="desktop-shell hidden">
+      <div class="panel">
+        <div class="start-menu">K</div>
+        <div class="task-bar"></div>
+        <div class="system-tray">
+          <span class="wifi">📶</span>
+          <span class="volume">🔊</span>
+          <span class="battery">🔋</span>
+          <span class="clock">12:00</span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="xfce-shell" class="desktop-shell hidden">
+      <div class="panel">
+        <div class="applications">Applications</div>
+        <div class="task-bar"></div>
+        <div class="system-tray">
+          <span class="clock">12:00</span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="terminal" class="window terminal-window">
+      <div class="window-titlebar">
+        <div class="window-title">Terminal</div>
+        <div class="window-controls">
+          <button class="window-button minimize"></button>
+          <button class="window-button maximize"></button>
+          <button class="window-button close"></button>
+        </div>
+      </div>
+      <div class="window-content">
+        <div id="terminal-output"></div>
+        <div id="input-line">
+          <span class="prompt">user@arch:~$</span>
+          <input type="text" id="terminal-input" autofocus>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="terminal.js"></script>
+  <script type="module" src="window-manager.js"></script>
+  <script type="module" src="browser.js"></script>
+</body>
+</html>

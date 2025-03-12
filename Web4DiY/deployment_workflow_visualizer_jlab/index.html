@@ -1,0 +1,438 @@
+<title>Project Structure Visualization</title>
+<style>
+:root {
+  --primary: #2962ff;
+  --success: #00c853;
+  --warning: #ffd600;
+  --error: #d50000;
+  --folder: #4a90e2;
+  --file: #67c23a;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.project-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  color: var(--primary);
+  font-size: 2.5em;
+  margin-bottom: 40px;
+}
+
+.file-tree {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.folder, .file {
+  position: relative;
+  padding: 8px 8px 8px 35px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.folder::before {
+  content: "📁";
+  position: absolute;
+  left: 10px;
+}
+
+.file::before {
+  content: "📄";
+  position: absolute;
+  left: 10px;
+}
+
+.folder:hover, .file:hover {
+  background: #3a3a3a;
+  transform: translateX(5px);
+}
+
+.folder {
+  color: var(--folder);
+}
+
+.file {
+  color: var(--file);
+}
+
+.indent {
+  margin-left: 20px;
+  border-left: 1px dashed #444;
+  padding-left: 10px;
+}
+
+.description {
+  display: none;
+  background: #333;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #ddd;
+}
+
+.info-panel {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 300px;
+  background: #333;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+}
+
+.editor-panel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  display: none;
+  z-index: 1000;
+}
+
+.editor-textarea {
+  width: 100%;
+  height: 300px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: 'Monaco', 'Consolas', monospace;
+  margin-bottom: 10px;
+  resize: vertical;
+}
+
+.editor-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.editor-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.save-button {
+  background: var(--success);
+  color: white;
+}
+
+.cancel-button {
+  background: var(--error);
+  color: white;
+}
+
+.context-menu {
+  position: fixed;
+  background: #333;
+  border-radius: 4px;
+  padding: 5px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  padding: 8px 15px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.context-menu-item:hover {
+  background: #444;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.4; }
+}
+</style>
+</head>
+<body>
+
+<div class="project-container">
+  <h1 class="title">Project Structure</h1>
+  
+  <div class="file-tree">
+    <div class="folder" data-path="/project-root">project-root/
+      <div class="description" id="root-desc">Root directory containing all project files and folders</div>
+      
+      <div class="indent">
+        <div class="folder" data-path="/project-root/backend">backend/
+          <div class="description" id="backend-desc">Server-side application logic and API endpoints</div>
+          <div class="indent">
+            <div class="folder" data-path="/project-root/backend/controllers">controllers/</div>
+            <div class="folder" data-path="/project-root/backend/models">models/
+              <div class="indent">
+                <div class="file" data-path="/project-root/backend/models/User.js">User.js</div>
+              </div>
+            </div>
+            <div class="folder" data-path="/project-root/backend/routes">routes/
+              <div class="indent">
+                <div class="file" data-path="/project-root/backend/routes/badgeRoutes.js">badgeRoutes.js</div>
+              </div>
+            </div>
+            <div class="folder" data-path="/project-root/backend/services">services/</div>
+            <div class="file" data-path="/project-root/backend/app.js">app.js</div>
+          </div>
+        </div>
+        
+        <div class="folder" data-path="/project-root/frontend">frontend/
+          <div class="description" id="frontend-desc">Client-side application components and assets</div>
+          <div class="indent">
+            <div class="folder" data-path="/project-root/frontend/public">public/</div>
+            <div class="folder" data-path="/project-root/frontend/src">src/
+              <div class="indent">
+                <div class="folder" data-path="/project-root/frontend/src/assets">assets/</div>
+                <div class="folder" data-path="/project-root/frontend/src/components">components/</div>
+                <div class="folder" data-path="/project-root/frontend/src/layouts">layouts/</div>
+                <div class="folder" data-path="/project-root/frontend/src/pages">pages/</div>
+                <div class="folder" data-path="/project-root/frontend/src/router">router/</div>
+                <div class="folder" data-path="/project-root/frontend/src/store">store/</div>
+                <div class="file" data-path="/project-root/frontend/src/main.js">main.js</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="folder" data-path="/project-root/config">config/
+          <div class="indent">
+            <div class="file" data-path="/project-root/config/db.config.js">db.config.js</div>
+            <div class="file" data-path="/project-root/config/server.config.js">server.config.js</div>
+          </div>
+        </div>
+        
+        <div class="folder" data-path="/project-root/scripts">scripts/</div>
+        <div class="folder" data-path="/project-root/tests">tests/
+          <div class="indent">
+            <div class="folder" data-path="/project-root/tests/backend">backend/</div>
+            <div class="folder" data-path="/project-root/tests/frontend">frontend/</div>
+          </div>
+        </div>
+        
+        <div class="folder" data-path="/project-root/docs">docs/</div>
+        <div class="file" data-path="/project-root/.env">.env</div>
+        <div class="file" data-path="/project-root/.gitignore">.gitignore</div>
+        <div class="file" data-path="/project-root/package.json">package.json</div>
+        <div class="file" data-path="/project-root/README.md">README.md</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="info-panel" id="infoPanel"></div>
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" onclick="editFile()">Edit</div>
+  <div class="context-menu-item" onclick="createNewFile()">New File</div>
+  <div class="context-menu-item" onclick="createNewFolder()">New Folder</div>
+  <div class="context-menu-item" onclick="deleteItem()">Delete</div>
+</div>
+
+<div class="editor-panel" id="editorPanel">
+  <textarea class="editor-textarea" id="fileContent"></textarea>
+  <div class="editor-buttons">
+    <button class="editor-button save-button" onclick="saveFile()">Save</button>
+    <button class="editor-button cancel-button" onclick="closeEditor()">Cancel</button>
+  </div>
+</div>
+
+<script>const componentInfo = {
+  controllers: "Handle HTTP requests and responses, implementing business logic",
+  models: "Database schemas and data models",
+  routes: "API endpoint definitions and routing logic",
+  services: "Reusable business logic and third-party integrations",
+  appjs: "Main backend application entry point",
+  public: "Static files served directly to clients",
+  assets: "Images, styles, and other static resources",
+  components: "Reusable UI components",
+  layouts: "Page layout templates",
+  pages: "Main application views",
+  router: "Frontend routing configuration",
+  store: "State management",
+  mainjs: "Frontend application entry point",
+  config: "Configuration files for different environments",
+  dbconfig: "Database connection and configuration",
+  serverconfig: "Server settings and environment variables",
+  scripts: "Build and deployment scripts",
+  tests: "Unit and integration tests",
+  backendtests: "Backend-specific tests",
+  frontendtests: "Frontend-specific tests",
+  docs: "Project documentation",
+  env: "Environment variables",
+  gitignore: "Git ignore patterns",
+  package: "Project dependencies and scripts",
+  readme: "Project overview and setup instructions",
+  User: "User model schema with badge library support",
+  badgeRoutes: "API routes for managing user badges"
+};
+let selectedElement = null;
+let fileSystem = new Map();
+fileSystem.set('/project-root/.env', 'PORT=3000\nDB_CONNECTION=mongodb://localhost:27017');
+fileSystem.set('/project-root/package.json', '{\n  "name": "fullstack-app",\n  "version": "1.0.0"\n}');
+fileSystem.set('/project-root/backend/models/User.js', `const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    badges: [{ type: String, default: [] }],
+    badgeLibrary: [{
+        badgeName: { type: String },
+        description: { type: String }, 
+        dateEarned: { type: Date, default: Date.now },
+    }],
+}, { timestamps: true });
+
+module.exports = mongoose.model('User', userSchema);`);
+fileSystem.set('/project-root/backend/routes/badgeRoutes.js', `const express = require('express');
+const User = require('../models/User');
+const router = express.Router();
+
+// Add badge to library
+router.post('/:userId/add-badge', async (req, res) => {
+    const { badgeName, description } = req.body;
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.userId,
+            { $push: { badgeLibrary: { badgeName, description } } },
+            { new: true }
+        );
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to add badge' });
+    }
+});
+
+// Get user badge library  
+router.get('/:userId/library', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        res.status(200).json(user.badgeLibrary);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve badge library' });
+    }
+});
+
+module.exports = router;`);
+function toggleDescription(id) {
+  const desc = document.getElementById(`${id}-desc`);
+  desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
+}
+function showInfo(component) {
+  const panel = document.getElementById('infoPanel');
+  panel.textContent = componentInfo[component] || 'No information available';
+  panel.style.display = 'block';
+  panel.style.animation = 'pulse 2s infinite';
+  setTimeout(() => {
+    panel.style.display = 'none';
+  }, 3000);
+}
+document.addEventListener('contextmenu', e => {
+  const target = e.target.closest('.folder, .file');
+  if (target) {
+    e.preventDefault();
+    selectedElement = target;
+    const contextMenu = document.getElementById('contextMenu');
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = e.pageX + 'px';
+    contextMenu.style.top = e.pageY + 'px';
+  }
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#contextMenu')) {
+    document.getElementById('contextMenu').style.display = 'none';
+  }
+});
+function editFile() {
+  if (!selectedElement || !selectedElement.classList.contains('file')) return;
+  const filePath = selectedElement.dataset.path;
+  const content = fileSystem.get(filePath) || '';
+  const editor = document.getElementById('editorPanel');
+  const textarea = document.getElementById('fileContent');
+  textarea.value = content;
+  editor.style.display = 'block';
+}
+function saveFile() {
+  if (!selectedElement) return;
+  const filePath = selectedElement.dataset.path;
+  const content = document.getElementById('fileContent').value;
+  fileSystem.set(filePath, content);
+  closeEditor();
+}
+function closeEditor() {
+  document.getElementById('editorPanel').style.display = 'none';
+  document.getElementById('fileContent').value = '';
+}
+function createNewFile() {
+  const name = prompt('Enter file name:');
+  if (!name) return;
+  const parentPath = selectedElement.dataset.path;
+  const newPath = `${parentPath}/${name}`;
+  const fileDiv = document.createElement('div');
+  fileDiv.className = 'file';
+  fileDiv.dataset.path = newPath;
+  fileDiv.textContent = name;
+  selectedElement.querySelector('.indent').appendChild(fileDiv);
+  fileSystem.set(newPath, '');
+}
+function createNewFolder() {
+  const name = prompt('Enter folder name:');
+  if (!name) return;
+  const parentPath = selectedElement.dataset.path;
+  const newPath = `${parentPath}/${name}`;
+  const folderDiv = document.createElement('div');
+  folderDiv.className = 'folder';
+  folderDiv.dataset.path = newPath;
+  folderDiv.textContent = name + '/';
+  const indentDiv = document.createElement('div');
+  indentDiv.className = 'indent';
+  folderDiv.appendChild(indentDiv);
+  selectedElement.querySelector('.indent').appendChild(folderDiv);
+}
+function deleteItem() {
+  if (!selectedElement) return;
+  const confirmDelete = confirm('Are you sure you want to delete this item?');
+  if (confirmDelete) {
+    const path = selectedElement.dataset.path;
+    fileSystem.delete(path);
+    selectedElement.remove();
+  }
+}
+document.querySelectorAll('.folder, .file').forEach(element => {
+  element.addEventListener('mouseover', () => {
+    element.style.transform = 'translateX(10px)';
+  });
+  element.addEventListener('mouseout', () => {
+    element.style.transform = 'translateX(0)';
+  });
+});</script>
+
+</body>
+</html>

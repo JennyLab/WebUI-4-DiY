@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheria Forum</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/forum.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <nav class="main-nav">
+      <div class="nav-content">
+        <a href="index.html" class="nav-logo">
+          <i class="fas fa-robot"></i>
+          <span>Aetheria</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+          <a href="forum.html" class="nav-link active">
+            <i class="fas fa-comments"></i>
+            <span>Forum</span>
+          </a>
+          <a href="gallery.html" class="nav-link">
+            <i class="fas fa-images"></i>
+            <span>Gallery</span>
+          </a>
+        </div>
+        <div class="nav-actions">
+          <button id="createPostBtn" class="primary-btn">
+            <i class="fas fa-plus"></i>
+            Create Post
+          </button>
+          <button class="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="user-menu">
+            <img src="" alt="User avatar" id="userAvatar" class="avatar">
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="forum-main">
+      <div id="forumContainer" class="forum-container">
+        <!-- Forum content will be loaded here -->
+        <div id="forumPosts" class="forum-posts-grid">
+          <!-- Posts will be loaded here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create New Post</h2>
+          <button class="close-modal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="postForm" class="post-form">
+          <div class="form-group">
+            <label for="postTitle">Title</label>
+            <input type="text" id="postTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="postContent">Content</label>
+            <textarea id="postContent" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="postTags">Tags</label>
+            <input type="text" id="postTags" placeholder="Separate tags with commas">
+          </div>
+          <div class="form-group">
+            <label for="postCategory">Category</label>
+            <select id="postCategory" required>
+              <option value="projects">Projects</option>
+              <option value="tutorials">Tutorials</option>
+              <option value="questions">Questions</option>
+              <option value="showcase">Showcase</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Publish Post</button>
+            <button type="button" class="secondary-btn draft-btn">Save as Draft</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { ForumManager } from './js/forumManager.js';
+    const forumManager = new ForumManager();
+  </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+:root {
+    --bg-dark: #2c2c2c;
+    --bg-medium: #3c3c3c;
+    --bg-light: #4c4c4c;
+    --text-color: #e0e0e0;
+    --accent-color: #4287f5;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    height: 100%;
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+#roblox-studio-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#top-menu {
+    display: flex;
+    background-color: var(--bg-medium);
+    padding: 10px;
+    position: relative;
+}
+
+.menu-section {
+    margin-right: 15px;
+    cursor: pointer;
+    position: relative;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.menu-section:hover {
+    background-color: var(--bg-light);
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--bg-light);
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.menu-section:hover .dropdown {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-medium);
+}
+
+#workspace {
+    display: flex;
+    flex-grow: 1;
+}
+
+#left-sidebar, #right-sidebar {
+    width: 250px;
+    background-color: var(--bg-medium);
+    border-right: 1px solid #555;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+#main-viewport {
+    flex-grow: 1;
+    background-color: var(--bg-dark);
+    position: relative;
+}
+
+.viewport-tabs {
+    display: flex;
+    background-color: var(--bg-medium);
+    color: var(--text-color);
+}
+
+.tab {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tab.active {
+    background-color: var(--accent-color);
+}
+
+#3d-scene {
+    width: 100%;
+    height: calc(100% - 40px);
+    background-color: var(--bg-dark);
+    position: relative;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.3;
+}
+
+.toolbox .tool-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 10px;
+    background-color: var(--bg-light);
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toolbox .tool-button.active {
+    background-color: var(--accent-color);
+}
+
+.toolbox .tool-button:hover {
+    background-color: var(--bg-medium);
+}
+
+#bottom-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-medium);
+    padding: 10px;
+}
+
+.play-controls button {
+    margin-right: 10px;
+    padding: 5px 15px;
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.status-bar {
+    display: flex;
+    gap: 20px;
+    color: var(--text-color);
+}
+
+.properties-panel .property-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.properties-panel .property-input {
+    width: 60%;
+    background-color: var(--bg-light);
+    border: none;
+    color: var(--text-color);
+    padding: 5px;
+}
+
+#project-hierarchy {
+    list-style-type: none;
+    padding: 0;
+}
+
+#project-hierarchy li {
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#project-hierarchy li:hover {
+    background-color: var(--bg-light);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--bg-medium);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+}
+
+.close-modal {
+    color: var(--text-color);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.part-options {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.part-options button {
+    padding: 10px;
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    cursor: pointer;
+}

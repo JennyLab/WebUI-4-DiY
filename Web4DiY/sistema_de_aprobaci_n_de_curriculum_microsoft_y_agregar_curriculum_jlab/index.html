@@ -1,0 +1,456 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración de Pendientes | Microsoft CV System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+    --microsoft-blue: #0078d4;
+    --microsoft-hover: #106ebe;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+}
+
+.navbar {
+    background: var(--microsoft-blue);
+}
+
+.sidebar {
+    background: white;
+    height: calc(100vh - 56px);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.settings-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.settings-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    background: #e9ecef;
+    cursor: pointer;
+}
+
+.tag.selected {
+    background: var(--microsoft-blue);
+    color: white;
+}
+
+.workflow-step {
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: white;
+    cursor: move;
+    position: relative;
+}
+
+.workflow-step::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -20px;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20px;
+    background: #dee2e6;
+}
+
+.workflow-step:last-child::before {
+    display: none;
+}
+
+.reviewer-card {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.priority-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.priority-high {
+    background: #dc3545;
+}
+
+.priority-medium {
+    background: #ffc107;
+}
+
+.priority-low {
+    background: #28a745;
+}
+
+.notification-setting {
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.notification-setting:last-child {
+    border-bottom: none;
+}
+
+.time-threshold {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="fab fa-microsoft me-2"></i>
+            CV Approval System
+        </a>
+        <div class="d-flex align-items-center">
+            <div class="position-relative me-3">
+                <i class="fas fa-bell fa-lg text-white"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    3
+                </span>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-transparent text-white" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle fa-lg me-2"></i>
+                    Admin User
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/profile">Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="/settings">Configuración</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar pt-3">
+            <div class="list-group list-group-flush">
+                <a href="/dashboard" class="list-group-item list-group-item-action">
+                    <i class="fas fa-home me-2"></i> Dashboard
+                </a>
+                <a href="/pending" class="list-group-item list-group-item-action">
+                    <i class="fas fa-clock me-2"></i> Pendientes
+                    <span class="badge bg-warning rounded-pill float-end">8</span>
+                </a>
+                <a href="/approved" class="list-group-item list-group-item-action">
+                    <i class="fas fa-check-circle me-2"></i> Aprobados
+                </a>
+                <a href="/rejected" class="list-group-item list-group-item-action">
+                    <i class="fas fa-times-circle me-2"></i> Rechazados
+                </a>
+                <a href="/reports" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-bar me-2"></i> Reportes
+                </a>
+                <a href="/settings" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-cog me-2"></i> Configuración
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Configuración de Pendientes</h2>
+                    <p class="text-muted">Gestiona el proceso de revisión de CVs pendientes</p>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save me-2"></i>
+                    Guardar Cambios
+                </button>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card settings-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Flujo de Trabajo</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="workflow-container">
+                                <div class="workflow-step">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6>1. Recepción Inicial</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Verificación automática de requisitos básicos</small>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6>2. Revisión Técnica</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Evaluación por parte del equipo técnico</small>
+                                </div>
+
+                                <div class="workflow-step">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6>3. Evaluación Final</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Decisión final por parte de RRHH</small>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-plus me-2"></i>
+                                Agregar Paso
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card settings-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Criterios de Priorización</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Etiquetas de Prioridad</label>
+                                <div>
+                                    <span class="tag selected">Urgente</span>
+                                    <span class="tag">Alta</span>
+                                    <span class="tag">Media</span>
+                                    <span class="tag">Baja</span>
+                                    <span class="tag">Rutina</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Reglas de Priorización</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label">
+                                        Priorizar por antigüedad
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label">
+                                        Priorizar por nivel de experiencia
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox">
+                                    <label class="form-check-label">
+                                        Priorizar por ubicación
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="time-threshold">
+                                <label class="form-label mb-0">Tiempo máximo en cola:</label>
+                                <input type="number" class="form-control form-control-sm" style="width: 80px" value="48">
+                                <span>horas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card settings-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Asignación de Revisores</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="reviewer-card">
+                                <div>
+                                    <span class="priority-indicator priority-high"></span>
+                                    María González - Técnico Senior
+                                </div>
+                                <div class="badge bg-success">Disponible</div>
+                            </div>
+
+                            <div class="reviewer-card">
+                                <div>
+                                    <span class="priority-indicator priority-medium"></span>
+                                    Juan Pérez - RRHH
+                                </div>
+                                <div class="badge bg-warning text-dark">Ocupado</div>
+                            </div>
+
+                            <div class="reviewer-card">
+                                <div>
+                                    <span class="priority-indicator priority-low"></span>
+                                    Ana Martínez - Técnico
+                                </div>
+                                <div class="badge bg-success">Disponible</div>
+                            </div>
+
+                            <button class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Agregar Revisor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card settings-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notificaciones</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="notification-setting">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Nuevo CV Pendiente</h6>
+                                        <small class="text-muted">Notificar cuando se recibe un nuevo CV</small>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="notification-setting">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Tiempo de Espera Excedido</h6>
+                                        <small class="text-muted">Alertar cuando un CV supera el tiempo máximo</small>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="notification-setting">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Asignación de Revisor</h6>
+                                        <small class="text-muted">Notificar cuando se asigna un revisor</small>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="notification-setting">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Recordatorios Diarios</h6>
+                                        <small class="text-muted">Resumen diario de CVs pendientes</small>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Función para manejar la selección de tags
+document.querySelectorAll('.tag').forEach(tag => {
+    tag.addEventListener('click', function() {
+        this.classList.toggle('selected');
+    });
+});
+
+// Drag and Drop para pasos del workflow
+document.querySelectorAll('.workflow-step').forEach(step => {
+    step.setAttribute('draggable', true);
+    
+    step.addEventListener('dragstart', function(e) {
+        this.style.opacity = '0.4';
+        e.dataTransfer.setData('text/plain', this.innerHTML);
+    });
+
+    step.addEventListener('dragend', function(e) {
+        this.style.opacity = '1';
+    });
+
+    step.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderTop = '2px solid var(--microsoft-blue)';
+    });
+
+    step.addEventListener('dragleave', function(e) {
+        this.style.borderTop = '1px solid #dee2e6';
+    });
+
+    step.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderTop = '1px solid #dee2e6';
+        const draggedHTML = e.dataTransfer.getData('text/plain');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = draggedHTML;
+        this.parentNode.insertBefore(tempDiv.firstChild, this);
+    });
+});
+
+// Función para guardar la configuración
+function saveSettings() {
+    // Recopilar toda la configuración
+    const settings = {
+        workflow: Array.from(document.querySelectorAll('.workflow-step')).map(step => ({
+            title: step.querySelector('h6').textContent,
+            enabled: step.querySelector('input[type="checkbox"]').checked
+        })),
+        priorities: Array.from(document.querySelectorAll('.tag.selected')).map(tag => tag.textContent),
+        reviewers: Array.from(document.querySelectorAll('.reviewer-card')).map(card => ({
+            name: card.querySelector('div').textContent.trim(),
+            status: card.querySelector('.badge').textContent
+        })),
+        notifications: Array.from(document.querySelectorAll('.notification-setting')).map(setting => ({
+            type: setting.querySelector('h6').textContent,
+            enabled: setting.querySelector('input[type="checkbox"]').checked
+        }))
+    };
+
+    console.log('Guardando configuración:', settings);
+    alert('Configuración guardada exitosamente');
+}
+
+// Inicialización de tooltips de Bootstrap
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+});
+</script>
+
+</body></html>

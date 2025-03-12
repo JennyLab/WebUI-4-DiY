@@ -1,0 +1,333 @@
+body {
+  background: #1a1b26;
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', monospace;
+  height: 100vh;
+}
+
+#desktop-environment {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-shell {
+  flex: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* GNOME Shell Styles */
+#gnome-shell {
+  background: #2e3440;
+}
+
+#gnome-shell .top-bar {
+  background: #3b4252;
+  color: #eceff4;
+  height: 28px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  align-items: center;
+}
+
+/* KDE Shell Styles */
+#kde-shell {
+  background: #1d1f21;
+}
+
+#kde-shell .panel {
+  background: #2f343f;
+  color: #ffffff;
+  height: 36px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  align-items: center;
+}
+
+/* XFCE Shell Styles */
+#xfce-shell {
+  background: #232729;
+}
+
+#xfce-shell .panel {
+  background: #2b2e37;
+  color: #ffffff;
+  height: 28px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  align-items: center;
+}
+
+/* Terminal Styles */
+#terminal {
+  background: rgba(26, 27, 38, 0.95);
+  color: #a9b1d6;
+  padding: 10px;
+  border-radius: 5px;
+  height: 60%;
+  margin: 20px;
+  overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#terminal-output {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+#input-line {
+  display: flex;
+  margin-top: 10px;
+}
+
+.prompt {
+  color: #9ece6a;
+  margin-right: 8px;
+}
+
+#terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #a9b1d6;
+  font-family: 'Courier New', monospace;
+  font-size: inherit;
+  outline: none;
+}
+
+.success { 
+  color: #9ece6a; 
+}
+
+.error { 
+  color: #f7768e; 
+}
+
+.info { 
+  color: #7aa2f7; 
+}
+
+/* Add Nano Editor Styles */
+.nano-editor {
+  background: #1a1b26;
+  color: #a9b1d6;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.nano-content {
+  flex: 1;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  outline: none;
+}
+
+.nano-status-bar {
+  background: #2e3440;
+  padding: 5px;
+  font-size: 12px;
+}
+
+.nano-filename {
+  color: #88c0d0;
+  margin-bottom: 5px;
+}
+
+.nano-shortcuts {
+  color: #ffffff;
+  opacity: 0.7;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.nano-message {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2e3440;
+  color: #88c0d0;
+  padding: 5px 15px;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* htop styles */
+.htop-interface {
+  background: #1a1b26;
+  color: #a9b1d6;
+  height: 100%;
+  padding: 0;
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  overflow-y: auto;
+}
+
+.htop-header {
+  padding: 5px;
+  border-bottom: 1px solid #2e3440;
+}
+
+.cpu-meters {
+  margin-bottom: 5px;
+}
+
+.meter {
+  color: #7aa2f7;
+  margin: 2px 0;
+}
+
+.mem-meter {
+  color: #9ece6a;
+  margin: 2px 0;
+}
+
+.swap-meter {
+  color: #f7768e;
+  margin: 2px 0;
+}
+
+.tasks-info {
+  color: #bb9af7;
+  margin-top: 5px;
+}
+
+.htop-processes {
+  margin-top: 10px;
+}
+
+.process-header {
+  color: #7dcfff;
+  padding: 2px 5px;
+  background: #2e3440;
+}
+
+.process-row {
+  padding: 2px 5px;
+}
+
+.process-row:hover {
+  background: #2e3440;
+}
+
+.htop-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 5px;
+  background: #2e3440;
+  color: #7aa2f7;
+  border-top: 1px solid #3b4252;
+}
+
+/* Window Management Styles */
+.window {
+  position: absolute;
+  background: rgba(26, 27, 38, 0.95);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  min-width: 400px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  resize: both;
+  overflow: hidden;
+}
+
+.window-titlebar {
+  background: #2e3440;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+}
+
+.window-title {
+  color: #eceff4;
+  font-size: 14px;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.minimize { background: #f7d08a; }
+.maximize { background: #9ece6a; }
+.close { background: #f7768e; }
+
+.window-content {
+  flex: 1;
+  overflow: auto;
+}
+
+.browser-window .window-content {
+  background: white;
+}
+
+.browser-toolbar {
+  background: #2e3440;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.url-bar {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  background: #3b4252;
+  color: #eceff4;
+}
+
+.browser-frame {
+  width: 100%;
+  height: calc(100% - 40px);
+  border: none;
+}
+
+.minimized {
+  height: 30px !important;
+  min-height: 30px !important;
+  overflow: hidden;
+}
+
+.maximized {
+  width: 100% !important;
+  height: calc(100% - 28px) !important;
+  top: 28px !important;
+  left: 0 !important;
+}
+
+.taskbar-item {
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.taskbar-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

@@ -1,0 +1,296 @@
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; line-height: 1.5; padding: 20px; background: #1e1e1e; color: #fff; }
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.editor {
+    background: #2d2d2d;
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+}
+
+textarea {
+    width: 100%;
+    height: 300px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Consolas', monospace;
+    resize: none;
+}
+
+.output {
+    background: #2d2d2d;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+button {
+    background: #0078d4;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    width: 100%;
+    margin-top: 20px;
+}
+
+button:hover {
+    background: #0086f0;
+}
+
+button:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+h2 {
+    color: #0078d4;
+    margin-bottom: 10px;
+}
+
+pre {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    color: #d4d4d4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.loading svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.error {
+    color: #ff6b6b;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255,107,107,0.1);
+    border-radius: 4px;
+    display: none;
+}
+
+.debug-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: #333;
+    border-radius: 4px;
+    font-family: monospace;
+    display: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="editor">
+        <h2>First C++ Code</h2>
+        <textarea id="code1" placeholder="Paste your first C++ code here..."></textarea>
+    </div>
+    <div class="editor">
+        <h2>Second C++ Code</h2>
+        <textarea id="code2" placeholder="Paste your second C++ code here..."></textarea>
+    </div>
+</div>
+
+<button id="mergeButton" onclick="mergeCodes()">Merge Codes</button>
+
+<div class="loading" id="loading">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 2a10 10 0 0 1 10 10"></path>
+    </svg>
+    <p>Merging codes...</p>
+</div>
+
+<div class="error" id="error">
+    An error occurred while merging the code. Please try again.
+</div>
+
+<div class="debug-info" id="debugInfo">
+    Debug information will appear here...
+</div>
+
+<div class="output">
+    <h2>Merged Result</h2>
+    <pre id="output">// Merged code will appear here...</pre>
+</div>
+
+<script>
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('Unhandled promise rejection:', event.reason);
+    showError(event.reason);
+});
+
+function showError(error) {
+    const elements = getElements();
+    elements.error.style.display = 'block';
+    elements.output.textContent = '// An error occurred while merging the code';
+    
+    const debugInfo = {
+        timestamp: new Date().toISOString(),
+        errorMessage: error?.message || 'Unknown error',
+        errorStack: error?.stack,
+        errorType: error?.constructor.name,
+        browserInfo: navigator.userAgent
+    };
+    
+    elements.debugInfo.style.display = 'block';
+    elements.debugInfo.textContent = JSON.stringify(debugInfo, null, 2);
+    elements.loading.style.display = 'none';
+    elements.mergeButton.disabled = false;
+}
+
+function getElements() {
+    return {
+        code1: document.getElementById('code1'),
+        code2: document.getElementById('code2'),
+        mergeButton: document.getElementById('mergeButton'),
+        loading: document.getElementById('loading'),
+        error: document.getElementById('error'),
+        debugInfo: document.getElementById('debugInfo'),
+        output: document.getElementById('output')
+    };
+}
+
+function validateCppCode(code) {
+    // Basic validation patterns for C++ code
+    const cppPatterns = [
+        { pattern: '#include', description: 'Missing include directives' },
+        { pattern: 'int|void|char|double|float', description: 'No valid C++ type declarations found' },
+        { pattern: 'class|struct|namespace', description: 'No class, struct, or namespace definitions found' },
+        { pattern: '\\w+\\s+\\w+\\s*\\([^)]*\\)', description: 'No function definitions found' }
+    ];
+    
+    const missingPatterns = cppPatterns.filter(({ pattern }) => 
+        !new RegExp(pattern).test(code)
+    );
+    
+    return {
+        isValid: missingPatterns.length < cppPatterns.length,
+        feedback: missingPatterns.map(p => p.description)
+    };
+}
+
+async function mergeCodes() {
+    const elements = getElements();
+    
+    try {
+        elements.error.style.display = 'none';
+        elements.debugInfo.style.display = 'none';
+        
+        const code1 = elements.code1.value.trim();
+        const code2 = elements.code2.value.trim();
+
+        if (!code1 || !code2) {
+            throw new Error('Both code editors must contain C++ code');
+        }
+
+        // Validate both code snippets
+        const validation1 = validateCppCode(code1);
+        const validation2 = validateCppCode(code2);
+        
+        if (!validation1.isValid || !validation2.isValid) {
+            throw new Error(`Invalid C++ code detected:\nFirst code: ${validation1.feedback.join(', ')}\nSecond code: ${validation2.feedback.join(', ')}`);
+        }
+
+        elements.mergeButton.disabled = true;
+        elements.loading.style.display = 'block';
+        elements.output.textContent = '// Processing...';
+
+        const response = await fetch('/api/ai_completion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: `Merge these C++ code snippets into a single coherent program. Identify and resolve any conflicts:
+
+First Code:
+\`\`\`cpp
+${code1}
+\`\`\`
+
+Second Code:
+\`\`\`cpp
+${code2}
+\`\`\`
+
+<typescript-interface>
+interface Response {
+    mergedCode: string;
+    debugInfo: {
+        conflicts: string[];
+        resolutions: string[];
+        mergeStrategy: string;
+    }
+}
+</typescript-interface>
+
+<example>
+{
+    "mergedCode": "// Merged C++ code here",
+    "debugInfo": {
+        "conflicts": ["Duplicate function names", "Different header includes"],
+        "resolutions": ["Renamed conflicting functions", "Merged header includes"],
+        "mergeStrategy": "Function-level merge with namespace separation"
+    }
+}
+</example>`,
+                data: { code1, code2 }
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || typeof data.mergedCode !== 'string') {
+            throw new Error('Invalid response format from AI service');
+        }
+
+        elements.output.textContent = data.mergedCode;
+        
+        if (data.debugInfo) {
+            elements.debugInfo.style.display = 'block';
+            elements.debugInfo.textContent = JSON.stringify(data.debugInfo, null, 2);
+        }
+
+    } catch (error) {
+        console.error('Error merging code:', error);
+        showError(error);
+    } finally {
+        elements.loading.style.display = 'none';
+        elements.mergeButton.disabled = false;
+    }
+}
+</script>
+</body></html>

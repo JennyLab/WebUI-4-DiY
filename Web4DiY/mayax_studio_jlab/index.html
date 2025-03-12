@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MayaX Studio</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls": "https://unpkg.com/three@0.158.0/examples/jsm/controls/OrbitControls.js"
+        }
+    }
+    </script>
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    <div id="roblox-studio-container">
+        <nav id="top-menu">
+            <div class="menu-section file-menu">
+                File
+                <div class="dropdown">
+                    <div class="dropdown-item">New Project</div>
+                    <div class="dropdown-item">Open Project</div>
+                    <div class="dropdown-item">Save</div>
+                    <div class="dropdown-item">Save As</div>
+                    <div class="dropdown-item">Exit</div>
+                </div>
+            </div>
+            <div class="menu-section edit-menu">
+                Edit
+                <div class="dropdown">
+                    <div class="dropdown-item">Undo</div>
+                    <div class="dropdown-item">Redo</div>
+                    <div class="dropdown-item">Cut</div>
+                    <div class="dropdown-item">Copy</div>
+                    <div class="dropdown-item">Paste</div>
+                </div>
+            </div>
+            <div class="menu-section view-menu">View</div>
+            <div class="menu-section model-menu">
+                Model
+                <div class="dropdown">
+                    <div class="dropdown-item" id="add-part">Add Part</div>
+                    <div class="dropdown-item" id="add-model">Import Model</div>
+                    <div class="dropdown-item" id="export-model">Export Model</div>
+                </div>
+            </div>
+            <div class="menu-section plugins-menu">Plugins</div>
+        </nav>
+
+        <div id="workspace">
+            <div id="left-sidebar">
+                <div class="explorer-panel">
+                    <h3>Explorer</h3>
+                    <ul id="project-hierarchy">
+                        <li data-type="workspace" class="parent-node">
+                            Workspace
+                            <ul id="workspace-children"></ul>
+                        </li>
+                        <li>Baseplate</li>
+                        <li>Camera</li>
+                    </ul>
+                </div>
+                <div class="properties-panel">
+                    <h3>Properties</h3>
+                    <div id="object-properties">
+                        <div class="property-row">
+                            <span>Position:</span>
+                            <input type="text" id="position-input" class="property-input" placeholder="X, Y, Z">
+                        </div>
+                        <div class="property-row">
+                            <span>Rotation:</span>
+                            <input type="text" id="rotation-input" class="property-input" placeholder="X, Y, Z">
+                        </div>
+                        <div class="property-row">
+                            <span>Size:</span>
+                            <input type="text" id="size-input" class="property-input" placeholder="Width, Height, Depth">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="main-viewport">
+                <div class="viewport-tabs">
+                    <div class="tab active" data-view="perspective">Perspective</div>
+                    <div class="tab" data-view="top">Top</div>
+                    <div class="tab" data-view="front">Front</div>
+                    <div class="tab" data-view="side">Side</div>
+                </div>
+                <div id="3d-scene">
+                    <div class="grid-overlay"></div>
+                </div>
+            </div>
+
+            <div id="right-sidebar">
+                <div class="toolbox">
+                    <h3>Tools</h3>
+                    <div class="tool-group">
+                        <button class="tool-button active" data-tool="select">Select</button>
+                        <button class="tool-button" data-tool="move">Move</button>
+                        <button class="tool-button" data-tool="rotate">Rotate</button>
+                        <button class="tool-button" data-tool="scale">Scale</button>
+                    </div>
+                </div>
+                <div class="output-panel">
+                    <h3>Output</h3>
+                    <div id="console-log"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bottom-toolbar">
+            <div class="play-controls">
+                <button id="play-btn">Play</button>
+                <button id="stop-btn">Stop</button>
+            </div>
+            <div class="status-bar">
+                <span class="cursor-position">X: 0, Y: 0, Z: 0</span>
+                <span class="zoom-level">Zoom: 100%</span>
+            </div>
+        </div>
+
+        <!-- Modal for adding parts -->
+        <div id="add-part-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Add Part</h2>
+                <div class="part-options">
+                    <button data-part-type="box">Box</button>
+                    <button data-part-type="sphere">Sphere</button>
+                    <button data-part-type="cylinder">Cylinder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Added New Project Modal -->
+        <div id="new-project-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>New Project</h2>
+                <input type="text" id="project-name-input" placeholder="Project Name">
+                <div class="modal-actions">
+                    <button id="create-project-btn">Create</button>
+                    <button id="cancel-project-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Project Modal -->
+        <div id="open-project-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Open Project</h2>
+                <select id="saved-projects-list"></select>
+                <div class="modal-actions">
+                    <button id="load-project-btn">Open</button>
+                    <button id="delete-project-btn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

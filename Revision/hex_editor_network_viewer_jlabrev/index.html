@@ -1,0 +1,113 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hex Editor & Network Viewer</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.0.0/css/xterm.min.css" />
+</head>
+<body>
+
+  <div class="desktop">
+    <div class="window" id="hex-editor-window" data-window-type="hex-editor">
+      <div class="window-header">
+        Hex Editor
+        <div class="window-controls">
+          <span class="minimize"><i class="fas fa-window-minimize"></i></span>
+          <span class="maximize"><i class="fas fa-window-maximize"></i></span>
+          <span class="close"><i class="fas fa-times"></i></span>
+        </div>
+      </div>
+      <div class="window-content">
+        <div id="hex-editor-container"></div>
+      </div>
+    </div>
+
+    <div class="window" id="code-editor-window" data-window-type="code-editor">
+      <div class="window-header">
+        Code Editor
+        <div class="window-controls">
+          <span class="minimize"><i class="fas fa-window-minimize"></i></span>
+          <span class="maximize"><i class="fas fa-window-maximize"></i></span>
+          <span class="close"><i class="fas fa-times"></i></span>
+        </div>
+      </div>
+      <div class="window-content">
+        <textarea id="code-editor"></textarea>
+      </div>
+    </div>
+
+    <div class="window" id="terminal-window" data-window-type="terminal">
+      <div class="window-header">
+        Advanced Terminal
+        <div class="window-controls">
+          <span class="minimize"><i class="fas fa-window-minimize"></i></span>
+          <span class="maximize"><i class="fas fa-window-maximize"></i></span>
+          <span class="close"><i class="fas fa-times"></i></span>
+        </div>
+      </div>
+      <div class="window-content">
+        <div id="terminal"></div>
+      </div>
+    </div>
+
+    <div class="window" id="network-viewer-window" data-window-type="network-viewer">
+      <div class="window-header">
+        Network Package Viewer
+        <div class="window-controls">
+          <span class="minimize"><i class="fas fa-window-minimize"></i></span>
+          <span class="maximize"><i class="fas fa-window-maximize"></i></span>
+          <span class="close"><i class="fas fa-times"></i></span>
+        </div>
+      </div>
+      <div class="window-content">
+        <div id="network-viewer-container"></div>
+      </div>
+    </div>
+
+    <div class="window" id="http-analyzer-window" data-window-type="http-analyzer">
+      <div class="window-header">
+        HTTP Analyzer
+        <div class="window-controls">
+          <span class="minimize"><i class="fas fa-window-minimize"></i></span>
+          <span class="maximize"><i class="fas fa-window-maximize"></i></span>
+          <span class="close"><i class="fas fa-times"></i></span>
+        </div>
+      </div>
+      <div class="window-content">
+        <div class="panel">
+          <h3>Request</h3>
+          <textarea id="http-request"></textarea>
+        </div>
+        <div class="panel">
+          <h3>Response</h3>
+          <textarea id="http-response"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div id="marks-panel">
+      <h3>Marks</h3>
+      <ul id="marks-list"></ul>
+    </div>
+  </div>
+
+  <div id="add-window-menu">
+    <button data-window-type="hex-editor">Add Hex Editor</button>
+    <button data-window-type="code-editor">Add Code Editor</button>
+    <button data-window-type="terminal">Add Terminal</button>
+    <button data-window-type="network-viewer">Add Network Viewer</button>
+    <button data-window-type="http-analyzer">Add HTTP Analyzer</button>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsnetworkx/0.3.0/jsnetworkx.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.0/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.0.0/lib/xterm.min.js"></script>
+  <script src="script.js" type="module"></script>
+
+</body>
+</html>

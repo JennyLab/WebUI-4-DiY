@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BB</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="browser">
+    <div class="titlebar">
+      <div class="logo">
+        <span class="material-icons">language</span>
+        <span class="title">BB</span>
+      </div>
+      <div class="controls">
+        <button class="control-btn minimize">
+          <span class="material-icons">remove</span>
+        </button>
+        <button class="control-btn maximize">
+          <span class="material-icons">crop_square</span>
+        </button>
+        <button class="control-btn close">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+    <div class="tabs">
+      <!-- Tabs will be dynamically added here -->
+    </div>
+    <div class="toolbar">
+      <button class="nav-btn back">
+        <span class="material-icons">arrow_back</span>
+      </button>
+      <button class="nav-btn forward">
+        <span class="material-icons">arrow_forward</span>
+      </button>
+      <button class="nav-btn refresh">
+        <span class="material-icons">refresh</span>
+      </button>
+      <div class="address-bar">
+        <span class="material-icons">lock</span>
+        <input type="text" placeholder="Enter a 'buss://' url..." id="urlInput">
+      </div>
+      <button class="nav-btn bookmark">
+        <span class="material-icons">star_border</span>
+      </button>
+      <button class="nav-btn menu">
+        <span class="material-icons">more_vert</span>
+      </button>
+    </div>
+    <div class="browser-content">
+      <!-- Tab contents will be dynamically added here -->
+    </div>
+  </div>
+  <script src="browser.js"></script>
+</body>
+</html>

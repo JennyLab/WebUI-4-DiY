@@ -1,0 +1,273 @@
+:root {
+  --terminal-bg: #1e1e1e;
+  --terminal-text: #ffffff;
+  --terminal-header: #323233;
+  --terminal-prompt: #00ff00;
+  --border-color: #444;
+  --highlight-color: #3f3f3f;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #2d2d2d;
+  font-family: 'Consolas', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  gap: 20px;
+}
+
+.terminal {
+  width: 1000px;
+  height: 600px;
+  background: var(--terminal-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-header {
+  background: var(--terminal-header);
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.title {
+  color: #fff;
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.controls div {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.minimize {
+  background: #ffbd2e;
+}
+
+.maximize {
+  background: #28c940;
+}
+
+.close {
+  background: #ff5f56;
+}
+
+.split-view {
+  display: flex;
+  height: calc(100% - 36px);
+}
+
+.file-browser {
+  width: 250px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.file-browser-header {
+  padding: 8px;
+  background: var(--terminal-header);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.file-actions button {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--terminal-text);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.file-actions button:hover {
+  background: var(--highlight-color);
+}
+
+.file-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.file-item {
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 4px;
+}
+
+.file-item .file-name {
+  color: var(--terminal-text);
+}
+
+.file-item[data-exe="true"] .file-name {
+  color: #28c940;
+}
+
+.file-item:hover {
+  background: var(--highlight-color);
+  border-radius: 4px;
+}
+
+.file-item .file-size {
+  color: #888;
+}
+
+.drive-status {
+  padding: 8px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.9em;
+  color: #888;
+}
+
+.terminal-content {
+  flex-grow: 1;
+  padding: 16px;
+  overflow-y: auto;
+  color: var(--terminal-text);
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prompt {
+  color: var(--terminal-prompt);
+}
+
+#commandInput {
+  background: transparent;
+  border: none;
+  color: var(--terminal-text);
+  font-family: inherit;
+  font-size: inherit;
+  flex-grow: 1;
+  outline: none;
+}
+
+.output-line {
+  margin: 4px 0;
+  white-space: pre-wrap;
+}
+
+.error {
+  color: #ff5f56;
+}
+
+.success {
+  color: #28c940;
+}
+
+#isoFileInput {
+  width: 100%;
+  padding: 8px;
+  background: var(--terminal-header);
+  border: 1px solid var(--border-color);
+  color: var(--terminal-text);
+  border-radius: 4px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--terminal-bg);
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  color: var(--terminal-text);
+}
+
+.form-group input,
+.form-group select {
+  background: var(--terminal-header);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  color: var(--terminal-text);
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-actions button {
+  background: var(--terminal-header);
+  border: 1px solid var(--border-color);
+  color: var(--terminal-text);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button:hover {
+  background: var(--highlight-color);
+}

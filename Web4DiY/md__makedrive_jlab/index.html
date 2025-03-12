@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MD:\ - MakeDrive</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="title">MD:\ - MakeDrive</span>
+        <div class="controls">
+          <div class="minimize">−</div>
+          <div class="maximize">□</div>
+          <div class="close">×</div>
+        </div>
+      </div>
+      <div class="split-view">
+        <div class="file-browser">
+          <div class="file-browser-header">
+            <span>Files</span>
+            <div class="file-actions">
+              <button id="newFileBtn" title="New File">+</button>
+              <button id="saveISOBtn" title="Save ISO">💾</button>
+              <button id="loadISOBtn" title="Load ISO">📂</button>
+              <button id="refreshBtn" title="Refresh">↻</button>
+            </div>
+          </div>
+          <div id="fileList" class="file-list"></div>
+          <div class="drive-status" id="driveStatus"></div>
+        </div>
+        <div class="terminal-content">
+          <div id="output"></div>
+          <div class="input-line">
+            <span class="prompt">MD:\></span>
+            <input type="text" id="commandInput" autofocus>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2>Create New File</h2>
+      <div class="modal-form">
+        <div class="form-group">
+          <label for="filename">Filename:</label>
+          <input type="text" id="filename" placeholder="Enter filename">
+        </div>
+        <div class="form-group">
+          <label for="contentType">Content Type:</label>
+          <select id="contentType">
+            <option value="story">Story</option>
+            <option value="code">Code</option>
+            <option value="poem">Poem</option>
+            <option value="recipe">Recipe</option>
+            <option value="game">Text Game</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button id="generateBtn">Generate</button>
+          <button id="cancelBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="loadISOModal" class="modal">
+    <div class="modal-content">
+      <h2>Load ISO File</h2>
+      <div class="modal-form">
+        <div class="form-group">
+          <input type="file" id="isoFileInput" accept=".iso">
+        </div>
+        <div class="modal-actions">
+          <button id="loadISOConfirmBtn">Load</button>
+          <button id="loadISOCancelBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

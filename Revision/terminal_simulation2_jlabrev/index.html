@@ -1,0 +1,932 @@
+<style>
+  body {
+    background: #000;
+    color: #0F0;
+    font-family: monospace;
+    padding: 20px;
+    margin: 0;
+    overflow: hidden;
+  }
+  
+  #terminal {
+    width: 100%;
+    height: 90vh;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #0F0;
+    position: relative;
+  }
+  
+  .command-output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .typing-line {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  #prompt {
+    color: #0F0;
+    margin-right: 10px;
+  }
+  
+  #command {
+    background: transparent;
+    border: none;
+    color: #0F0;
+    font-family: monospace;
+    font-size: 16px;
+    width: 100%;
+    padding: 5px;
+  }
+  
+  #command:focus {
+    outline: none;
+  }
+  
+  .matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.1;
+    z-index: -1;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  .cursor {
+    animation: blink 1s infinite;
+    display: inline-block;
+  }
+
+  #thoughts-window {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(0, 20, 0, 0.9);
+    border: 1px solid #0F0;
+    border-radius: 5px;
+    padding: 15px;
+    z-index: 100;
+  }
+
+  #thoughts-header {
+    border-bottom: 1px solid #0F0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #thoughts-content {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .hacker-thought {
+    color: #808080;
+    font-style: italic;
+    margin: 5px 0;
+    padding-left: 20px;
+    border-bottom: 1px dotted #1a1a1a;
+    padding-bottom: 5px;
+  }
+
+  .minimize-btn {
+    background: none;
+    border: 1px solid #0F0;
+    color: #0F0;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-family: monospace;
+  }
+
+  .minimize-btn:hover {
+    background: #0F0;
+    color: #000;
+  }
+
+  .thoughts-title {
+    color: #0F0;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  #cpu-monitor {
+    position: fixed;
+    top: 370px; /* Changed from 20px to position below thoughts window */
+    right: 20px; /* Changed from left: 20px to align with thoughts window */
+    width: 300px;
+    background: rgba(0, 20, 0, 0.9);
+    border: 1px solid #0F0;
+    border-radius: 5px;
+    padding: 15px;
+    z-index: 100;
+  }
+
+  #cpu-header {
+    border-bottom: 1px solid #0F0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #cpu-content {
+    font-family: monospace;
+  }
+
+  .cpu-bar {
+    width: 100%;
+    height: 20px;
+    background: #0F0;
+    margin: 5px 0;
+    position: relative;
+    opacity: 0.3;
+  }
+
+  .cpu-info {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .advertisement {
+    position: fixed;
+    background: rgba(0, 20, 0, 0.9);
+    border: 2px solid #0F0;
+    padding: 15px;
+    z-index: 200;
+    min-width: 300px;
+    max-width: 400px;
+  }
+
+  .ad-header {
+    border-bottom: 1px solid #0F0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .ad-content {
+    margin: 10px 0;
+  }
+
+  .ad-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .ad-button {
+    background: none;
+    border: 1px solid #0F0;
+    color: #0F0;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: monospace;
+  }
+
+  .ad-button:hover {
+    background: #0F0;
+    color: #000;
+  }
+</style>
+</head>
+<body>
+
+<canvas class="matrix-rain" id="matrix"></canvas>
+<div id="thoughts-window">
+  <div id="thoughts-header">
+    <span class="thoughts-title">HACKER THOUGHTS</span>
+    <button class="minimize-btn" id="toggle-thoughts">_</button>
+  </div>
+  <div id="thoughts-content"></div>
+</div>
+<div id="cpu-monitor">
+  <div id="cpu-header">
+    <span class="thoughts-title">TARGET: ACME-SERVER01</span>
+    <button class="minimize-btn" id="toggle-cpu">_</button>
+  </div>
+  <div id="cpu-content">
+    <div class="cpu-info">
+      <span>CPU Usage:</span>
+      <span id="cpu-percentage">0%</span>
+    </div>  
+    <div class="cpu-bar" id="cpu-bar"></div>
+    <div class="cpu-info">
+      <span>Memory:</span>
+      <span id="memory-usage">4.2GB / 16GB</span>
+    </div>
+    <div class="cpu-info">
+      <span>Processes:</span>
+      <span id="process-count">142</span>
+    </div>
+  </div>
+</div>
+<div id="terminal"></div>
+<div id="input-line">
+  <span id="prompt">root@system:~#</span>
+  <input type="text" id="command" autofocus>
+</div>
+
+<script>
+const terminal = document.getElementById('terminal');
+const commandInput = document.getElementById('command');
+
+async function typeText(text, isUserTyping = false) {
+  const line = document.createElement('div');
+  line.className = 'command-output';
+  terminal.appendChild(line);
+  
+  for(let char of text) {
+    if(isUserTyping) {
+      await sleep(Math.random() * 100 + 50);
+    } else {
+      await sleep(Math.random() * 50 + 10);
+    }
+    line.textContent += char;
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+}
+
+const hackerThoughts = {
+  'scan': [
+    "Time to see what we're dealing with here...",
+    "Looking for the weak spots in their armor...",
+    "Let's map out this network's anatomy..."
+  ],
+  'decrypt': [
+    "Breaking through their encryption, bit by bit...",
+    "These codes can't hide from me forever...",
+    "Just a matter of time before these walls crumble..."
+  ],
+  'hack': [
+    "I'm in their system now, they won't even know what hit them...",
+    "Security systems are just puzzles waiting to be solved...",
+    "Time to dance with their firewall..."
+  ],
+  'ransomware': [
+    "Let's see how much they value their precious data...",
+    "Time to turn their files into digital gold...",
+    "They should've backed up their data... too late now..."
+  ],
+  'bruteforce': [
+    "Time to try every combination in the book...",
+    "One of these passwords has to work...",
+    "Brute force isn't elegant, but it gets the job done..."
+  ],
+  'ddos': [
+    "Let's bring their servers to their knees...",
+    "Time to flood their networks with requests...",
+    "They won't know what hit them..."
+  ],
+  'phish': [
+    "A well-crafted email is all it takes...",
+    "Social engineering - the human weakness...",
+    "Let's see who takes the bait..."
+  ],
+  'rootkit': [
+    "Time to plant some deep roots in their system...",
+    "They'll never find this back door...",
+    "The perfect hiding spot..."
+  ],
+  'professional': [
+    "Time for some corporate espionage...",
+    "This requires a more... sophisticated approach",
+    "Clean, precise, and completely untraceable..."
+  ],
+  'infiltrate': [
+    "Slipping through their defenses like a ghost...",
+    "They'll never know I was here...",
+    "Time for some subtle reconnaissance..."
+  ],
+  'exfiltrate': [
+    "Let's see what secrets they're hiding...",
+    "Data is digital gold, time to mine it...",
+    "Slow and steady wins the race..."
+  ],
+  'backdoor': [
+    "Installing my secret entrance...",
+    "They'll never find this little surprise...",
+    "Always good to have a way back in..."
+  ],
+  'crash': [
+    "Time to bring this system to its knees...",
+    "Let's see how much abuse this hardware can take...",
+    "Maximum CPU burn initiated - no mercy!",
+  ],
+  'guess': [
+    "Time to crack this password, the old fashioned way...",
+    "Let's see if I can figure this one out...",
+    "Every password has a pattern, just need to find it..."
+  ],
+};
+
+const commands = {
+  'help': `Available commands:
+help, clear, scan, decrypt, hack, ransomware, bruteforce, ddos
+phish, rootkit, professional, infiltrate, exfiltrate, backdoor, crash, guess, ads, exit`,
+  'clear': () => terminal.innerHTML = '',
+  'scan': async () => {
+    await typeText('Scanning network for vulnerabilities...\n', true);
+    await showHackerThought('scan');
+    await sleep(1000);
+    await typeText('Found open ports: 22, 80, 443\n');
+    await sleep(500);
+    await typeText('Detected systems:\n');
+    await typeText('192.168.1.1 - Router [***]\n');
+    await typeText('192.168.1.100 - Server [**]\n');
+    await typeText('192.168.1.254 - Unknown [*]\n');
+  },
+  'decrypt': async () => {
+    await typeText('Initiating decryption sequence...\n', true);
+    await showHackerThought('decrypt');
+    await sleep(1000);
+    for(let i = 0; i < 100; i += 10) {
+      await typeText(`Decrypting... ${i}%\n`);
+      await sleep(200);
+    }
+    await typeText('Decryption complete!\n');
+  },
+  'hack': async () => {
+    await typeText('INITIATING HACK SEQUENCE...\n', true);
+    await showHackerThought('hack');
+    await sleep(500);
+    await typeText('Bypassing firewall...\n');
+    await sleep(800);
+    await typeText('Injecting payload...\n');
+    await sleep(1000);
+    await typeText('ACCESS GRANTED\n');
+  },
+  'ransomware': async () => {
+    await typeText('DEPLOYING RANSOMWARE ATTACK...\n', true);
+    await showHackerThought('ransomware');
+    await sleep(1000);
+    await typeText('Scanning for vulnerable systems...\n');
+    await sleep(800);
+    await typeText('Encrypting target files...\n');
+    await sleep(1000);
+    
+    for(let i = 0; i < 100; i += 20) {
+      await typeText(`File encryption progress: ${i}%\n`);
+      await sleep(500);
+    }
+    
+    await typeText('ALL FILES ENCRYPTED\n');
+    await sleep(500);
+    await typeText(`
+╔══════════════════════════════════════════╗
+║             YOUR FILES ARE               ║
+║           NOW ENCRYPTED! 🔒              ║
+║                                         ║
+║ Send 5 BTC to unlock your files:        ║
+║ bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh ║
+║                                         ║
+║ Time remaining: 48:00:00                ║
+╚══════════════════════════════════════════╝\n`);
+  },
+  'bruteforce': async () => {
+    await typeText('INITIATING BRUTEFORCE ATTACK...\n', true);
+    await showHackerThought('bruteforce');
+    await sleep(500);
+    await typeText('Target: SSH Service on 192.168.1.100\n');
+    
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for(let i = 0; i < 10; i++) {
+      let attempt = '';
+      for(let j = 0; j < 8; j++) {
+        attempt += chars[Math.floor(Math.random() * chars.length)];
+      }
+      await typeText(`Trying password: ${attempt}\n`);
+      await sleep(300);
+    }
+    await typeText('PASSWORD FOUND: Adm1n123!\n');
+    await typeText('ACCESS GRANTED\n');
+  },
+  'ddos': async () => {
+    await typeText('INITIATING DDOS ATTACK...\n', true);
+    await showHackerThought('ddos');
+    await sleep(500);
+    await typeText('Spinning up zombie network...\n');
+    await sleep(800);
+    
+    let requestCount = 0;
+    for(let i = 0; i < 5; i++) {
+      requestCount += Math.floor(Math.random() * 10000);
+      await typeText(`Requests sent: ${requestCount.toLocaleString()}\n`);
+      await sleep(500);
+    }
+    
+    await typeText('TARGET SERVER OVERWHELMED\n');
+    await typeText('Service disruption successful\n');
+  },
+  'phish': async () => {
+    await typeText('PREPARING PHISHING CAMPAIGN...\n', true);
+    await showHackerThought('phish');
+    await sleep(500);
+    await typeText('Cloning legitimate login page...\n');
+    await sleep(800);
+    await typeText('Generating convincing email template...\n');
+    await sleep(800);
+    await typeText(`
+From: security@legitbank.com
+Subject: Urgent: Verify Your Account
+    
+Dear Valued Customer,
+    
+We have detected suspicious activity...
+    
+Click here to verify: http://totally-legit-bank.evil.com
+    
+Best regards,
+Security Team\n`);
+    await typeText('\nPhishing campaign deployed!\n');
+  },
+  'rootkit': async () => {
+    await typeText('DEPLOYING ROOTKIT...\n', true);
+    await showHackerThought('rootkit');
+    await sleep(500);
+    await typeText('Analyzing system architecture...\n');
+    await sleep(800);
+    await typeText('Identifying kernel vulnerabilities...\n');
+    await sleep(800);
+    await typeText('Installing rootkit components:\n');
+    
+    const components = [
+      'Kernel module loader',
+      'Process concealer',
+      'Network traffic interceptor',
+      'Log cleaner',
+      'Backdoor service'
+    ];
+    
+    for(let component of components) {
+      await typeText(`[+] ${component}\n`);
+      await sleep(400);
+    }
+    
+    await typeText('ROOTKIT SUCCESSFULLY DEPLOYED\n');
+    await typeText('System compromised and concealed\n');
+  },
+  'professional': async () => {
+    await typeText('INITIATING PROFESSIONAL INFILTRATION PROTOCOL...\n', true);
+    await showHackerThought('professional');
+    await sleep(500);
+    await typeText('Analyzing corporate infrastructure...\n');
+    await sleep(800);
+    await typeText('Establishing covert persistence methods:\n');
+    
+    const steps = [
+      'Creating legitimate-looking service accounts',
+      'Implementing encrypted C2 channels',
+      'Deploying memory-resident payloads',
+      'Establishing alternate access methods',
+      'Configuring data exfiltration routines'
+    ];
+    
+    for(let step of steps) {
+      await typeText(`[+] ${step}... Complete\n`);
+      await sleep(600);
+    }
+    
+    await typeText('\nProducing documentation:\n');
+    await sleep(500);
+    await typeText(`
+┌── Operation Summary ───────────────────┐
+│ Target: ACME Corporation              │
+│ Access Level: Domain Admin            │
+│ Foothold: Established                 │
+│ Persistence: Multiple                 │
+│ Detection Risk: Minimal               │
+│ Data Channels: Secured                │
+└──────────────────────────────────────┘\n`);
+    
+    await typeText('\nPROFESSIONAL INFILTRATION COMPLETE\n');
+    await typeText('Systems compromised with zero alerts triggered\n');
+  },
+  'infiltrate': async () => {
+    await typeText('INITIATING STEALTH INFILTRATION...\n', true);
+    await showHackerThought('infiltrate');
+    await sleep(500);
+    await typeText('Analyzing network topology...\n');
+    await sleep(800);
+    await typeText('Identifying low-traffic entry points...\n');
+    await sleep(800);
+    await typeText('Creating covert tunnel...\n');
+    await sleep(1000);
+    await typeText('STEALTH ACCESS ESTABLISHED\n');
+    await typeText('No alerts triggered\n');
+  },
+  'exfiltrate': async () => {
+    await typeText('INITIATING DATA EXFILTRATION...\n', true);
+    await showHackerThought('exfiltrate');
+    await sleep(500);
+    await typeText('Scanning for valuable data...\n');
+    await sleep(800);
+    
+    const files = [
+      'financial_reports.xlsx',
+      'customer_database.sql',
+      'internal_secrets.pdf',
+      'passwords.txt',
+      'source_code/'
+    ];
+    
+    for(let file of files) {
+      await typeText(`Extracting: ${file}\n`);
+      await sleep(600);
+    }
+    
+    await typeText('\nCompressing data...\n');
+    await sleep(1000);
+    await typeText('Encrypting package...\n');
+    await sleep(800);
+    await typeText('EXFILTRATION COMPLETE\n');
+  },
+  'backdoor': async () => {
+    await typeText('CREATING SYSTEM BACKDOOR...\n', true);
+    await showHackerThought('backdoor');
+    await sleep(500);
+    await typeText('Analyzing system services...\n');
+    await sleep(800);
+    await typeText('Identifying suitable injection points...\n');
+    await sleep(800);
+    await typeText('Installing persistent access:\n');
+    
+    const steps = [
+      'Creating hidden user account',
+      'Modifying system services',
+      'Installing remote access toolkit',
+      'Configuring startup scripts',
+      'Masking system modifications'
+    ];
+    
+    for(let step of steps) {
+      await typeText(`[+] ${step}...\n`);
+      await sleep(400);
+    }
+    
+    await typeText('\nBACKDOOR INSTALLED SUCCESSFULLY\n');
+    await typeText('Access available on port 43389\n');
+  },
+  'crash': async () => {
+    await typeText('INITIATING SYSTEM CRASH SEQUENCE...\n', true);
+    await showHackerThought('crash');
+    await sleep(500);
+    await typeText('Launching CPU-intensive processes...\n');
+    
+    // Force CPU to 100%
+    cpuValue = 100;
+    cpuBar.style.width = '100%';
+    cpuPercentage.textContent = '100%';
+    
+    // Show increasing process count
+    let procs = 142;
+    const processInterval = setInterval(() => {
+      procs += Math.floor(Math.random() * 100);
+      processCount.textContent = procs;
+    }, 500);
+    
+    // Show increasing memory usage
+    memoryUsage.textContent = '15.9GB / 16GB';
+    
+    await sleep(1000);
+    await typeText('System resources maxing out...\n');
+    await sleep(800);
+    
+    // Display glitch effect
+    for(let i = 0; i < 5; i++) {
+      await typeText('ERR0R: SYST3M_CR1T1CAL\n');
+      await sleep(300);
+    }
+    
+    await typeText('\nKERNEL PANIC\n');
+    await typeText('System stability compromised\n');
+    
+    // Return to normal after 5 seconds
+    setTimeout(() => {
+      clearInterval(processInterval);
+      processCount.textContent = '142';
+      memoryUsage.textContent = '4.2GB / 16GB';
+      cpuValue = 30;
+    }, 5000);
+  },
+  'guess': async () => {
+    const secretPassword = "h4ck3r"; // The password to guess
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    await typeText('PASSWORD GUESSING GAME INITIATED...\n', true);
+    await showHackerThought('guess');
+    await sleep(500);
+    await typeText('Target system requires password authentication\n');
+    await typeText('Password format: 6 characters\n');
+    await typeText('Attempts remaining: 5\n\n');
+
+    while (attempts < maxAttempts) {
+      const guess = await new Promise(resolve => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.style.background = 'transparent';
+        input.style.border = 'none';
+        input.style.color = '#0F0';
+        input.style.fontFamily = 'monospace';
+        input.style.fontSize = '16px';
+        
+        const line = document.createElement('div');
+        line.className = 'command-output';
+        line.appendChild(document.createTextNode('Enter guess: '));
+        line.appendChild(input);
+        terminal.appendChild(line);
+        input.focus();
+
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            const value = this.value;
+            this.remove();
+            line.textContent = 'Enter guess: ' + value;
+            resolve(value);
+          }
+        });
+      });
+
+      attempts++;
+      
+      if (guess === secretPassword) {
+        await typeText('\nPASSWORD CORRECT!\n');
+        await typeText('ACCESS GRANTED TO SECRET COMMAND: "ultimate"\n');
+        commands['ultimate'] = async () => {
+          await typeText('ULTIMATE HACKER MODE ACTIVATED\n');
+          await typeText('All systems compromised\n');
+          await typeText('You are now the master of all networks\n');
+        };
+        return;
+      } else {
+        let correctChars = 0;
+        for (let i = 0; i < guess.length; i++) {
+          if (guess[i] === secretPassword[i]) correctChars++;
+        }
+        await typeText(`\nIncorrect! But ${correctChars} characters were correct.\n`);
+        await typeText(`Attempts remaining: ${maxAttempts - attempts}\n\n`);
+      }
+    }
+
+    await typeText('\nMAXIMUM ATTEMPTS EXCEEDED\n');
+    await typeText('System locked. Try the guess command again.\n');
+  },
+  'ads': async () => {
+    await typeText('ADVERTISEMENT SYSTEM CONTROLS\n', true);
+    if (adInterval) {
+      clearInterval(adInterval);
+      adInterval = null;
+      await typeText('Advertisement system disabled\n');
+    } else {
+      adInterval = setInterval(createAd, adCooldown);
+      await typeText('Advertisement system enabled\n');
+      await typeText('Ads will appear every 30 seconds\n');
+      await typeText('Use the buttons on ads to manage them\n');
+    }
+  },
+  'exit': () => typeText('Connection terminated.\n', true)
+};
+
+let adInterval = null;
+let activeAds = [];
+let adCooldown = 30000; // 30 seconds
+
+const adMessages = [
+  "🔥 HOT DEAL: Premium Hacking Tools - 50% OFF!",
+  "💻 New Exploit Kits Available Now!",
+  "🛡️ Untraceable VPN Services - Limited Time Offer!",
+  "🌐 Anonymous Hosting - First Month Free!",
+  "⚡ Boost Your Hacking Speed - Pro Tools Bundle!"
+];
+
+function createAd() {
+  const ad = document.createElement('div');
+  ad.className = 'advertisement';
+  ad.style.left = Math.random() * (window.innerWidth - 400) + 'px';
+  ad.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+  
+  const message = adMessages[Math.floor(Math.random() * adMessages.length)];
+  
+  ad.innerHTML = `
+    <div class="ad-header">SPECIAL OFFER</div>
+    <div class="ad-content">${message}</div>
+    <div class="ad-buttons">
+      <button class="ad-button" onclick="closeAllAds()">Close All Advertisements</button>
+      <button class="ad-button" onclick="ignoreAd()">Ignore</button>
+      <button class="ad-button" onclick="closeAd(this)">Close Advertisement</button>
+    </div>
+  `;
+  
+  document.body.appendChild(ad);
+  activeAds.push(ad);
+  
+  // Make ad draggable
+  ad.style.cursor = 'move';
+  ad.onmousedown = dragMouseDown;
+}
+
+function closeAd(button) {
+  const ad = button.closest('.advertisement');
+  ad.remove();
+  activeAds = activeAds.filter(a => a !== ad);
+}
+
+function closeAllAds() {
+  activeAds.forEach(ad => ad.remove());
+  activeAds = [];
+}
+
+function ignoreAd() {
+  adCooldown = 20000; // Reduce to 20 seconds
+}
+
+// Add dragging functionality
+function dragMouseDown(e) {
+  e = e || window.event;
+  e.preventDefault();
+  
+  const ad = e.target.closest('.advertisement');
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  pos3 = e.clientX;
+  pos4 = e.clientY;
+  
+  document.onmouseup = closeDragElement;
+  document.onmousemove = elementDrag;
+  
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    ad.style.top = (ad.offsetTop - pos2) + "px";
+    ad.style.left = (ad.offsetLeft - pos1) + "px";
+  }
+  
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+// Function calls
+async function showHackerThought(command) {
+  const thoughts = hackerThoughts[command];
+  if (thoughts) {
+    const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
+    const thoughtElement = document.createElement('div');
+    thoughtElement.className = 'hacker-thought';
+    thoughtElement.textContent = thought;
+    
+    const thoughtsContent = document.getElementById('thoughts-content');
+    thoughtsContent.insertBefore(thoughtElement, thoughtsContent.firstChild);
+    
+    await sleep(1000);
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let isExecutingCommand = false;
+
+commandInput.addEventListener('keypress', async function(e) {
+  if(e.key === 'Enter' && !isExecutingCommand) {
+    isExecutingCommand = true;
+    const cmd = this.value.toLowerCase().trim();
+    const fullPrompt = `${document.getElementById('prompt').textContent} ${this.value}\n`;
+    await typeText(fullPrompt, true);
+    
+    if(commands[cmd]) {
+      if(typeof commands[cmd] === 'string') {
+        await typeText(commands[cmd] + '\n');
+      } else {
+        await commands[cmd]();
+      }
+    } else if(cmd) {
+      await typeText(`Command not found: ${cmd}\n`);
+    }
+    
+    this.value = '';
+    terminal.scrollTop = terminal.scrollHeight;
+    isExecutingCommand = false;
+  }
+});
+
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+const drops = [];
+const fontSize = 14;
+const columns = canvas.width/fontSize;
+
+for(let i = 0; i < columns; i++) {
+  drops[i] = 1;
+}
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = '#0F0';
+  ctx.font = fontSize + 'px monospace';
+  
+  for(let i = 0; i < drops.length; i++) {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    
+    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix, 50);
+
+// CPU Monitor functionality
+const cpuBar = document.getElementById('cpu-bar');
+const cpuPercentage = document.getElementById('cpu-percentage');
+let cpuValue = 0;
+
+function updateCPU() {
+  // Simulate CPU fluctuation
+  cpuValue += (Math.random() - 0.5) * 20;
+  cpuValue = Math.min(100, Math.max(0, cpuValue));
+  
+  cpuBar.style.width = cpuValue + '%';
+  cpuPercentage.textContent = Math.round(cpuValue) + '%';
+}
+
+setInterval(updateCPU, 1000);
+
+// CPU window toggle
+document.getElementById('toggle-cpu').addEventListener('click', function() {
+  const cpuContent = document.getElementById('cpu-content');
+  const btn = this;
+  
+  if (cpuContent.style.display === 'none') {
+    cpuContent.style.display = 'block';
+    btn.textContent = '_';
+  } else {
+    cpuContent.style.display = 'none';
+    btn.textContent = '□';
+  }
+});
+
+// Update process count randomly
+const processCount = document.getElementById('process-count');
+setInterval(() => {
+  processCount.textContent = 140 + Math.floor(Math.random() * 10);
+}, 5000);
+
+// Update memory usage randomly
+const memoryUsage = document.getElementById('memory-usage');
+setInterval(() => {
+  const used = (4 + Math.random()).toFixed(1);
+  memoryUsage.textContent = `${used}GB / 16GB`;
+}, 2000);
+
+typeText('Welcome to HackerSim v1.0\nType "help" for available commands.\n');
+
+document.getElementById('toggle-thoughts').addEventListener('click', function() {
+  const thoughtsContent = document.getElementById('thoughts-content');
+  const btn = this;
+  
+  if (thoughtsContent.style.display === 'none') {
+    thoughtsContent.style.display = 'block';
+    btn.textContent = '_';
+  } else {
+    thoughtsContent.style.display = 'none';
+    btn.textContent = '□';
+  }
+});
+</script>
+</body></html>

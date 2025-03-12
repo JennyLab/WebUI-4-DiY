@@ -1,0 +1,202 @@
+<style>
+:root {
+  --primary: #2a2d3e;
+  --secondary: #1e1f2b;
+  --accent: #6272a4;
+  --text: #f8f8f2;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Source Code Pro', monospace;
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.ide-container {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  height: 100vh;
+}
+
+.sidebar {
+  background: var(--primary);
+  padding: 1rem;
+  border-right: 1px solid var(--accent);
+}
+
+.file-tree {
+  list-style: none;
+  padding: 0;
+}
+
+.file-tree li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.file-tree li:hover {
+  background: var(--accent);
+}
+
+.editor {
+  background: var(--primary);
+  padding: 1rem;
+}
+
+.editor textarea {
+  width: 100%;
+  height: calc(100vh - 4rem);
+  background: var(--secondary);
+  color: var(--text);
+  border: none;
+  padding: 1rem;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
+  resize: none;
+}
+
+.preview {
+  background: white;
+  padding: 1rem;
+}
+
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  height: 40px;
+  background: var(--primary);
+  border-bottom: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 1rem;
+}
+
+.btn {
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="ide-container">
+  <div class="sidebar">
+    <h3>Archivos</h3>
+    <ul class="file-tree">
+      <li>📄 documento.typ</li>
+      <li>📄 referencias.bib</li>
+      <li>📁 images/</li>
+    </ul>
+  </div>
+
+  <div class="editor">
+    <div class="toolbar">
+      <button class="btn" onclick="compile()">Compilar</button>
+      <button class="btn" onclick="save()">Guardar</button>
+      <button class="btn" onclick="exportPDF()">Exportar PDF</button>
+    </div>
+    <textarea id="code-editor" spellcheck="false">
+#let project(title: "", authors: (), date: none, body) = {
+  set document(author: authors, title: title)
+  set page(numbering: "1", number-align: center)
+  
+  // Title row.
+  align(center)[
+    #block(text(2em, weight: 700, title))
+    #block(text(date))
+  ]
+
+  // Author information.
+  pad(
+    top: 0.5em,
+    bottom: 0.5em,
+    x: 2em,
+    grid(
+      columns: (1fr,) * calc.min(3, authors.len()),
+      gutter: 1em,
+      ..authors.map(author => align(center, author)),
+    ),
+  )
+
+  // Main body.
+  set par(justify: true)
+  body
+}
+
+#show: project.with(
+  title: "Mi Documento Typst",
+  authors: (
+    "Tu Nombre",
+  ),
+  date: "Abril 2024",
+)
+
+= Introducción
+
+Este es un documento de ejemplo creado con Typst.
+
+#lorem(40)</textarea>
+  </div>
+
+  <div class="preview">
+    <iframe id="preview-frame" style="width:100%;height:100%;border:none;background:white;"></iframe>
+  </div>
+</div>
+
+<script>
+const editor = document.getElementById('code-editor');
+const previewFrame = document.getElementById('preview-frame');
+
+// Simular la compilación de Typst
+function compile() {
+  // En una implementación real, esto enviaría el código a un servidor
+  // que ejecutaría el compilador de Typst
+  alert('Compilando... (simulación)');
+}
+
+function save() {
+  localStorage.setItem('typst-code', editor.value);
+  alert('Código guardado localmente');
+}
+
+function exportPDF() {
+  alert('Exportando a PDF... (simulación)');
+}
+
+// Autoguardado
+editor.addEventListener('input', () => {
+  localStorage.setItem('typst-code', editor.value);
+});
+
+// Cargar código guardado
+window.addEventListener('load', () => {
+  const savedCode = localStorage.getItem('typst-code');
+  if (savedCode) {
+    editor.value = savedCode;
+  }
+});
+
+// Resaltado de sintaxis básico
+editor.addEventListener('input', function() {
+  // En una implementación real, aquí iría el código para resaltar la sintaxis
+  // Usando librerías como Prism.js o CodeMirror
+});
+</script>
+
+</body></html>

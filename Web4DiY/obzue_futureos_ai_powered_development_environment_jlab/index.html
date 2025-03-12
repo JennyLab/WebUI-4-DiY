@@ -1,0 +1,1650 @@
+<title>FutureOS - AI-Powered Development Environment</title>
+<style>
+:root {
+  --primary: #2a2a72;
+  --secondary: #009ffd;
+  --accent: #00d4ff;
+  --dark: #1a1a1a;
+  --light: #f0f0f0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+  background: var(--dark);
+  color: var(--light);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.os-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 60px 1fr;
+  height: 100vh;
+}
+
+.top-bar {
+  grid-column: 1 / -1;
+  background: var(--primary);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar {
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+}
+
+.main-content {
+  padding: 2rem;
+  background: #202020;
+}
+
+.menu-item {
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.menu-item:hover {
+  background: var(--primary);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--dark);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.code-editor {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+}
+
+.terminal {
+  background: #000;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #00ff00;
+}
+
+.projects-panel {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 250px;
+  width: 300px;
+  height: calc(100vh - 60px);
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  animation: slideIn 0.3s ease;
+}
+
+.projects-panel.active {
+  display: block;
+}
+
+.project-item {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 6px;
+  background: #2a2a2a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.project-item:hover {
+  background: var(--primary);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-indicator {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+/* Add these new styles for AI Lab */
+.ai-lab-panel {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 250px;
+  width: 600px;
+  height: calc(100vh - 60px);
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  animation: slideIn 0.3s ease;
+}
+
+.ai-lab-panel.active {
+  display: block;
+}
+
+.ai-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ai-feature-card {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-feature-card:hover {
+  background: var(--primary);
+  transform: translateY(-2px);
+}
+
+.ai-feature-card h4 {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.ai-settings {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+
+.ai-settings label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.ai-settings input[type="range"] {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+/* Add the code generator panel styles */
+.code-generator-panel {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 250px;
+  width: 600px;
+  height: calc(100vh - 60px);
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  animation: slideIn 0.3s ease;
+}
+
+.code-generator-panel.active {
+  display: block;
+}
+
+.code-template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.template-card {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.template-card:hover {
+  background: var(--primary);
+  transform: translateY(-2px);
+}
+
+.template-card h4 {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.generator-settings {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+
+.generator-settings label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.generator-settings select,
+.generator-settings input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: var(--light);
+  border-radius: 4px;
+}
+
+.code-output {
+  margin-top: 1rem;
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.generate-btn {
+  background: var(--primary);
+  color: var(--light);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.generate-btn:hover {
+  background: var(--secondary);
+}
+
+.settings-panel {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 250px;
+  width: 500px;
+  height: calc(100vh - 60px);
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  animation: slideIn 0.3s ease;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
+.settings-section {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.settings-section h3 {
+  color: var(--accent);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+.setting-item {
+  margin: 1rem 0;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.setting-item select,
+.setting-item input[type="text"],
+.setting-item input[type="number"],
+.setting-item input[type="color"] {
+  width: 100%;
+  padding: 0.5rem;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  color: var(--light);
+  border-radius: 4px;
+}
+
+.theme-preview {
+  height: 100px;
+  border-radius: 8px;
+  margin: 1rem 0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.font-preview {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.settings-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.settings-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn {
+  background: var(--primary);
+  color: var(--light);
+}
+
+.reset-btn {
+  background: #444;
+  color: var(--light);
+}
+
+.settings-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Add these styles for Extensions */
+.extensions-panel {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 250px;
+  width: 500px;
+  height: calc(100vh - 60px);
+  background: var(--dark);
+  border-right: 1px solid #333;
+  padding: 1rem;
+  z-index: 100;
+  animation: slideIn 0.3s ease;
+}
+
+.extensions-panel.active {
+  display: block;
+}
+
+.extensions-search {
+  width: 100%;
+  padding: 0.75rem;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: var(--light);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.extensions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 180px);
+}
+
+.extension-card {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.extension-card:hover {
+  background: var(--primary);
+  transform: translateY(-2px);
+}
+
+.extension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.extension-title {
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.extension-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.extension-description {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.extension-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.extension-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.install-btn {
+  background: var(--secondary);
+  color: var(--light);
+}
+
+.uninstall-btn {
+  background: #444;
+  color: var(--light);
+}
+
+.extension-categories {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.category-tag {
+  padding: 0.25rem 0.75rem;
+  background: #333;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+
+<div class="os-container">
+  <header class="top-bar">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4M12 8h.01"/>
+      </svg>
+      FutureOS
+    </div>
+    <div class="ai-status">
+      <div class="ai-indicator"></div>
+      AI Assistant Active
+    </div>
+  </header>
+  
+  <nav class="sidebar">
+    <div class="menu-item" id="projectsBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      Projects
+    </div>
+    <div class="menu-item" id="aiLabBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      AI Lab
+    </div>
+    <div class="menu-item" id="codeGenBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polyline points="16 18 22 12 16 6"/>
+        <polyline points="8 6 2 12 8 18"/>
+      </svg>
+      Code Generator
+    </div>
+    <div class="menu-item" id="extensionsBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+        <line x1="7" y1="7" x2="7.01" y2="7"/>
+      </svg>
+      Extensions
+    </div>
+    <div class="menu-item" id="settingsBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="projects-panel" id="projectsPanel">
+    <h2>Projects</h2>
+    <div id="projectsList">
+      <!-- Projects will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <div class="ai-lab-panel" id="aiLabPanel">
+    <h2>AI Lab</h2>
+    <div class="ai-lab-grid">
+      <div class="ai-feature-card" id="codeAnalysis">
+        <h4>Code Analysis</h4>
+        <p>Analyze code quality and suggest improvements</p>
+      </div>
+      <div class="ai-feature-card" id="autoComplete">
+        <h4>Smart Auto-Complete</h4>
+        <p>AI-powered code completion and suggestions</p>
+      </div>
+      <div class="ai-feature-card" id="bugDetection">
+        <h4>Bug Detection</h4>
+        <p>Identify potential bugs and security issues</p>
+      </div>
+      <div class="ai-feature-card" id="refactoring">
+        <h4>AI Refactoring</h4>
+        <p>Suggest code refactoring improvements</p>
+      </div>
+    </div>
+    
+    <div class="ai-settings">
+      <h3>AI Lab Settings</h3>
+      <label>
+        AI Response Speed
+        <input type="range" id="aiSpeed" min="1" max="10" value="5">
+      </label>
+      <label>
+        Code Suggestion Frequency
+        <input type="range" id="suggestionFreq" min="1" max="10" value="7">
+      </label>
+    </div>
+  </div>
+
+  <div class="code-generator-panel" id="codeGeneratorPanel">
+    <h2>Code Generator</h2>
+    <div class="code-template-grid">
+      <div class="template-card" id="apiTemplate">
+        <h4>API Endpoint</h4>
+        <p>Generate RESTful API endpoints with documentation</p>
+      </div>
+      <div class="template-card" id="componentTemplate">
+        <h4>UI Component</h4>
+        <p>Create reusable UI components with styles</p>
+      </div>
+      <div class="template-card" id="databaseTemplate">
+        <h4>Database Schema</h4>
+        <p>Generate database models and migrations</p>
+      </div>
+      <div class="template-card" id="testTemplate">
+        <h4>Test Suite</h4>
+        <p>Create test cases and testing infrastructure</p>
+      </div>
+    </div>
+    
+    <div class="generator-settings">
+      <h3>Generator Settings</h3>
+      <label>
+        Programming Language
+        <select id="programmingLanguage">
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="python">Python</option>
+          <option value="java">Java</option>
+        </select>
+      </label>
+      <label>
+        Framework
+        <select id="framework">
+          <option value="none">None</option>
+          <option value="react">React</option>
+          <option value="vue">Vue</option>
+          <option value="angular">Angular</option>
+          <option value="express">Express</option>
+        </select>
+      </label>
+      <label>
+        Code Style
+        <select id="codeStyle">
+          <option value="standard">Standard</option>
+          <option value="modern">Modern/ES6+</option>
+          <option value="functional">Functional</option>
+          <option value="oop">Object-Oriented</option>
+        </select>
+      </label>
+      <button class="generate-btn" id="generateBtn">Generate Code</button>
+    </div>
+
+    <div class="code-output" id="codeOutput">
+      <pre><code>// Generated code will appear here</code></pre>
+    </div>
+  </div>
+
+  <div class="extensions-panel" id="extensionsPanel">
+    <h2>Extensions</h2>
+    <input type="text" class="extensions-search" id="extensionSearch" placeholder="Search extensions...">
+    
+    <div class="extension-categories">
+      <span class="category-tag">All</span>
+      <span class="category-tag">Programming Languages</span>
+      <span class="category-tag">Themes</span>
+      <span class="category-tag">AI Tools</span>
+      <span class="category-tag">Debuggers</span>
+    </div>
+    
+    <div class="extensions-grid" id="extensionsGrid">
+      <!-- Extensions will be dynamically inserted here -->
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <h2>Settings</h2>
+    
+    <div class="settings-section">
+      <h3>Theme Settings</h3>
+      <div class="setting-item">
+        <label>Primary Color</label>
+        <input type="color" id="primaryColor" value="#2a2a72">
+      </div>
+      <div class="setting-item">
+        <label>Secondary Color</label>
+        <input type="color" id="secondaryColor" value="#009ffd">
+      </div>
+      <div class="setting-item">
+        <label>Accent Color</label>
+        <input type="color" id="accentColor" value="#00d4ff">
+      </div>
+      <div class="theme-preview" id="themePreview">
+        Theme Preview
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Font Settings</h3>
+      <div class="setting-item">
+        <label>Editor Font Family</label>
+        <select id="editorFont">
+          <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+          <option value="'Fira Code', monospace">Fira Code</option>
+          <option value="'Source Code Pro', monospace">Source Code Pro</option>
+          <option value="monospace">System Monospace</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>Font Size</label>
+        <input type="number" id="fontSize" value="14" min="8" max="24">
+      </div>
+      <div class="font-preview" id="fontPreview">
+        console.log("Font Preview");
+        function example() {
+          return "Hello World";
+        }
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Editor Settings</h3>
+      <div class="setting-item">
+        <label>Tab Size</label>
+        <input type="number" id="tabSize" value="2" min="2" max="8">
+      </div>
+      <div class="setting-item">
+        <label>Auto Save</label>
+        <select id="autoSave">
+          <option value="off">Off</option>
+          <option value="afterDelay">After Delay</option>
+          <option value="onFocusChange">On Focus Change</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>Word Wrap</label>
+        <select id="wordWrap">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+          <option value="wordWrapColumn">Wrap at Column</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>System Settings</h3>
+      <div class="setting-item">
+        <label>Language</label>
+        <select id="language">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>Auto Update</label>
+        <select id="autoUpdate">
+          <option value="never">Never</option>
+          <option value="askFirst">Ask First</option>
+          <option value="automatic">Automatic</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="settings-btn save-btn" id="saveSettings">Save Settings</button>
+      <button class="settings-btn reset-btn" id="resetSettings">Reset to Default</button>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="workspace">
+      <div class="card">
+        <h3>AI Code Assistant</h3>
+        <div class="code-editor" id="codeEditor">
+          <pre><code>// Start coding here
+function initAI() {
+  return new Promise((resolve) => {
+    // AI initialization
+    resolve('AI Ready');
+  });
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>Project Analysis</h3>
+        <div class="terminal" id="terminal">
+          > Analyzing project structure...
+          > Optimizing code patterns...
+          > AI suggestions ready
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const projectSystem = {
+    projects: [
+      { id: 1, name: 'AI Chat Bot', lastModified: '2024-01-20' },
+      { id: 2, name: 'Neural Network Demo', lastModified: '2024-01-19' },
+      { id: 3, name: 'Machine Learning API', lastModified: '2024-01-18' }
+    ],
+
+    init() {
+      this.projectsPanel = document.getElementById('projectsPanel');
+      this.projectsList = document.getElementById('projectsList');
+      this.renderProjects();
+      this.setupEventListeners();
+    },
+
+    renderProjects() {
+      this.projectsList.innerHTML = this.projects
+        .map(project => `
+          <div class="project-item" data-id="${project.id}">
+            <h4>${project.name}</h4>
+            <small>Last modified: ${project.lastModified}</small>
+          </div>
+        `)
+        .join('');
+    },
+
+    setupEventListeners() {
+      document.getElementById('projectsBtn').addEventListener('click', () => {
+        this.projectsPanel.classList.toggle('active');
+      });
+
+      this.projectsList.addEventListener('click', (e) => {
+        const projectItem = e.target.closest('.project-item');
+        if (projectItem) {
+          const projectId = projectItem.dataset.id;
+          this.openProject(projectId);
+        }
+      });
+    },
+
+    async openProject(projectId) {
+      try {
+        const project = this.projects.find(p => p.id === parseInt(projectId));
+        if (project) {
+          const terminal = document.getElementById('terminal');
+          terminal.innerHTML += `\n> Opening project: ${project.name}...\n> Loading project files...`;
+          
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const codeEditor = document.getElementById('codeEditor');
+          codeEditor.innerHTML = `<pre><code>// ${project.name}
+// Last modified: ${project.lastModified}
+
+// Project initialization
+async function initProject() {
+  try {
+    await loadDependencies();
+    await setupEnvironment();
+    return 'Project ready';
+  } catch (error) {
+    console.error('Project initialization failed:', error);
+  }
+}
+
+initProject();</code></pre>`;
+        }
+      } catch (error) {
+        console.error('Failed to open project:', error);
+      }
+    }
+  };
+
+  const aiLabSystem = {
+    init() {
+      this.aiLabPanel = document.getElementById('aiLabPanel');
+      this.setupEventListeners();
+      this.initializeAIFeatures();
+    },
+
+    setupEventListeners() {
+      document.getElementById('aiLabBtn').addEventListener('click', () => {
+        this.aiLabPanel.classList.toggle('active');
+        if (this.aiLabPanel.classList.contains('active')) {
+          this.updateTerminalStatus('AI Lab activated');
+        }
+      });
+
+      document.querySelectorAll('.ai-feature-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const featureId = e.currentTarget.id;
+          this.activateFeature(featureId);
+        });
+      });
+
+      document.getElementById('aiSpeed').addEventListener('change', (e) => {
+        this.updateAISettings('speed', e.target.value);
+      });
+
+      document.getElementById('suggestionFreq').addEventListener('change', (e) => {
+        this.updateAISettings('frequency', e.target.value);
+      });
+    },
+
+    async initializeAIFeatures() {
+      try {
+        const response = await fetch('/api/ai_completion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: `Initialize AI Lab features with following capabilities:
+            - Code analysis
+            - Auto-completion
+            - Bug detection
+            - Refactoring suggestions
+            
+            Return status and initialized features.
+            
+            <typescript-interface>
+            interface Response {
+              status: string;
+              features: string[];
+              readiness: number;
+            }
+            </typescript-interface>
+            
+            <example>
+            {
+              "status": "AI Lab initialized successfully",
+              "features": ["analysis", "completion", "debugging", "refactoring"],
+              "readiness": 100
+            }
+            </example>`,
+            data: "Initialize AI Lab"
+          })
+        });
+        
+        const data = await response.json();
+        this.updateTerminalStatus(`AI Lab initialized: ${data.status}`);
+      } catch (error) {
+        console.error('AI Lab initialization failed:', error);
+        this.updateTerminalStatus('AI Lab initialization failed');
+      }
+    },
+
+    async activateFeature(featureId) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> Activating ${featureId}...`;
+      
+      try {
+        const response = await fetch('/api/ai_completion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: `Activate AI Lab feature: ${featureId}
+            
+            <typescript-interface>
+            interface Response {
+              feature: string;
+              status: string;
+              result: string;
+            }
+            </typescript-interface>
+            
+            <example>
+            {
+              "feature": "codeAnalysis",
+              "status": "active",
+              "result": "Analysis complete: 3 improvements suggested"
+            }
+            </example>`,
+            data: featureId
+          })
+        });
+        
+        const data = await response.json();
+        this.updateTerminalStatus(`${featureId}: ${data.result}`);
+      } catch (error) {
+        console.error(`Failed to activate ${featureId}:`, error);
+        this.updateTerminalStatus(`Failed to activate ${featureId}`);
+      }
+    },
+
+    updateAISettings(setting, value) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> Updating AI ${setting} to ${value}...`;
+      // In a real implementation, this would persist settings to a backend
+    },
+
+    updateTerminalStatus(message) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> ${message}`;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  };
+
+  const codeGeneratorSystem = {
+    init() {
+      this.codeGeneratorPanel = document.getElementById('codeGeneratorPanel');
+      this.setupEventListeners();
+      this.initializeTemplates();
+    },
+
+    setupEventListeners() {
+      document.getElementById('codeGenBtn').addEventListener('click', () => {
+        this.codeGeneratorPanel.classList.toggle('active');
+        if (this.codeGeneratorPanel.classList.contains('active')) {
+          this.updateTerminalStatus('Code Generator activated');
+        }
+      });
+
+      document.querySelectorAll('.template-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const templateId = e.currentTarget.id;
+          this.selectTemplate(templateId);
+        });
+      });
+
+      document.getElementById('generateBtn').addEventListener('click', () => {
+        this.generateCode();
+      });
+    },
+
+    async initializeTemplates() {
+      try {
+        const terminal = document.getElementById('terminal');
+        terminal.innerHTML += '\n> Initializing code templates...';
+        await this.loadTemplateDefinitions();
+      } catch (error) {
+        console.error('Failed to initialize templates:', error);
+      }
+    },
+
+    async loadTemplateDefinitions() {
+      // In a real implementation, this would load template definitions from a server
+      this.templates = {
+        apiTemplate: {
+          name: 'API Endpoint',
+          defaults: {
+            language: 'javascript',
+            framework: 'express'
+          }
+        },
+        componentTemplate: {
+          name: 'UI Component',
+          defaults: {
+            language: 'typescript',
+            framework: 'react'
+          }
+        },
+        databaseTemplate: {
+          name: 'Database Schema',
+          defaults: {
+            language: 'javascript',
+            framework: 'none'
+          }
+        },
+        testTemplate: {
+          name: 'Test Suite',
+          defaults: {
+            language: 'javascript',
+            framework: 'jest'
+          }
+        }
+      };
+    },
+
+    async selectTemplate(templateId) {
+      const template = this.templates[templateId];
+      if (template) {
+        document.getElementById('programmingLanguage').value = template.defaults.language;
+        document.getElementById('framework').value = template.defaults.framework;
+        this.updateTerminalStatus(`Selected template: ${template.name}`);
+      }
+    },
+
+    async generateCode() {
+      const language = document.getElementById('programmingLanguage').value;
+      const framework = document.getElementById('framework').value;
+      const codeStyle = document.getElementById('codeStyle').value;
+
+      try {
+        const terminal = document.getElementById('terminal');
+        terminal.innerHTML += `\n> Generating code with: ${language}, ${framework}, ${codeStyle}...`;
+
+        // Simulate code generation
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const codeOutput = document.getElementById('codeOutput');
+        codeOutput.innerHTML = `<pre><code>// Generated ${language} code using ${framework}
+${this.getCodeTemplate(language, framework, codeStyle)}</code></pre>`;
+
+        this.updateTerminalStatus('Code generated successfully');
+      } catch (error) {
+        console.error('Code generation failed:', error);
+        this.updateTerminalStatus('Code generation failed');
+      }
+    },
+
+    getCodeTemplate(language, framework, style) {
+      // This would be more sophisticated in a real implementation
+      return `
+// Example generated code
+${language === 'typescript' ? 'interface Props {' : 'class Component {'} 
+  // Generated component structure
+  constructor() {
+    // Initialize component
+  }
+
+  // Generated methods
+  async process() {
+    try {
+      // Implementation
+      return 'Success';
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}`;
+    },
+
+    updateTerminalStatus(message) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> ${message}`;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  };
+
+  const settingsSystem = {
+    init() {
+      this.settingsPanel = document.getElementById('settingsPanel');
+      this.setupEventListeners();
+      this.loadSettings();
+    },
+
+    setupEventListeners() {
+      document.getElementById('settingsBtn').addEventListener('click', () => {
+        this.settingsPanel.classList.toggle('active');
+      });
+
+      // Theme settings
+      document.getElementById('primaryColor').addEventListener('input', (e) => {
+        this.updateThemePreview();
+      });
+      document.getElementById('secondaryColor').addEventListener('input', (e) => {
+        this.updateThemePreview();
+      });
+      document.getElementById('accentColor').addEventListener('input', (e) => {
+        this.updateThemePreview();
+      });
+
+      // Font settings
+      document.getElementById('editorFont').addEventListener('change', (e) => {
+        this.updateFontPreview();
+      });
+      document.getElementById('fontSize').addEventListener('input', (e) => {
+        this.updateFontPreview();
+      });
+
+      // Save and reset buttons
+      document.getElementById('saveSettings').addEventListener('click', () => {
+        this.saveSettings();
+      });
+      document.getElementById('resetSettings').addEventListener('click', () => {
+        this.resetSettings();
+      });
+    },
+
+    updateThemePreview() {
+      const primary = document.getElementById('primaryColor').value;
+      const secondary = document.getElementById('secondaryColor').value;
+      const accent = document.getElementById('accentColor').value;
+      
+      const preview = document.getElementById('themePreview');
+      preview.style.background = `linear-gradient(45deg, ${primary}, ${secondary})`;
+      preview.style.color = accent;
+    },
+
+    updateFontPreview() {
+      const fontFamily = document.getElementById('editorFont').value;
+      const fontSize = document.getElementById('fontSize').value;
+      
+      const preview = document.getElementById('fontPreview');
+      preview.style.fontFamily = fontFamily;
+      preview.style.fontSize = `${fontSize}px`;
+    },
+
+    async saveSettings() {
+      const settings = {
+        theme: {
+          primary: document.getElementById('primaryColor').value,
+          secondary: document.getElementById('secondaryColor').value,
+          accent: document.getElementById('accentColor').value
+        },
+        font: {
+          family: document.getElementById('editorFont').value,
+          size: document.getElementById('fontSize').value
+        },
+        editor: {
+          tabSize: document.getElementById('tabSize').value,
+          autoSave: document.getElementById('autoSave').value,
+          wordWrap: document.getElementById('wordWrap').value
+        },
+        system: {
+          language: document.getElementById('language').value,
+          autoUpdate: document.getElementById('autoUpdate').value
+        }
+      };
+
+      try {
+        // In a real implementation, this would save to a backend
+        localStorage.setItem('futureOsSettings', JSON.stringify(settings));
+        this.applySettings(settings);
+        const terminal = document.getElementById('terminal');
+        terminal.innerHTML += '\n> Settings saved successfully';
+      } catch (error) {
+        console.error('Failed to save settings:', error);
+      }
+    },
+
+    loadSettings() {
+      try {
+        const saved = localStorage.getItem('futureOsSettings');
+        if (saved) {
+          const settings = JSON.parse(saved);
+          this.applySettings(settings);
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      }
+    },
+
+    applySettings(settings) {
+      // Apply theme
+      document.documentElement.style.setProperty('--primary', settings.theme.primary);
+      document.documentElement.style.setProperty('--secondary', settings.theme.secondary);
+      document.documentElement.style.setProperty('--accent', settings.theme.accent);
+
+      // Apply font
+      document.body.style.setProperty('font-family', settings.font.family);
+      document.body.style.setProperty('font-size', `${settings.font.size}px`);
+
+      // Update inputs
+      Object.entries(settings).forEach(([category, values]) => {
+        Object.entries(values).forEach(([key, value]) => {
+          const element = document.getElementById(`${key}${category.charAt(0).toUpperCase() + category.slice(1)}`);
+          if (element) {
+            element.value = value;
+          }
+        });
+      });
+
+      this.updateThemePreview();
+      this.updateFontPreview();
+    },
+
+    resetSettings() {
+      const defaultSettings = {
+        theme: {
+          primary: '#2a2a72',
+          secondary: '#009ffd',
+          accent: '#00d4ff'
+        },
+        font: {
+          family: "'JetBrains Mono', monospace",
+          size: '14'
+        },
+        editor: {
+          tabSize: '2',
+          autoSave: 'off',
+          wordWrap: 'off'
+        },
+        system: {
+          language: 'en',
+          autoUpdate: 'askFirst'
+        }
+      };
+
+      this.applySettings(defaultSettings);
+      localStorage.setItem('futureOsSettings', JSON.stringify(defaultSettings));
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += '\n> Settings reset to default';
+    }
+  };
+
+  const extensionsSystem = {
+    extensions: [
+      {
+        id: 'python-extension',
+        name: 'Python',
+        publisher: 'Microsoft',
+        version: '2024.1.0', 
+        ratings: '4.8',
+        installs: '50M+',
+        description: 'IntelliSense, linting, debugging, code navigation, code formatting, refactoring, unit tests, snippets and more.',
+        categories: ['Programming Languages'],
+        installed: false
+      },
+      {
+        id: 'java-extension',
+        name: 'Language Support for Java',
+        publisher: 'Red Hat',
+        version: '1.21.0',
+        ratings: '4.7',
+        installs: '25M+',
+        description: 'Java language support, debugging, testing, Maven/Gradle support, project management and more.',
+        categories: ['Programming Languages'],
+        installed: false
+      },
+      {
+        id: 'cpp-extension',
+        name: 'C/C++',
+        publisher: 'Microsoft',
+        version: '1.18.0',
+        ratings: '4.6',
+        installs: '35M+',
+        description: 'C/C++ IntelliSense, debugging, code browsing and more.',
+        categories: ['Programming Languages', 'Debuggers'],
+        installed: false
+      },
+      {
+        id: 'go-extension',
+        name: 'Go',
+        publisher: 'Go Team at Google',
+        version: '0.40.0',
+        ratings: '4.8',
+        installs: '10M+',
+        description: 'Rich Go language support for VS Code',
+        categories: ['Programming Languages'],
+        installed: false
+      },
+      {
+        id: 'rust-extension',
+        name: 'rust-analyzer',
+        publisher: 'rust-lang',
+        version: '0.4.1693',
+        ratings: '4.9',
+        installs: '5M+',
+        description: 'Rust language support - code completion, goto definition, syntax highlighting',
+        categories: ['Programming Languages'],
+        installed: false
+      },
+      {
+        id: 'dracula-theme',
+        name: 'Dracula Official',
+        publisher: 'Dracula Theme',
+        version: '2.24.4',
+        ratings: '4.9',
+        installs: '8M+',
+        description: 'Official Dracula Theme. A dark theme for many editors, shells, and more.',
+        categories: ['Themes'],
+        installed: false
+      },
+      {
+        id: 'material-theme',
+        name: 'Material Theme',
+        publisher: 'Equinusocio',
+        version: '3.16.0',
+        ratings: '4.8',
+        installs: '12M+',
+        description: 'The most epic theme now for Visual Studio Code',
+        categories: ['Themes'],
+        installed: false
+      },
+      {
+        id: 'gitlens-extension',
+        name: 'GitLens',
+        publisher: 'GitKraken',
+        version: '14.5.0',
+        ratings: '4.8',
+        installs: '28M+',
+        description: 'Supercharge Git within VS Code - Visualize code authorship, navigate history, explore branches.',
+        categories: ['Other'],
+        installed: false
+      },
+      {
+        id: 'tabnine-extension',
+        name: 'Tabnine AI',
+        publisher: 'TabNine',
+        version: '3.34.0',
+        ratings: '4.7',
+        installs: '15M+',
+        description: 'AI code completion and suggestions powered by machine learning',
+        categories: ['AI Tools'],
+        installed: false
+      },
+      {
+        id: 'debugger-chrome',
+        name: 'Debugger for Chrome',
+        publisher: 'Microsoft',
+        version: '4.13.0',
+        ratings: '4.7',
+        installs: '40M+',
+        description: 'Debug your JavaScript code in the Chrome browser.',
+        categories: ['Debuggers'],
+        installed: false
+      },
+      {
+        id: 'live-server',
+        name: 'Live Server',
+        publisher: 'Ritwick Dey',
+        version: '5.7.9',
+        ratings: '4.9',
+        installs: '45M+',
+        description: 'Launch a development local Server with live reload feature.',
+        categories: ['Other'],
+        installed: false
+      },
+      {
+        id: 'jest-runner',
+        name: 'Jest Runner',
+        publisher: 'firsttris',
+        version: '0.4.59',
+        ratings: '4.7',
+        installs: '3M+',
+        description: 'Simple way to run or debug individual Jest tests.',
+        categories: ['Testing', 'Debuggers'],
+        installed: false
+      },
+      {
+        id: 'eslint',
+        name: 'ESLint',
+        publisher: 'Microsoft',
+        version: '2.4.2',
+        ratings: '4.8',
+        installs: '35M+',
+        description: 'Integrates ESLint JavaScript into VS Code.',
+        categories: ['Linters', 'Programming Languages'],
+        installed: false
+      }
+    ],
+
+    init() {
+      this.extensionsPanel = document.getElementById('extensionsPanel');
+      this.extensionsGrid = document.getElementById('extensionsGrid');
+      this.setupEventListeners();
+      this.renderExtensions();
+    },
+
+    setupEventListeners() {
+      document.getElementById('extensionsBtn').addEventListener('click', () => {
+        this.extensionsPanel.classList.toggle('active');
+        if (this.extensionsPanel.classList.contains('active')) {
+          this.updateTerminalStatus('Extensions panel opened');
+        }
+      });
+
+      document.getElementById('extensionSearch').addEventListener('input', (e) => {
+        this.filterExtensions(e.target.value);
+      });
+    },
+
+    renderExtensions() {
+      this.extensionsGrid.innerHTML = this.extensions
+        .map(ext => `
+          <div class="extension-card" data-id="${ext.id}">
+            <div class="extension-header">
+              <div class="extension-title">${ext.name}</div>
+              <div class="extension-actions">
+                ${ext.installed ? 
+                  `<button class="extension-btn uninstall-btn" data-id="${ext.id}">Uninstall</button>` :
+                  `<button class="extension-btn install-btn" data-id="${ext.id}">Install</button>`
+                }
+              </div>
+            </div>
+            <div class="extension-meta">
+              <span>${ext.publisher}</span>
+              <span>${ext.version}</span>
+              <span>★ ${ext.ratings}</span>
+              <span>${ext.installs} installs</span>
+            </div>
+            <div class="extension-description">${ext.description}</div>
+            <div class="extension-categories">
+              ${ext.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+            </div>
+          </div>
+        `)
+        .join('');
+
+      this.setupExtensionButtons();
+    },
+
+    setupExtensionButtons() {
+      document.querySelectorAll('.extension-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const extId = e.target.dataset.id;
+          if (e.target.classList.contains('install-btn')) {
+            this.installExtension(extId);
+          } else {
+            this.uninstallExtension(extId);
+          }
+        });
+      });
+    },
+
+    filterExtensions(searchTerm) {
+      const filtered = this.extensions.filter(ext => 
+        ext.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ext.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ext.categories.some(cat => cat.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      
+      this.extensionsGrid.innerHTML = filtered
+        .map(ext => `
+          <div class="extension-card" data-id="${ext.id}">
+            <div class="extension-header">
+              <div class="extension-title">${ext.name}</div>
+              <div class="extension-actions">
+                ${ext.installed ? 
+                  `<button class="extension-btn uninstall-btn" data-id="${ext.id}">Uninstall</button>` :
+                  `<button class="extension-btn install-btn" data-id="${ext.id}">Install</button>`
+                }
+              </div>
+            </div>
+            <div class="extension-meta">
+              <span>${ext.publisher}</span>
+              <span>${ext.version}</span>
+              <span>★ ${ext.ratings}</span>
+              <span>${ext.installs} installs</span>
+            </div>
+            <div class="extension-description">${ext.description}</div>
+            <div class="extension-categories">
+              ${ext.categories.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+            </div>
+          </div>
+        `)
+        .join('');
+      
+      this.setupExtensionButtons();
+    },
+
+    async installExtension(extId) {
+      try {
+        const ext = this.extensions.find(e => e.id === extId);
+        if (ext) {
+          this.updateTerminalStatus(`Installing ${ext.name}...`);
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate installation
+          ext.installed = true;
+          this.renderExtensions();
+          this.updateTerminalStatus(`${ext.name} installed successfully`);
+        }
+      } catch (error) {
+        console.error('Extension installation failed:', error);
+        this.updateTerminalStatus('Extension installation failed');
+      }
+    },
+
+    async uninstallExtension(extId) {
+      try {
+        const ext = this.extensions.find(e => e.id === extId);
+        if (ext) {
+          this.updateTerminalStatus(`Uninstalling ${ext.name}...`);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate uninstallation
+          ext.installed = false;
+          this.renderExtensions();
+          this.updateTerminalStatus(`${ext.name} uninstalled successfully`);
+        }
+      } catch (error) {
+        console.error('Extension uninstallation failed:', error);
+        this.updateTerminalStatus('Extension uninstallation failed');
+      }
+    },
+
+    updateTerminalStatus(message) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> ${message}`;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  };
+
+  projectSystem.init();
+  aiLabSystem.init();
+  codeGeneratorSystem.init();
+  settingsSystem.init();
+  extensionsSystem.init();
+
+  const aiAssistant = {
+    async init() {
+      try {
+        const response = await fetch('/api/ai_completion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: `Initialize AI assistant with coding capabilities.`,
+            data: "Initialize FutureOS AI Assistant"
+          })
+        });
+        
+        const data = await response.json();
+        this.updateStatus(data);
+      } catch (error) {
+        console.error('AI initialization failed:', error);
+      }
+    },
+
+    updateStatus(data) {
+      const terminal = document.getElementById('terminal');
+      terminal.innerHTML += `\n> AI Status: ${data.status}\n> Capabilities loaded: ${data.capabilities.join(', ')}`;
+    }
+  };
+
+  aiAssistant.init();
+
+  const codeEditor = document.getElementById('codeEditor');
+  codeEditor.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = codeEditor.selectionStart;
+      const end = codeEditor.selectionEnd;
+      codeEditor.value = codeEditor.value.substring(0, start) + '  ' + codeEditor.value.substring(end);
+      codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+    }
+  });
+});
+</script>
+</body></html>

@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SymbolScript IDE</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ide-container">
+        <header class="ide-header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" class="symbol-icon">
+                    <path d="M25 5 L5 20 L25 35 L45 20 Z" fill="#4CAF50" />
+                    <path d="M25 35 L25 45 L45 30 L45 20 Z" fill="#45a049" />
+                    <path d="M5 20 L5 30 L25 45 L25 35 Z" fill="#388E3C" />
+                </svg>
+                SymbolScript
+            </div>
+            <nav class="ide-nav">
+                <button>File</button>
+                <button>Edit</button>
+                <button>Run</button>
+                <button>Help</button>
+            </nav>
+        </header>
+
+        <div class="workspace">
+            <div class="sidebar">
+                <div class="file-explorer">
+                    <h3>Explorer</h3>
+                    <ul>
+                        <li class="active">📄 main.symbol</li>
+                    </ul>
+                </div>
+                <div class="tools-panel">
+                    <h3>Tools</h3>
+                    <button id="format-code">Format Code</button>
+                    <button id="toggle-settings">Settings</button>
+                </div>
+            </div>
+
+            <div class="editor-panel">
+                <div class="editor-tabs">
+                    <div class="tab active">
+                        <span>main.symbol</span>
+                        <button class="close-tab">×</button>
+                    </div>
+                </div>
+                <div class="code-editor">
+                    <div class="line-numbers"></div>
+                    <textarea id="code-input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
+# Welcome to SymbolScript
+# A powerful symbolic programming language
+
+create function fibonacci(n)
+    if n <= 1 then
+        return n
+    else
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    end
+end
+
+create list numbers = [1, 2, 3, 4, 5]
+create variable result = fibonacci(6)
+print result
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="terminal-panel">
+                <div class="terminal-tabs">
+                    <div class="tab active">Output</div>
+                    <div class="tab">Debug</div>
+                </div>
+                <div class="terminal-content">
+                    <pre id="output" class="output-area"></pre>
+                </div>
+                <div class="terminal-controls">
+                    <button id="run-code">▶ Run</button>
+                    <button id="clear-output">🧹 Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="ide-footer">
+            <div class="status-bar">
+                <span>SymbolScript v1.0.0</span>
+                <span>Ln 1, Col 1</span>
+                <span>UTF-8</span>
+                <span>Spaces: 2</span>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

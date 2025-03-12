@@ -1,0 +1,575 @@
+<title>Advanced Self-Evolving File System Visualizer with Real-Time Debugger</title>
+<script src="https://unpkg.com/htmx.org@1.9.4"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/vhdl/vhdl.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/vb/vb.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<style id="dynamic-styles">
+  body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Courier New', monospace; background: #000; color: #0f0; }
+  #container { display: flex; width: 100%; height: 100%; }
+  #sidebar { width: 250px; height: 100%; overflow-y: auto; background: #111; padding: 10px; box-sizing: border-box; }
+  #main-area { flex: 1; display: flex; flex-direction: column; }
+  #visualizer { flex: 1; }
+  #debugger { height: 40%; background: #222; padding: 10px; overflow: auto; display: flex; }
+  #code-editor { flex: 1; }
+  #debug-output { flex: 1; overflow: auto; padding-left: 10px; }
+  #controls { position: absolute; top: 10px; left: 270px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; }
+  .file-tree-item { cursor: pointer; padding: 2px; }
+  .file-tree-item:hover { background: #222; }
+  button { background: #0f0; color: #000; border: none; padding: 5px 10px; margin: 2px; cursor: pointer; border-radius: 3px; }
+  #cli { width: 100%; background: #000; color: #0f0; border: 1px solid #0f0; padding: 5px; }
+  .CodeMirror { height: 100%; }
+  #oscilloscope, #logic-analyzer { width: 100%; height: 150px; }
+  #ai-controls { position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; }
+  #ai-log { position: fixed; bottom: 60px; right: 10px; width: 300px; height: 200px; background: rgba(0,0,0,0.7); color: #0f0; overflow-y: auto; padding: 10px; border-radius: 5px; font-size: 12px; }
+  #debug-tabs { display: flex; justify-content: flex-start; background: #333; }
+  #debug-tabs button { background: #444; color: #0f0; border: none; padding: 5px 10px; cursor: pointer; }
+  #debug-tabs button.active { background: #0f0; color: #000; }
+  #debug-content { padding: 10px; background: #222; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="sidebar">
+    <div id="file-tree"></div>
+    <input type="text" id="cli" placeholder="Enter command...">
+    <div id="control-panel">
+      <button onclick="toggleView()">Toggle View</button>
+      <button onclick="openImageViewer()">Image Viewer</button>
+      <button onclick="openVideoPlayer()">Video Player</button>
+      <button onclick="openBinaryExecutor()">Binary Executor</button>
+      <button onclick="openPythonInterpreter()">Python Interpreter</button>
+      <button onclick="openFreeBASICInterpreter()">FreeBASIC Interpreter</button>
+      <button onclick="open65c02Assembler()">65c02 Assembler</button>
+      <button onclick="openARMv8Assembler()">ARMv8 Assembler</button>
+      <button onclick="openHardwareSimulator()">Hardware Simulator</button>
+    </div>
+  </div>
+  <div id="main-area">
+    <div id="visualizer"></div>
+    <div id="debugger">
+      <div id="code-editor"></div>
+      <div id="debug-output">
+        <div id="debug-tabs">
+          <button onclick="switchDebugTab('general')" class="active">General</button>
+          <button onclick="switchDebugTab('oscilloscope')">Oscilloscope</button>
+          <button onclick="switchDebugTab('logic-analyzer')">Logic Analyzer</button>
+        </div>
+        <div id="debug-content">
+          <div id="general-debug">
+            <h3>Debug Output</h3>
+            <pre id="debug-text"></pre>
+          </div>
+          <canvas id="oscilloscope" style="display: none;"></canvas>
+          <canvas id="logic-analyzer" style="display: none;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="controls">
+    <select id="debug-mode">
+      <option value="MOS-65c02">MOS-65c02 Assembly</option>
+      <option value="ARMv8">ARMv8 Assembly</option>
+      <option value="FPGA">FPGA HDL</option>
+      <option value="FreeBASIC">FreeBASIC</option>
+      <option value="VIC-II">VIC-II</option>
+      <option value="SVGA">SVGA</option>
+      <option value="ECS">ECS (Copper Lists, 32-bit ARGB)</option>
+      <option value="AGA">AGA (HAM8, 4096 colors)</option>
+      <option value="HDR">HDR</option>
+      <option value="HDRI">HDRI</option>
+      <option value="3D">Modern 3D Graphics</option>
+    </select>
+    <button onclick="runDebugger()">Run Debugger</button>
+  </div>
+  <div id="ai-controls">
+    <button onclick="toggleAI()">Toggle AI</button>
+    <button onclick="triggerAIUpdate()">Trigger AI Update</button>
+  </div>
+  <div id="ai-log"></div>
+</div>
+
+<script>
+let scene, camera, renderer, controls;
+let currentView = 'TreeV';
+let fileSystem = {
+  name: 'root',
+  type: 'directory',
+  children: [
+    { name: 'documents', type: 'directory', children: [
+      { name: 'report.doc', type: 'file', size: 2048 },
+      { name: 'presentation.ppt', type: 'file', size: 5120 }
+    ]},
+    { name: 'images', type: 'directory', children: [
+      { name: 'photo1.jpg', type: 'file', size: 3072 },
+      { name: 'photo2.jpg', type: 'file', size: 4096 }
+    ]},
+    { name: 'code', type: 'directory', children: [
+      { name: 'project.py', type: 'file', size: 1024 },
+      { name: 'data.json', type: 'file', size: 512 }
+    ]}
+  ]
+};
+
+let codeEditor;
+let oscilloscopeChart;
+let logicAnalyzerChart;
+let isAIEnabled = false;
+let initialSnapshot;
+
+function init() {
+  initVisualizer();
+  initFileTree();
+  initDebugger();
+  initOscilloscope();
+  initLogicAnalyzer();
+  animate();
+  initialSnapshot = takeSnapshot();
+}
+
+function initVisualizer() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth - 250, window.innerHeight * 0.6);
+  document.getElementById('visualizer').appendChild(renderer.domElement);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+
+  camera.position.set(0, 5, 10);
+  controls.update();
+
+  createFileSystem();
+
+  const ambientLight = new THREE.AmbientLight(0x404040);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  directionalLight.position.set(1, 1, 1);
+  scene.add(directionalLight);
+
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    'px.jpg', 'nx.jpg',
+    'py.jpg', 'ny.jpg',
+    'pz.jpg', 'nz.jpg'
+  ]);
+  scene.background = texture;
+  scene.environment = texture;
+
+  window.addEventListener('resize', onWindowResize, false);
+}
+
+function createFileSystem() {
+  scene.clear();
+  if (currentView === 'TreeV') {
+    createTreeView(fileSystem, 0, 0, 0);
+  } else {
+    createMapView(fileSystem, 0, 0, 0);
+  }
+}
+
+function createTreeView(node, x, y, z) {
+  const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+  const material = new THREE.MeshStandardMaterial({ 
+    color: node.type === 'directory' ? 0x00ff00 : 0xff00ff,
+    metalness: 0.5,
+    roughness: 0.5
+  });
+  const sphere = new THREE.Mesh(geometry, material);
+  sphere.position.set(x, y, z);
+  scene.add(sphere);
+
+  if (node.children) {
+    let offsetY = -2;
+    node.children.forEach((child, index) => {
+      createTreeView(child, x + 2, y + offsetY, z);
+      offsetY -= 2;
+
+      const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+      const points = [];
+      points.push(new THREE.Vector3(x, y, z));
+      points.push(new THREE.Vector3(x + 2, y + offsetY + 2, z));
+      const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(lineGeometry, lineMaterial);
+      scene.add(line);
+    });
+  }
+}
+
+function createMapView(node, x, y, z) {
+  const geometry = new THREE.BoxGeometry(1, node.size ? node.size / 1024 : 0.1, 1);
+  const material = new THREE.MeshStandardMaterial({ 
+    color: node.type === 'directory' ? 0x00ff00 : 0xff00ff,
+    metalness: 0.5,
+    roughness: 0.5
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(x, y + (node.size ? node.size / 2048 : 0.05), z);
+  scene.add(cube);
+
+  if (node.children) {
+    let offsetX = 0;
+    node.children.forEach((child, index) => {
+      createMapView(child, x + offsetX, y, z + 2);
+      offsetX += 2;
+    });
+  }
+}
+
+function initFileTree() {
+  const fileTreeElement = document.getElementById('file-tree');
+  fileTreeElement.innerHTML = createFileTreeHTML(fileSystem);
+}
+
+function createFileTreeHTML(node) {
+  let html = `<div class="file-tree-item">${node.name}</div>`;
+  if (node.children) {
+    html += '<ul>';
+    node.children.forEach(child => {
+      html += `<li>${createFileTreeHTML(child)}</li>`;
+    });
+    html += '</ul>';
+  }
+  return html;
+}
+
+function initDebugger() {
+  codeEditor = CodeMirror(document.getElementById('code-editor'), {
+    mode: 'javascript',
+    theme: 'monokai',
+    lineNumbers: true
+  });
+}
+
+function initOscilloscope() {
+  const ctx = document.getElementById('oscilloscope').getContext('2d');
+  oscilloscopeChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array.from({length: 100}, (_, i) => i),
+      datasets: [{
+        label: 'Signal',
+        data: Array.from({length: 100}, () => Math.random()),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: {
+          min: -1,
+          max: 1
+        }
+      }
+    }
+  });
+}
+
+function initLogicAnalyzer() {
+  const ctx = document.getElementById('logic-analyzer').getContext('2d');
+  logicAnalyzerChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array.from({length: 100}, (_, i) => i),
+      datasets: [{
+        label: 'Logic State',
+        data: Array.from({length: 100}, () => Math.random() > 0.5 ? 1 : 0),
+        borderColor: 'rgb(255, 99, 132)',
+        stepped: true
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: false,
+      scales: {
+        y: {
+          min: -0.1,
+          max: 1.1,
+          ticks: {
+            callback: value => value === 0 ? 'LOW' : value === 1 ? 'HIGH' : ''
+          }
+        }
+      }
+    }
+  });
+}
+
+function onWindowResize() {
+  camera.aspect = (window.innerWidth - 250) / (window.innerHeight * 0.6);
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth - 250, window.innerHeight * 0.6);
+}
+
+function toggleView() {
+  currentView = currentView === 'TreeV' ? 'MapV' : 'TreeV';
+  createFileSystem();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+  
+  oscilloscopeChart.data.datasets[0].data = oscilloscopeChart.data.datasets[0].data.slice(1).concat(Math.random() * 2 - 1);
+  oscilloscopeChart.update();
+  
+  logicAnalyzerChart.data.datasets[0].data = logicAnalyzerChart.data.datasets[0].data.slice(1).concat(Math.random() > 0.5 ? 1 : 0);
+  logicAnalyzerChart.update();
+
+  if (isAIEnabled) {
+    runAIAnalysis();
+  }
+}
+
+function runDebugger() {
+  const mode = document.getElementById('debug-mode').value;
+  const code = codeEditor.getValue();
+  
+  let output = '';
+  switch (mode) {
+    case 'MOS-65c02':
+      output = simulateMOS65c02(code);
+      break;
+    case 'ARMv8':
+      output = simulateARMv8(code);
+      break;
+    case 'FPGA':
+      output = simulateFPGA(code);
+      break;
+    case 'FreeBASIC':
+      output = interpretFreeBASIC(code);
+      break;
+    case 'VIC-II':
+      output = emulateVICII(code);
+      break;
+    case 'SVGA':
+      output = renderSVGA(code);
+      break;
+    case 'ECS':
+      output = processECS(code);
+      break;
+    case 'AGA':
+      output = renderAGA(code);
+      break;
+    case 'HDR':
+      output = processHDR(code);
+      break;
+    case 'HDRI':
+      output = applyHDRI(code);
+      break;
+    case '3D':
+      output = render3DGraphics(code);
+      break;
+  }
+  
+  document.getElementById('debug-text').textContent = output;
+}
+
+function simulateMOS65c02(code) {
+  // Placeholder for MOS-65c02 simulation
+  return `Simulating MOS-65c02 Assembly...\n${code}\nSimulation complete.`;
+}
+
+function simulateARMv8(code) {
+  // Placeholder for ARMv8 simulation
+  return `Simulating ARMv8 Assembly...\n${code}\nSimulation complete.`;
+}
+
+function simulateFPGA(code) {
+  // Placeholder for FPGA simulation
+  return `Synthesizing FPGA Hardware Description...\n${code}\nSynthesis complete.`;
+}
+
+function interpretFreeBASIC(code) {
+  // Placeholder for FreeBASIC interpretation
+  return `Interpreting FreeBASIC...\n${code}\nInterpretation complete.`;
+}
+
+function emulateVICII(code) {
+  // Placeholder for VIC-II emulation
+  return `Emulating VIC-II graphics...\n${code}\nEmulation complete.`;
+}
+
+function renderSVGA(code) {
+  // Placeholder for SVGA rendering
+  return `Rendering SVGA graphics...\n${code}\nRendering complete.`;
+}
+
+function processECS(code) {
+  // Placeholder for ECS processing
+  return `Processing ECS copper lists...\n${code}\nProcessing complete.`;
+}
+
+function renderAGA(code) {
+  // Placeholder for AGA rendering
+  return `Rendering AGA HAM8 graphics...\n${code}\nRendering complete.`;
+}
+
+function processHDR(code) {
+  // Placeholder for HDR processing
+  return `Processing HDR image...\n${code}\nProcessing complete.`;
+}
+
+function applyHDRI(code) {
+  // Placeholder for HDRI application
+  return `Applying HDRI lighting...\n${code}\nApplication complete.`;
+}
+
+function render3DGraphics(code) {
+  // Placeholder for 3D graphics rendering
+  return `Rendering modern 3D graphics...\n${code}\nRendering complete.`;
+}
+
+function switchDebugTab(tab) {
+  document.querySelectorAll('#debug-tabs button').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`#debug-tabs button[onclick="switchDebugTab('${tab}')"]`).classList.add('active');
+  
+  document.getElementById('general-debug').style.display = 'none';
+  document.getElementById('oscilloscope').style.display = 'none';
+  document.getElementById('logic-analyzer').style.display = 'none';
+  
+  switch (tab) {
+    case 'general':
+      document.getElementById('general-debug').style.display = 'block';
+      break;
+    case 'oscilloscope':
+      document.getElementById('oscilloscope').style.display = 'block';
+      break;
+    case 'logic-analyzer':
+      document.getElementById('logic-analyzer').style.display = 'block';
+      break;
+  }
+}
+
+function openImageViewer() {
+  alert('Image Viewer opened');
+}
+
+function openVideoPlayer() {
+  alert('Video Player opened');
+}
+
+function openBinaryExecutor() {
+  alert('Binary Executor opened');
+}
+
+function openPythonInterpreter() {
+  codeEditor.setOption('mode', 'python');
+  document.getElementById('debug-text').textContent = 'Python Interpreter ready';
+}
+
+function openFreeBASICInterpreter() {
+  codeEditor.setOption('mode', 'vb');
+  document.getElementById('debug-text').textContent = 'FreeBASIC Interpreter ready';
+}
+
+function open65c02Assembler() {
+  codeEditor.setOption('mode', 'text');
+  document.getElementById('debug-text').textContent = '65c02 Assembler ready';
+}
+
+function openARMv8Assembler() {
+  codeEditor.setOption('mode', 'text');
+  document.getElementById('debug-text').textContent = 'ARMv8 Assembler ready';
+}
+
+function openHardwareSimulator() {
+  codeEditor.setOption('mode', 'vhdl');
+  document.getElementById('debug-text').textContent = 'Hardware Simulator ready';
+}
+
+function toggleAI() {
+  isAIEnabled = !isAIEnabled;
+  document.getElementById('ai-log').innerHTML += `<p>AI ${isAIEnabled ? 'enabled' : 'disabled'}</p>`;
+}
+
+function triggerAIUpdate() {
+  if (isAIEnabled) {
+    runAIAnalysis(true);
+  } else {
+    document.getElementById('ai-log').innerHTML += '<p>AI is not enabled. Please enable AI first.</p>';
+  }
+}
+
+function runAIAnalysis(forceUpdate = false) {
+  const currentSnapshot = takeSnapshot();
+  const changes = compareSnapshots(initialSnapshot, currentSnapshot);
+
+  if (changes.length > 0 || forceUpdate) {
+    const aiSuggestions = generateAISuggestions(changes);
+    applyAIChanges(aiSuggestions);
+    logAIActivity(aiSuggestions);
+  }
+}
+
+function takeSnapshot() {
+  return {
+    html: document.documentElement.outerHTML,
+    css: Array.from(document.styleSheets).map(sheet => Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n')).join('\n'),
+    js: Array.from(document.scripts).map(script => script.innerHTML).join('\n')
+  };
+}
+
+function compareSnapshots(snapshot1, snapshot2) {
+  const changes = [];
+  if (snapshot1.html !== snapshot2.html) changes.push('HTML structure changed');
+  if (snapshot1.css !== snapshot2.css) changes.push('CSS styles changed');
+  if (snapshot1.js !== snapshot2.js) changes.push('JavaScript code changed');
+  return changes;
+}
+
+function generateAISuggestions(changes) {
+  // This is a placeholder for actual AI logic
+  const suggestions = [];
+  if (changes.includes('HTML structure changed')) {
+    suggestions.push('Optimize HTML structure for better performance');
+  }
+  if (changes.includes('CSS styles changed')) {
+    suggestions.push('Refactor CSS for improved responsiveness');
+  }
+  if (changes.includes('JavaScript code changed')) {
+    suggestions.push('Implement error handling in new JavaScript functions');
+  }
+  return suggestions;
+}
+
+function applyAIChanges(suggestions) {
+  suggestions.forEach(suggestion => {
+    // This is a placeholder for actual change implementation
+    console.log('Applying suggestion:', suggestion);
+    // In a real implementation, you would modify the DOM, styles, or scripts here
+  });
+}
+
+function logAIActivity(suggestions) {
+  const aiLog = document.getElementById('ai-log');
+  aiLog.innerHTML += '<p>AI Analysis complete. Suggestions:</p>';
+  suggestions.forEach(suggestion => {
+    aiLog.innerHTML += `<p>- ${suggestion}</p>`;
+  });
+}
+
+init();
+
+document.getElementById('cli').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const command = this.value;
+    console.log('Executing command:', command);
+    document.getElementById('debug-text').textContent += `> ${command}\n`;
+    this.value = '';
+  }
+});
+</script>
+
+</body></html>

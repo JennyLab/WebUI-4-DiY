@@ -1,0 +1,651 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Web Scraper Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 40px;
+        background-color: #f0f0f0;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+    .input-group {
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+    input[type="text"], input[type="file"] {
+        width: calc(100% - 30px);
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        margin-bottom: 10px;
+    }
+    input[type="text"]:focus, input[type="file"]:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+        font-size: 16px;
+        margin: 10px 0;
+    }
+    button:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+    button:active {
+        transform: translateY(0);
+    }
+    #scrapedData {
+        margin-top: 40px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 30px;
+        justify-content: center;
+    }
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+    }
+    #progressBar {
+        width: 100%;
+        background-color: #ddd;
+        border-radius: 8px;
+        margin-top: 30px;
+        overflow: hidden;
+    }
+    #progressBar div {
+        width: 0;
+        height: 30px;
+        background-color: #4CAF50;
+        transition: width 0.5s;
+    }
+    #urlList {
+        margin-bottom: 30px;
+        max-height: 150px; 
+        overflow-y: auto; 
+    }
+    #urlList div {
+        margin-bottom: 10px;
+    }
+    .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+    .button-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+    }
+    .format-note {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .json-container {
+        position: relative;
+    }
+    #jsonResponse {
+        height: 200px; 
+        overflow-y: auto; 
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        white-space: pre-wrap; 
+    }
+    .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+    .copy-btn:hover {
+        opacity: 1;
+    }
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+    .bulk-search-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 10px 0;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bulk-search-btn:hover {
+        background-color: #218838;
+    }
+    .bulk-search-btn svg {
+        fill: white;
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+    .modal-content button {
+        margin-top: 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+    .modal-content button:hover {
+        background-color: #45a049;
+    }
+    .modal-content button {
+        margin: 10px; 
+    }
+    button.delete-selected {
+        background-color: #dc3545; 
+    }
+    button.delete-selected:hover {
+        background-color: #c82333; 
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Web Scraper Dashboard</h1>
+
+        <div class="section">
+            <h2>Manual URL Input</h2>
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Enter URL to scrape">
+                <button onclick="addUrl()">Add URL</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Bulk URL Upload</h2>
+            <div class="input-group">
+                <input type="file" id="csvFileInput" accept=".csv">
+            </div>
+            <div class="button-group">
+                <button onclick="uploadCSV()">Upload CSV</button>
+                <button onclick="showExampleCSV()">See Example CSV</button>
+                <button onclick="useAIBulkSearch()" class="bulk-search-btn">
+                    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 .688l.025.103 2-1.24a1 1 0 11.95 1.739L33 1a1 1 0 111 1H31a1 1 0 011-1v36.29l-2.68 2.58L28 27.335zm-1.32 27.3L26 37.414l-2.681-7.425L1.074 21.38 16.293 5.803 24.633.874l2.685 11zM12.707 15.89l-2.09.832L11 23h-1l.384-6.36-2.194-.867.548-1.563 2.095.83L11 8a3 3 0 013-3h1V3a3 3 0 00-3-3H13h14v2h-1a3 3 0 00-3 3l.998 9.82L37 17V3h-1a3 3 0 00-3-3V0H16v1a3 3 0 00-3 3l1 6-3 1v5.89zM0 42.816V18.749A27.96 27.96 0 0132 0h1a1 1 0 00-1-1H32a27.96 27.96 0 0132 18.749v24.067A27.957 27.957 0 0132 63h-.977A27.96 27.96 0 010 42.816zM2 22v24.815A25.978 25.978 0 0131 61h.998A25.978 25.978 0 0162 46.815V22a25.978 25.978 0 01-32-15.185z"/></svg>
+                    Use AI for Bulk Search
+                </button>
+            </div>
+            <p class="format-note">Note: CSV must be in the correct format. See the example CSV for reference.</p>
+            <p class="format-note">Pro Tip: Use AI for Bulk Search to find and extract URLs with AI.</p>
+        </div>
+
+        <div class="section">
+            <h2>URL List</h2>
+            <div id="urlList"></div>
+            <p id="limitMessage" style="color: red; display: none;">You have hit your daily limit on BETA version. Please wait 24 hours before you can scrape again.</p>
+            <p id="countdownTimer" style="color: orange;"></p>
+            <button onclick="selectAll()">Select All</button>
+            <button onclick="scrapeSelectedUrls()">Scrape Selected URLs</button>
+            <button onclick="deleteSelectedUrls()" class="delete-selected">Delete Selected</button>
+        </div>
+
+        <div id="progressBar"><div></div></div>
+
+        <div id="scrapedData">
+            <h2>Scraped Data:</h2>
+            <button onclick="exportScrapedData()">Export Data</button>
+            <button onclick="clearScrapedData()">Clear Data</button>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Input URL</th>
+                        <th>JSON</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>JSON Response</h2>
+            <div class="json-container">
+                <pre id="jsonResponse"></pre>
+                <button id="copyJsonBtn" class="copy-btn" style="display: none;">Copy</button>
+            </div>
+        </div>
+
+        <div id="csvModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Example CSV</h2>
+                <img src="/a/8ad4048d-183c-4cbf-afd1-d28cce0d51f6" alt="Example CSV format" style="width:100%;">
+            </div>
+        </div>
+
+        <div id="proTipModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeProTip()">&times;</span>
+                <h2>Pro Tip</h2>
+                <p>Use ChatGPT to compile a list of websites by utilizing search functionalities, then export those URLs into a spreadsheet. Upload the spreadsheet for bulk web scraping here.</p>
+                <button onclick="goToChatGPT()">Go to ChatGPT</button>
+            </div>
+        </div>
+
+        <div id="aiFormatModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeAIFormatModal()">&times;</span>
+                <h2>Format Data with AI</h2>
+                <p>Would you like to format this data using AI?</p>
+                <button onclick="formatDataWithAI()">Yes, format with AI</button>
+                <button onclick="closeAIFormatModal()">No, thanks</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    let urls = [];
+    let scrapedData = [];
+    const MAX_SCRAPES_PER_DAY = 20;
+    const DAY_IN_MS = 86400000;
+
+    document.addEventListener('DOMContentLoaded', initScrapeLimit);
+
+    function initScrapeLimit(){
+        const today = new Date().setHours(0,0,0,0);
+        const lastScrapeDate = localStorage.getItem('lastScrapeDate') || today;
+        const urlScrapeCount = Number(localStorage.getItem('urlScrapeCount')) || 0;
+
+        if (today > lastScrapeDate) {
+            localStorage.setItem('urlScrapeCount', 0);
+            localStorage.setItem('lastScrapeDate', today);
+        }
+
+        if (urlScrapeCount >= MAX_SCRAPES_PER_DAY) {
+            const timeRemaining = DAY_IN_MS - (Date.now() - lastScrapeDate);
+            showCountdown(timeRemaining);
+        }
+    }
+
+    function addUrl() {
+        const url = document.getElementById('urlInput').value;
+        if (url) {
+            urls.push(url);
+            updateUrlList();
+            document.getElementById('urlInput').value = '';
+        }
+    }
+
+    function updateUrlList() {
+        const urlList = document.getElementById('urlList');
+        urlList.innerHTML = urls.map((url, index) => 
+            `<div>
+                <input type="checkbox" id="url${index}" value="${url}">
+                <label for="url${index}">${url}</label>
+            </div>`
+        ).join('');
+    }
+
+    function selectAll() {
+        const checkboxes = document.querySelectorAll('#urlList input[type="checkbox"]');
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+    }
+
+    function deleteSelectedUrls() {
+        const selectedUrls = [];
+        const checkboxes = document.querySelectorAll('#urlList input[type="checkbox"]:checked');
+        checkboxes.forEach(checkbox => {
+            selectedUrls.push(checkbox.value);
+        });
+
+        urls = urls.filter(url => !selectedUrls.includes(url));
+        updateUrlList();
+    }
+
+    async function scrapeSelectedUrls() {
+        const today = new Date().setHours(0,0,0,0);
+        let urlScrapeCount = Number(localStorage.getItem('urlScrapeCount')) || 0;
+
+        if (urlScrapeCount >= MAX_SCRAPES_PER_DAY) {
+            document.getElementById("limitMessage").style.display = "block";
+            return;
+        }
+
+        const selectedUrls = urls.filter((_, index) => document.getElementById(`url${index}`).checked);
+        const toScrape = selectedUrls.slice(0, MAX_SCRAPES_PER_DAY - urlScrapeCount);
+        const skipCount = selectedUrls.length - toScrape.length;
+
+        if (skipCount > 0) {
+            alert(`You can scrape ${toScrape.length} more URLs today. ${skipCount} URL(s) skipped.`);
+        }
+
+        if (toScrape.length === 0) return;
+
+        const progressBar = document.querySelector('#progressBar div');
+        const totalUrls = toScrape.length;
+        let processedUrls = 0;
+
+        toScrape.forEach(async url => {
+            try {
+                const response = await scrapeUrl(url);
+                scrapedData.push(response);
+                updateDataTable(response);
+                processedUrls++;
+                progressBar.style.width = `${(processedUrls / totalUrls) * 100}%`;
+                urlScrapeCount++;
+                localStorage.setItem('urlScrapeCount', urlScrapeCount);
+                localStorage.setItem('lastScrapeDate', today);
+            } catch (error) {
+                console.error(`Error scraping ${url}:`, error);
+                updateDataTable({
+                    status: 'Error',
+                    inputUrl: url,
+                    jsonResponse: JSON.stringify({ error: error.message }, null, 2)
+                });
+            }
+        });
+
+        if (urlScrapeCount >= MAX_SCRAPES_PER_DAY) {
+            const timeRemaining = DAY_IN_MS - (Date.now() - today);
+            showCountdown(timeRemaining);
+        }
+    }
+
+    async function scrapeUrl(url) {
+        const options = {
+            method: 'GET',
+            url: 'https://website-contacts-scraper.p.rapidapi.com/scrape-contacts',
+            params: {
+                query: url,
+                match_email_domain: 'false',
+                external_matching: 'false'
+            },
+            headers: {
+                'x-rapidapi-key': 'cb7fb4be2amsh039e0814516acb0p1022a8jsn778446d11ba7',
+                'x-rapidapi-host': 'website-contacts-scraper.p.rapidapi.com'
+            }
+        };
+
+        try {
+            const response = await axios.request(options);
+            const data = response.data;
+            
+            return {
+                status: 'Success',
+                inputUrl: url,
+                jsonResponse: JSON.stringify(data, null, 2)
+            };
+        } catch (error) {
+            console.error(`Error scraping ${url}:`, error);
+            return {
+                status: 'Error',
+                inputUrl: url,
+                jsonResponse: JSON.stringify({ error: error.message }, null, 2)
+            };
+        }
+    }
+
+    function updateDataTable(data) {
+        const tbody = document.querySelector('#dataTable tbody');
+        const row = tbody.insertRow();
+        
+        const statusCell = row.insertCell();
+        statusCell.textContent = data.status || 'None';
+        
+        const urlCell = row.insertCell();
+        urlCell.textContent = data.inputUrl || 'None';
+
+        const jsonCell = row.insertCell();
+        const showJsonButton = document.createElement('button');
+        showJsonButton.textContent = 'Show JSON';
+        showJsonButton.onclick = () => showJsonResponse(data.jsonResponse);
+        jsonCell.appendChild(showJsonButton);
+    }
+
+    function showJsonResponse(jsonResponse) {
+        document.getElementById('jsonResponse').textContent = jsonResponse;
+        
+        const copyButton = document.getElementById('copyJsonBtn');
+        copyButton.style.display = 'block';
+    }
+
+    function copyJsonToClipboard() {
+        const jsonContent = document.getElementById('jsonResponse').textContent;
+        navigator.clipboard.writeText(jsonContent).then(() => {
+            alert('JSON copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
+    document.getElementById('copyJsonBtn').style.display = 'none';
+    document.getElementById('copyJsonBtn').addEventListener('click', copyJsonToClipboard);
+
+    function exportScrapedData() {
+        if (scrapedData.length === 0) {
+            alert('No data to export. Please scrape some websites first.');
+            return;
+        }
+
+        const dataStr = JSON.stringify(scrapedData, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const exportFileDefaultName = 'scraped_data.json';
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+
+        showAIFormatModal();
+    }
+
+    function clearScrapedData() {
+        scrapedData = []; 
+        const tbody = document.querySelector('#dataTable tbody');
+        tbody.innerHTML = ''; 
+        alert('Scraped data cleared!');
+    }
+
+    function showAIFormatModal() {
+        const modal = document.getElementById('aiFormatModal');
+        modal.style.display = 'block';
+    }
+
+    function closeAIFormatModal() {
+        const modal = document.getElementById('aiFormatModal');
+        modal.style.display = 'none';
+    }
+
+    function formatDataWithAI() {
+        closeAIFormatModal();
+        window.open('https://chatgpt.com/g/g-S28IM4rAN-json-converter', '_blank');
+    }
+
+    function uploadCSV() {
+        const fileInput = document.getElementById('csvFileInput');
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                lines.forEach(line => {
+                    const url = line.trim();
+                    if (url && !urls.includes(url)) {
+                        urls.push(url);
+                    }
+                });
+                updateUrlList();
+                fileInput.value = ''; 
+            };
+            reader.readAsText(file);
+        } else {
+            alert('Please select a CSV file to upload.');
+        }
+    }
+
+    function showExampleCSV() {
+        const modal = document.getElementById('csvModal');
+        const span = document.getElementsByClassName("close")[0];
+        
+        modal.style.display = "block";
+        
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    function showProTip() {
+        const modal = document.getElementById('proTipModal');
+        modal.style.display = 'block';
+    }
+
+    function closeProTip() {
+        const modal = document.getElementById('proTipModal');
+        modal.style.display = 'none';
+    }
+
+    function goToChatGPT() {
+        window.open('https://chatgpt.com/', '_blank');
+    }
+
+    window.onclick = function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+    function useAIBulkSearch() {
+        window.open('https://chatgpt.com/g/g-M1rKAirV0-bulk-url-finder', '_blank');
+    }
+
+    function showCountdown(milliseconds) {
+        const limitMessage = document.getElementById("limitMessage");
+        const countdownTimer = document.getElementById("countdownTimer");
+        let countdown = milliseconds;
+
+        limitMessage.style.display = "block";
+
+        const interval = setInterval(() => {
+            const hours = Math.floor(countdown / (1000 * 60 * 60));
+            const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((countdown % (1000 * 60)) / 1000);
+
+            countdownTimer.textContent = `Time until you can scrape again: ${hours}h ${minutes}m ${seconds}s`;
+
+            countdown -= 1000;
+            if (countdown < 0) {
+                clearInterval(interval);
+                limitMessage.style.display = "none";
+                countdownTimer.textContent = '';
+            }
+        }, 1000);
+    }
+    </script>
+</body>
+</html>

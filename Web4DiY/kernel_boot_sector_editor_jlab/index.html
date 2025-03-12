@@ -1,0 +1,205 @@
+<title>Kernel Editor Simulator</title>
+<style>
+  body {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Consolas', monospace;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .editor-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .hex-editor, .kernel-editor {
+    background: #2d2d2d;
+    border: 1px solid #3d3d3d;
+    border-radius: 4px;
+    padding: 15px;
+    width: 45%;
+    min-width: 300px;
+  }
+
+  .title {
+    color: #569cd6;
+    margin-bottom: 10px;
+  }
+
+  .editor {
+    font-family: monospace;
+    background: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    color: #d4d4d4;
+    width: 100%;
+    height: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+    resize: none;
+  }
+
+  .status {
+    color: #6a9955;
+    margin-top: 10px;
+    height: 20px;
+  }
+
+  button {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #1177bb;
+  }
+
+  .terminal {
+    background: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    padding: 10px;
+    margin-top: 20px;
+    height: 150px;
+    overflow-y: auto;
+    font-family: monospace;
+  }
+
+  .warning {
+    color: #ce9178;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #d4d4d4;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+  <h1>Advanced Kernel Editor</h1>
+  <div class="editor-container">
+    <div class="hex-editor">
+      <h3 class="title">Boot Sector Editor (Hex)</h3>
+      <textarea class="editor" id="bootEditor" spellcheck="false">7C 00 00 80 01 00 00 00
+00 00 00 00 00 00 00 00
+00 00 7C 00 00 00 00 00
+00 00 00 00 29 00 00 00
+4B 45 52 4E 45 4C 20 20
+46 41 54 31 32 20 20 20
+FA 33 C0 8E D0 BC 00 7C
+FB 50 07 50 1F FC BE 1B</textarea>
+      <button onclick="updateBootSector()">Update Boot Sector</button>
+      <div class="status" id="bootStatus"></div>
+    </div>
+
+    <div class="kernel-editor">
+      <h3 class="title">Kernel Code Editor</h3>
+      <textarea class="editor" id="kernelEditor" spellcheck="false">/* Kernel Entry Point */
+void kernel_main() {
+  init_gdt();
+  init_interrupts();
+  init_memory();
+  
+  // Initialize system
+  load_modules();
+  start_scheduler();
+}</textarea>
+      <button onclick="compileKernel()">Compile Kernel</button>
+      <div class="status" id="kernelStatus"></div>
+    </div>
+  </div>
+
+  <div class="terminal" id="terminal">
+    > System initialized. Ready for kernel modifications.
+    <span class="cursor"></span>
+  </div>
+
+<script>
+let terminalHistory = [];
+
+function addToTerminal(text, isWarning = false) {
+  const terminal = document.getElementById('terminal');
+  const line = document.createElement('div');
+  line.textContent = '> ' + text;
+  if (isWarning) line.className = 'warning';
+  terminal.insertBefore(line, terminal.lastChild);
+  terminalHistory.push(text);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function updateBootSector() {
+  const bootEditor = document.getElementById('bootEditor');
+  const bootStatus = document.getElementById('bootStatus');
+  
+  // Validate hex input
+  const hexContent = bootEditor.value.replace(/[^0-9A-Fa-f\s]/g, '');
+  if (hexContent.length < 50) {
+    bootStatus.textContent = 'Error: Invalid boot sector data';
+    addToTerminal('Boot sector update failed - invalid data', true);
+    return;
+  }
+
+  bootStatus.textContent = 'Boot sector updated successfully';
+  addToTerminal('Boot sector successfully modified');
+  
+  // Simulate system response
+  setTimeout(() => {
+    addToTerminal('Recalculating checksums...');
+  }, 500);
+  
+  setTimeout(() => {
+    addToTerminal('Boot sector verification complete');
+  }, 1500);
+}
+
+function compileKernel() {
+  const kernelEditor = document.getElementById('kernelEditor');
+  const kernelStatus = document.getElementById('kernelStatus');
+  
+  // Simulate compilation process
+  kernelStatus.textContent = 'Compiling...';
+  addToTerminal('Starting kernel compilation');
+  
+  setTimeout(() => {
+    const steps = [
+      'Preprocessing kernel source...',
+      'Analyzing dependencies...',
+      'Generating assembly...',
+      'Linking objects...',
+      'Optimizing binary...'
+    ];
+    
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < steps.length) {
+        addToTerminal(steps[i]);
+        i++;
+      } else {
+        clearInterval(interval);
+        kernelStatus.textContent = 'Compilation successful';
+        addToTerminal('Kernel compilation completed successfully');
+      }
+    }, 800);
+  }, 500);
+}
+
+// Initial terminal message
+setTimeout(() => {
+  addToTerminal('System ready for modifications');
+}, 1000);
+</script>
+</body></html>

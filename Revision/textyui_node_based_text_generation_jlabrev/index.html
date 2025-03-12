@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextyUI - Node-based Text Generation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="toolbar">
+    <button id="addNodeBtn">Add Node</button>
+    <button id="executeBtn">Execute Flow</button>
+    <button id="clearBtn">Clear Canvas</button>
+  </div>
+  
+  <div id="canvas"></div>
+
+  <div id="node-menu" class="hidden">
+    <div class="menu-item" data-type="system-prompt">System Prompt</div>
+    <div class="menu-item" data-type="user-prompt">User Prompt</div>
+    <div class="menu-item" data-type="model-select">AI Model</div>
+    <div class="menu-item" data-type="modifier">Modifier</div>
+    <div class="menu-item" data-type="style">Style</div>
+    <div class="menu-item" data-type="combine">Combine</div>
+    <div class="menu-item" data-type="template">Template</div>
+    <div class="menu-item" data-type="output">Output</div>
+    <div class="menu-item" data-type="translator">Translator</div>
+    <div class="menu-item" data-type="chat">Chat</div>
+    <div class="menu-item" data-type="neural-network-visualizer">Neural Network Visualizer</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.15.6/js/jsplumb.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

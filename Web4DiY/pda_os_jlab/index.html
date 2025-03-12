@@ -1,0 +1,2499 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDA OS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    }
+
+    :root {
+      --accent: #336699;
+      --bg: #CCCCCC;
+      --text: #000000;
+      --card-bg: #E6E6E6;
+      --border: #666666;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      max-width: 480px;
+      margin: 0 auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .status-bar {
+      background: linear-gradient(to bottom, #666666, #333333);
+      color: white;
+      padding: 4px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      border-bottom: 2px solid var(--border);
+      z-index: 100;
+      position: relative;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+
+    .time {
+      font-weight: bold;
+    }
+
+    .icons i {
+      margin-left: 8px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px;
+      flex: 1;
+      background: var(--bg);
+      background-image: linear-gradient(45deg, #BBBBBB 25%, transparent 25%),
+                        linear-gradient(-45deg, #BBBBBB 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #BBBBBB 75%),
+                        linear-gradient(-45deg, transparent 75%, #BBBBBB 75%);
+      background-size: 4px 4px;
+    }
+
+    .app-icon {
+      aspect-ratio: 1;
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .app-icon:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+      transform: translate(1px, 1px);
+    }
+
+    .app-icon i {
+      font-size: 28px;
+      color: var(--accent);
+      margin-bottom: 6px;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .app-icon span {
+      font-size: 11px;
+      font-weight: bold;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .dock {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      padding: 8px;
+      display: flex;
+      justify-content: space-around;
+      border-top: 2px solid var(--border);
+      z-index: 100;
+      position: relative;
+    }
+
+    .dock-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px 12px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+    }
+
+    .dock-icon:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      border: 2px solid var(--border);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .dock-icon i {
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 2px;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .dock-icon span {
+      font-size: 10px;
+      font-weight: bold;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .app-window {
+      display: none;
+      position: fixed;
+      top: 26px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--card-bg);
+      z-index: 99;
+      animation: slideUp 0.3s ease;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .app-window h2 {
+      background: linear-gradient(to bottom, #666666, #333333);
+      color: white;
+      padding: 6px 8px;
+      font-size: 14px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+
+    .back-btn {
+      cursor: pointer;
+      padding: 4px;
+      z-index: 101;
+    }
+
+    .app-window h2 .title {
+      flex: 1;
+      text-align: center;
+      margin-left: -24px;
+    }
+
+    textarea {
+      font-family: "Courier New", monospace;
+      resize: none;
+      border-radius: 0;
+      background: #FFFFCC;
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(100%);
+      } 
+    }
+
+    .app-window.closing {
+      animation: slideDown 0.3s ease forwards;
+      pointer-events: none;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      padding: 1px;
+      height: calc(100% - 30px);
+    }
+
+    .calculator-screen {
+      grid-column: span 4;
+      background: #FFFFCC;
+      padding: 10px;
+      text-align: right;
+      font-family: "Courier New", monospace;
+      font-size: 24px;
+      border: 1px solid var(--border);
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .calc-button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: none;
+      padding: 15px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      min-height: 50px;
+    }
+
+    .calc-button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .operator {
+      background: linear-gradient(to bottom, #FFC966, #FF9900);
+    }
+
+    .operator:active {
+      background: linear-gradient(to bottom, #FF9900, #CC7A00);
+    }
+
+    .equals {
+      grid-column: span 2;
+      background: linear-gradient(to bottom, #66CC66, #339933);
+      color: white;
+    }
+
+    .equals:active {
+      background: linear-gradient(to bottom, #339933, #267326);
+    }
+
+    .notes-toolbar {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .notes-toolbar button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .notes-toolbar button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .notes-list {
+      border-bottom: 1px solid var(--border);
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .note-item {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .note-item:active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .note-item h3 {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .note-item p {
+      font-size: 12px;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .notes-content {
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 30px);
+    }
+
+    .terminal-window {
+      background: #000;
+      color: #33ff33;
+      font-family: "Courier New", monospace;
+      padding: 8px;
+      height: calc(100% - 30px);
+      overflow-y: auto;
+    }
+
+    .terminal-input {
+      background: transparent;
+      border: none;
+      color: #33ff33;
+      font-family: inherit;
+      font-size: inherit;
+      width: 100%;
+      outline: none;
+    }
+
+    .terminal-output {
+      white-space: pre-wrap;
+      margin-bottom: 8px;
+    }
+
+    .terminal-prompt {
+      color: #33ff33;
+      user-select: none;
+    }
+
+    .search-container {
+      padding: 16px;
+      height: calc(100% - 30px);
+      overflow-y: auto;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+    }
+
+    .search-bar i {
+      color: #666;
+      margin-right: 8px;
+    }
+
+    .search-bar input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .search-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-result {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .search-result:hover {
+      background: var(--bg);
+    }
+
+    .search-result i {
+      font-size: 24px;
+      margin-right: 12px;
+      color: var(--accent);
+    }
+
+    .search-result .details {
+      flex: 1;
+    }
+
+    .search-result .title {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .search-result .subtitle {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .settings-container {
+      padding: 16px;
+      height: calc(100% - 30px);
+      overflow-y: auto;
+    }
+
+    .settings-section {
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .settings-section h3 {
+      padding: 12px 16px;
+      margin: 0;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .settings-item .icon {
+      width: 24px;
+      color: var(--accent);
+      margin-right: 12px;
+    }
+
+    .settings-item .details {
+      flex: 1;
+    }
+
+    .settings-item .label {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .settings-item .description {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .settings-item .control {
+      margin-left: 12px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    .control-center {
+      position: fixed; 
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(-100%);
+      background: #f0f0f0;
+      color: #333;
+      padding: 12px;
+      z-index: 1000;
+      max-width: 480px;
+      margin: 0 auto;
+      border-bottom: 1px solid #ccc;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .control-center.visible {
+      transform: translateY(0);
+    }
+
+    .control-center-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .quick-toggle {
+      background: #fff;
+      padding: 12px 8px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border: 1px solid #ddd;
+    }
+
+    .quick-toggle:active {
+      background: #eee;
+    }
+
+    .quick-toggle.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .quick-toggle i {
+      font-size: 20px;
+    }
+
+    .quick-toggle span {
+      font-size: 11px;
+    }
+
+    .brightness-slider,
+    .volume-slider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      background: #fff;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .brightness-slider i,
+    .volume-slider i {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .brightness-slider input,
+    .volume-slider input {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: #ddd;
+      border-radius: 2px;
+    }
+
+    .brightness-slider input::-webkit-slider-thumb,
+    .volume-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .calendar-container {
+      height: calc(100% - 30px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calendar-header {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC); 
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calendar-header h3 {
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .calendar-nav button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .calendar-nav button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--border);
+      padding: 1px;
+      flex: 1;
+    }
+
+    .calendar-cell {
+      background: var(--card-bg);
+      min-height: 80px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calendar-weekday {
+      background: var(--accent);
+      color: white;
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .calendar-date {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .calendar-events {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .other-month {
+      opacity: 0.5;
+    }
+
+    .today {
+      background: var(--accent);
+      color: white;
+    }
+
+    .today .calendar-events {
+      color: white;
+    }
+
+    .event-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin: 2px 0;
+    }
+
+    .recent-apps-container {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    .recent-app-card {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .recent-app-card:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+      transform: translate(1px, 1px);
+    }
+
+    .recent-app-card i {
+      font-size: 28px;
+      color: var(--accent);
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .recent-app-card .details {
+      flex: 1;
+    }
+
+    .recent-app-card .title {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 4px;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    }
+
+    .recent-app-card .timestamp {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .recent-app-card .close {
+      padding: 4px;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .recent-app-card .close:hover {
+      opacity: 1;
+    }
+
+    .recent-app-card .close i {
+      font-size: 18px;
+      color: #666;
+    }
+
+    .tasks-content {
+      height: calc(100% - 30px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tasks-toolbar {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .tasks-toolbar button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tasks-toolbar button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .tasks-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .task-item.completed {
+      opacity: 0.7;
+    }
+
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+    }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+    }
+
+    .task-checkbox i {
+      display: none;
+      color: var(--accent);
+    }
+
+    .task-item.completed .task-checkbox i {
+      display: block;
+    }
+
+    .task-title {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .task-delete {
+      color: #cc3333;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .weather-container {
+      height: calc(100% - 30px);
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .weather-main {
+      background: linear-gradient(135deg, var(--accent), #1a4d80);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .weather-location {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .weather-current {
+      margin-bottom: 20px;
+    }
+
+    .weather-icon {
+      font-size: 64px;
+      margin-bottom: 10px;
+    }
+
+    .temperature {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .description {
+      font-size: 18px;
+      text-transform: capitalize;
+    }
+
+    .weather-details {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .weather-forecast h3 {
+      margin-bottom: 12px;
+      color: var(--accent);
+    }
+
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .forecast-item {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .forecast-item .day {
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .forecast-item i {
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .forecast-item .temp {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .contacts-container {
+      height: calc(100% - 30px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contacts-toolbar {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .contacts-toolbar button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .contacts-toolbar button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .contacts-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .contact-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .contact-details {
+      flex: 1;
+    }
+
+    .contact-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .contact-info {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .contact-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .contact-action {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--accent);
+    }
+
+    .contact-action:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    .contact-action.delete {
+      color: #cc3333;
+    }
+
+    .files-container {
+      height: calc(100% - 30px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .files-toolbar {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+    }
+
+    .files-toolbar button {
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .files-toolbar button:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .files-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .folder-path {
+      padding: 8px;
+      font-size: 12px;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: linear-gradient(to bottom, #FFFFFF, #CCCCCC);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .file-item:active {
+      background: linear-gradient(to bottom, #CCCCCC, #999999);
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .file-icon {
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .file-details {
+      flex: 1;
+    }
+
+    .file-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .file-info {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .file-action {
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--accent);
+    }
+
+    .file-action:hover {
+      background: rgba(0,0,0,0.1);
+    }
+
+    .file-action.delete {
+      color: #cc3333;
+    }
+  </style>
+</head>
+<body>
+  <div class="status-bar">
+    <div class="time"></div>
+    <div class="icons">
+      <i class="bi bi-wifi"></i>
+      <i class="bi bi-battery"></i>
+      <i class="bi bi-bluetooth"></i>
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <div class="app-icon" onclick="openApp(&apos;notes&apos;)">
+      <i class="bi bi-journal-text"></i>
+      <span>Notes</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;calendar&apos;)">
+      <i class="bi bi-calendar3"></i>
+      <span>Calendar</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;weather&apos;)">
+      <i class="bi bi-cloud-sun"></i>
+      <span>Weather</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;calculator&apos;)">
+      <i class="bi bi-calculator"></i>
+      <span>Calculator</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;tasks&apos;)">
+      <i class="bi bi-check2-square"></i>
+      <span>Tasks</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;contacts&apos;)">
+      <i class="bi bi-person-lines-fill"></i>
+      <span>Contacts</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;settings&apos;)">
+      <i class="bi bi-gear"></i>
+      <span>Settings</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;files&apos;)">
+      <i class="bi bi-folder2"></i>
+      <span>Files</span>
+    </div>
+    <div class="app-icon" onclick="openApp(&apos;terminal&apos;)">
+      <i class="bi bi-terminal"></i>
+      <span>Terminal</span>
+    </div>
+  </div>
+
+  <div id="notes" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Notes</span>
+    </h2>
+    <div class="notes-content">
+      <div class="notes-toolbar">
+        <button onclick="notes.newNote()"><i class="bi bi-plus-lg"></i> New</button>
+        <button onclick="notes.deleteNote()"><i class="bi bi-trash"></i> Delete</button>
+      </div>
+      <div class="notes-list"></div>
+      <textarea style="width: 100%; flex: 1; background: var(--bg); color: var(--text); padding: 8px; border: none; border-top: 1px solid var(--border);"></textarea>
+    </div>
+  </div>
+
+  <div id="calendar" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Calendar</span>
+    </h2>
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <h3></h3>
+        <div class="calendar-nav">
+          <button onclick="calendar.prevMonth()"><i class="bi bi-chevron-left"></i></button>
+          <button onclick="calendar.today()">Today</button>
+          <button onclick="calendar.nextMonth()"><i class="bi bi-chevron-right"></i></button>
+        </div>
+      </div>
+      <div class="calendar-grid">
+        <div class="calendar-weekday">Sun</div>
+        <div class="calendar-weekday">Mon</div>
+        <div class="calendar-weekday">Tue</div>
+        <div class="calendar-weekday">Wed</div>
+        <div class="calendar-weekday">Thu</div>
+        <div class="calendar-weekday">Fri</div>
+        <div class="calendar-weekday">Sat</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="calculator" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Calculator</span>
+    </h2>
+    <div class="calculator-grid">
+      <div class="calculator-screen">0</div>
+      <button class="calc-button" onclick="calculator.clear()">C</button>
+      <button class="calc-button" onclick="calculator.delete()">DEL</button>
+      <button class="calc-button" onclick="calculator.percent()">%</button>
+      <button class="calc-button operator" onclick="calculator.operator(&apos;/&apos;)">/</button>
+      <button class="calc-button" onclick="calculator.number(&apos;7&apos;)">7</button>
+      <button class="calc-button" onclick="calculator.number(&apos;8&apos;)">8</button>
+      <button class="calc-button" onclick="calculator.number(&apos;9&apos;)">9</button>
+      <button class="calc-button operator" onclick="calculator.operator(&apos;*&apos;)">*</button>
+      <button class="calc-button" onclick="calculator.number(&apos;4&apos;)">4</button>
+      <button class="calc-button" onclick="calculator.number(&apos;5&apos;)">5</button>
+      <button class="calc-button" onclick="calculator.number(&apos;6&apos;)">6</button>
+      <button class="calc-button operator" onclick="calculator.operator(&apos;-&apos;)">-</button>
+      <button class="calc-button" onclick="calculator.number(&apos;1&apos;)">1</button>
+      <button class="calc-button" onclick="calculator.number(&apos;2&apos;)">2</button>
+      <button class="calc-button" onclick="calculator.number(&apos;3&apos;)">3</button>
+      <button class="calc-button operator" onclick="calculator.operator(&apos;+&apos;)">+</button>
+      <button class="calc-button" onclick="calculator.number(&apos;0&apos;)">0</button>
+      <button class="calc-button" onclick="calculator.decimal()">.</button>
+      <button class="calc-button equals" onclick="calculator.equals()">=</button>
+    </div>
+  </div>
+
+  <div id="tasks" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Tasks</span>
+    </h2>
+    <div class="tasks-content">
+      <div class="tasks-toolbar">
+        <button onclick="tasks.addTask()"><i class="bi bi-plus-lg"></i> New Task</button>
+      </div>
+      <div class="tasks-list"></div>
+    </div>
+  </div>
+
+  <div id="terminal" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Terminal</span>
+    </h2>
+    <div class="terminal-window">
+      <div id="terminal-output"></div>
+      <div style="display: flex;">
+        <span class="terminal-prompt">&#x24; </span>
+        <input type="text" class="terminal-input" id="terminal-input" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <div id="search" class="app-window">
+    <div class="search-container" style="height: 100%">
+      <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search apps and files..." onkeyup="search.handleSearch(this.value)">
+      </div>
+      <div class="search-results"></div>
+    </div>
+  </div>
+
+  <div id="settings" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Settings</span>
+    </h2>
+    <div class="settings-container">
+      <div class="settings-section">
+        <h3>System</h3>
+        <div class="settings-item">
+          <div class="icon"><i class="bi bi-palette"></i></div>
+          <div class="details">
+            <div class="label">Dark Mode</div>
+            <div class="description">Enable dark color scheme</div>
+          </div>
+          <div class="control">
+            <label class="toggle-switch">
+              <input type="checkbox" onchange="settings.toggleDarkMode(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-item">
+          <div class="icon"><i class="bi bi-volume-up"></i></div>
+          <div class="details">
+            <div class="label">Sound Effects</div>
+            <div class="description">Enable system sounds</div>
+          </div>
+          <div class="control">
+            <label class="toggle-switch">
+              <input type="checkbox" onchange="settings.toggleSounds(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>Privacy</h3>
+        <div class="settings-item">
+          <div class="icon"><i class="bi bi-shield-check"></i></div>
+          <div class="details">
+            <div class="label">Analytics</div>
+            <div class="description">Send anonymous usage data</div>
+          </div>
+          <div class="control">
+            <label class="toggle-switch">
+              <input type="checkbox" onchange="settings.toggleAnalytics(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>About</h3>
+        <div class="settings-item">
+          <div class="icon"><i class="bi bi-info-circle"></i></div>
+          <div class="details">
+            <div class="label">Version</div>
+            <div class="description">PDA OS v1.0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="weather" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Weather</span>
+    </h2>
+    <div class="weather-container">
+      <div class="weather-main">
+        <div class="weather-location">
+          <i class="bi bi-geo-alt"></i>
+          <span class="location-name">Loading...</span>
+        </div>
+        <div class="weather-current">
+          <i class="bi bi-cloud-fill weather-icon"></i>
+          <div class="temperature">--&#xb0;C</div>
+          <div class="description">Loading...</div>
+        </div>
+        <div class="weather-details">
+          <div class="detail">
+            <i class="bi bi-droplet"></i>
+            <span class="humidity">--%</span>
+          </div>
+          <div class="detail">
+            <i class="bi bi-wind"></i>
+            <span class="wind">-- m/s</span>
+          </div>
+        </div>
+      </div>
+      <div class="weather-forecast">
+        <h3>5-Day Forecast</h3>
+        <div class="forecast-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contacts" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Contacts</span>
+    </h2>
+    <div class="contacts-container">
+      <div class="contacts-toolbar">
+        <button onclick="contacts.addContact()"><i class="bi bi-person-plus"></i> Add Contact</button>
+      </div>
+      <div class="contacts-list"></div>
+    </div>
+  </div>
+
+  <div id="recent-apps" class="app-window">
+    <div class="recent-apps-container">
+    </div>
+  </div>
+
+  <div id="files" class="app-window">
+    <h2>
+      <span class="back-btn" onclick="showHome()"><i class="bi bi-chevron-left"></i></span>
+      <span class="title">Files</span>
+    </h2>
+    <div class="files-container">
+      <div class="files-toolbar">
+        <button onclick="files.createFolder()"><i class="bi bi-folder-plus"></i> New Folder</button>
+        <button onclick="files.uploadFile()"><i class="bi bi-upload"></i> Upload</button>
+      </div>
+      <div class="folder-path"></div>
+      <div class="files-list"></div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <div class="dock-icon" onclick="showHome()">
+      <i class="bi bi-house"></i>
+      <span>Home</span>
+    </div>
+    <div class="dock-icon" onclick="openApp(&apos;search&apos;)">
+      <i class="bi bi-search"></i>
+      <span>Search</span>
+    </div>
+    <div class="dock-icon">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+    </div>
+    <div class="dock-icon" onclick="openApp(&apos;recent-apps&apos;)">
+      <i class="bi bi-collection"></i>
+      <span>Recent</span>
+    </div>
+  </div>
+
+  <div class="control-center">
+    <div class="control-center-grid">
+      <div class="quick-toggle">
+        <i class="bi bi-wifi"></i>
+        <span>WiFi</span>
+      </div>
+      <div class="quick-toggle">
+        <i class="bi bi-bluetooth"></i>
+        <span>Bluetooth</span> 
+      </div>
+      <div class="quick-toggle">
+        <i class="bi bi-brightness-high"></i>
+        <span>Brightness</span>
+      </div>
+      <div class="quick-toggle">
+        <i class="bi bi-volume-up"></i>
+        <span>Volume</span>
+      </div>
+      <div class="quick-toggle">
+        <i class="bi bi-phone-vibrate"></i>
+        <span>Silent</span>
+      </div>
+    </div>
+    <div class="brightness-slider">
+      <i class="bi bi-brightness-low"></i>
+      <input type="range" min="0" max="100" value="50">
+      <i class="bi bi-brightness-high"></i>
+    </div>
+    <div class="volume-slider">
+      <i class="bi bi-volume-mute"></i>
+      <input type="range" min="0" max="100" value="70">
+      <i class="bi bi-volume-up"></i>
+    </div>
+  </div>
+
+  <script>function updateTime() {
+  const time = new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  document.querySelector('.time').textContent = time;
+}
+setInterval(updateTime, 1000);
+updateTime();
+function openApp(appId) {
+  const appWindows = document.querySelectorAll('.app-window');
+  appWindows.forEach(window => window.style.display = 'none');
+  const app = document.getElementById(appId);
+  if (app) {
+    app.style.display = 'block';
+    if (appId !== 'recent-apps') {
+      const appData = {
+        notes: {
+          title: 'Notes',
+          icon: 'bi-journal-text'
+        },
+        calendar: {
+          title: 'Calendar',
+          icon: 'bi-calendar3'
+        },
+        weather: {
+          title: 'Weather',
+          icon: 'bi-cloud-sun'
+        },
+        calculator: {
+          title: 'Calculator',
+          icon: 'bi-calculator'
+        },
+        tasks: {
+          title: 'Tasks',
+          icon: 'bi-check2-square'
+        },
+        contacts: {
+          title: 'Contacts',
+          icon: 'bi-person-lines-fill'
+        },
+        settings: {
+          title: 'Settings',
+          icon: 'bi-gear'
+        },
+        files: {
+          title: 'Files',
+          icon: 'bi-folder2'
+        },
+        terminal: {
+          title: 'Terminal',
+          icon: 'bi-terminal'
+        }
+      };
+      if (appData[appId]) {
+        recentApps.addApp(appId, appData[appId].title, appData[appId].icon);
+      }
+    }
+  }
+}
+function closeApp(appId) {
+  const app = document.getElementById(appId);
+  if (app) {
+    app.classList.add('closing');
+    app.addEventListener('animationend', () => {
+      app.style.display = 'none';
+      app.classList.remove('closing');
+      app.style.animation = 'none';
+      app.offsetHeight;
+      app.style.animation = null;
+    }, {
+      once: true
+    });
+  }
+}
+function showHome() {
+  const appWindows = document.querySelectorAll('.app-window');
+  appWindows.forEach(window => {
+    if (window.style.display === 'block') {
+      window.classList.add('closing');
+      window.addEventListener('animationend', () => {
+        window.style.display = 'none';
+        window.classList.remove('closing');
+        window.style.animation = 'none';
+        window.offsetHeight;
+        window.style.animation = null;
+      }, {
+        once: true
+      });
+    }
+  });
+}
+let apps = {};
+class App {
+  constructor(id) {
+    this.id = id;
+    this.data = {};
+  }
+  save() {
+    localStorage.setItem(`app_${this.id}`, JSON.stringify(this.data));
+  }
+  load() {
+    const saved = localStorage.getItem(`app_${this.id}`);
+    if (saved) {
+      this.data = JSON.parse(saved);
+    }
+  }
+}
+class Notes extends App {
+  constructor() {
+    super('notes');
+    this.data = {
+      notes: [],
+      currentNoteId: null
+    };
+    this.load();
+    this.textarea = document.querySelector('#notes textarea');
+    this.notesList = document.querySelector('.notes-list');
+    this.textarea.addEventListener('input', () => this.saveCurrentNote());
+    this.render();
+  }
+  newNote() {
+    const note = {
+      id: Date.now(),
+      title: 'New Note',
+      content: '',
+      created: new Date().toISOString()
+    };
+    this.data.notes.unshift(note);
+    this.data.currentNoteId = note.id;
+    this.save();
+    this.render();
+  }
+  deleteNote() {
+    if (!this.data.currentNoteId) return;
+    this.data.notes = this.data.notes.filter(n => n.id !== this.data.currentNoteId);
+    this.data.currentNoteId = this.data.notes[0]?.id || null;
+    this.save();
+    this.render();
+  }
+  selectNote(id) {
+    this.data.currentNoteId = id;
+    this.save();
+    this.render();
+  }
+  saveCurrentNote() {
+    if (!this.data.currentNoteId) return;
+    const note = this.data.notes.find(n => n.id === this.data.currentNoteId);
+    if (note) {
+      note.content = this.textarea.value;
+      note.title = this.textarea.value.split('\n')[0].slice(0, 24) || 'New Note';
+      this.save();
+      this.renderNotesList();
+    }
+  }
+  render() {
+    this.renderNotesList();
+    const currentNote = this.data.notes.find(n => n.id === this.data.currentNoteId);
+    this.textarea.value = currentNote ? currentNote.content : '';
+  }
+  renderNotesList() {
+    this.notesList.innerHTML = this.data.notes.map(note => `
+          <div class="note-item ${note.id === this.data.currentNoteId ? 'active' : ''}" 
+               onclick="notes.selectNote(${note.id})">
+            <h3>${note.title}</h3>
+            <p>${note.content.slice(0, 50)}</p>
+          </div>
+        `).join('');
+  }
+}
+const notes = new Notes();
+apps.notes = notes;
+class Calendar extends App {
+  constructor() {
+    super('calendar');
+    this.data = {
+      events: [],
+      currentDate: new Date()
+    };
+    this.load();
+    this.grid = document.querySelector('.calendar-grid');
+    this.header = document.querySelector('.calendar-header h3');
+    this.render();
+  }
+  render() {
+    const year = this.data.currentDate.getFullYear();
+    const month = this.data.currentDate.getMonth();
+    const monthName = new Date(year, month).toLocaleString('default', {
+      month: 'long'
+    });
+    this.header.textContent = `${monthName} ${year}`;
+    const cells = this.grid.querySelectorAll('.calendar-cell');
+    cells.forEach(cell => cell.remove());
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = prevMonthDays - i;
+      this.createCalendarCell(day, 'other-month');
+    }
+    const today = new Date();
+    for (let day = 1; day <= totalDays; day++) {
+      const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+      this.createCalendarCell(day, isToday ? 'today' : '');
+    }
+    const remainingCells = 42 - (firstDay + totalDays);
+    for (let day = 1; day <= remainingCells; day++) {
+      this.createCalendarCell(day, 'other-month');
+    }
+  }
+  createCalendarCell(day, className = '') {
+    const cell = document.createElement('div');
+    cell.className = `calendar-cell ${className}`;
+    cell.innerHTML = `
+          <div class="calendar-date">${day}</div>
+          <div class="calendar-events">
+            <div class="event-dot"></div>
+          </div>
+        `;
+    this.grid.appendChild(cell);
+  }
+  prevMonth() {
+    this.data.currentDate.setMonth(this.data.currentDate.getMonth() - 1);
+    this.render();
+  }
+  nextMonth() {
+    this.data.currentDate.setMonth(this.data.currentDate.getMonth() + 1);
+    this.render();
+  }
+  today() {
+    this.data.currentDate = new Date();
+    this.render();
+  }
+}
+const calendar = new Calendar();
+apps.calendar = calendar;
+class Weather extends App {
+  constructor() {
+    super('weather');
+    this.data = {
+      location: null,
+      current: null,
+      forecast: []
+    };
+    this.apiKey = '1234567890abcdef';
+    this.load();
+    this.getLocation();
+  }
+  async getLocation() {
+    try {
+      const position = await new Promise((resolve, reject) => {
+        //patched by h0ffy // @JennyLab
+	//navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+      const {
+        latitude,
+        longitude
+      } = position.coords;
+      await this.fetchWeather(latitude, longitude);
+    } catch (error) {
+      console.error('Error getting location:', error);
+      await this.fetchWeather(51.5074, -0.1278);
+    }
+  }
+  async fetchWeather(lat, lon) {
+    try {
+      const currentResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${this.apiKey}`);
+      const currentData = await currentResponse.json();
+      const forecastResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${this.apiKey}`);
+      const forecastData = await forecastResponse.json();
+      this.data.location = currentData.name;
+      this.data.current = {
+        temp: Math.round(currentData.main.temp),
+        description: currentData.weather[0].description,
+        humidity: currentData.main.humidity,
+        windSpeed: currentData.wind.speed,
+        icon: this.getWeatherIcon(currentData.weather[0].icon)
+      };
+      this.data.forecast = forecastData.list.filter(item => item.dt_txt.includes('12:00:00')).slice(0, 5).map(item => ({
+        day: new Date(item.dt_txt).toLocaleDateString('en-US', {
+          weekday: 'short'
+        }),
+        temp: Math.round(item.main.temp),
+        icon: this.getWeatherIcon(item.weather[0].icon)
+      }));
+      this.save();
+      this.render();
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+    }
+  }
+  getWeatherIcon(code) {
+    const iconMap = {
+      '01d': 'bi-sun-fill',
+      '01n': 'bi-moon-fill',
+      '02d': 'bi-cloud-sun-fill',
+      '02n': 'bi-cloud-moon-fill',
+      '03d': 'bi-cloud-fill',
+      '03n': 'bi-cloud-fill',
+      '04d': 'bi-clouds-fill',
+      '04n': 'bi-clouds-fill',
+      '09d': 'bi-cloud-rain-heavy-fill',
+      '09n': 'bi-cloud-rain-heavy-fill',
+      '10d': 'bi-cloud-rain-fill',
+      '10n': 'bi-cloud-rain-fill',
+      '11d': 'bi-cloud-lightning-fill',
+      '11n': 'bi-cloud-lightning-fill',
+      '13d': 'bi-snow',
+      '13n': 'bi-snow',
+      '50d': 'bi-cloud-haze-fill',
+      '50n': 'bi-cloud-haze-fill'
+    };
+    return iconMap[code] || 'bi-cloud-fill';
+  }
+  render() {
+    if (!this.data.current) return;
+    document.querySelector('.location-name').textContent = this.data.location;
+    document.querySelector('.weather-icon').className = `bi ${this.data.current.icon} weather-icon`;
+    document.querySelector('.temperature').textContent = `${this.data.current.temp}°C`;
+    document.querySelector('.description').textContent = this.data.current.description;
+    document.querySelector('.humidity').textContent = `${this.data.current.humidity}%`;
+    document.querySelector('.wind').textContent = `${this.data.current.windSpeed} m/s`;
+    const forecastGrid = document.querySelector('.forecast-grid');
+    forecastGrid.innerHTML = this.data.forecast.map(day => `
+          <div class="forecast-item">
+            <div class="day">${day.day}</div>
+            <i class="bi ${day.icon}"></i>
+            <div class="temp">${day.temp}°C</div>
+          </div>
+        `).join('');
+  }
+}
+const weather = new Weather();
+apps.weather = weather;
+['notes', 'calendar', 'weather', 'calculator', 'tasks', 'contacts', 'settings', 'files'].forEach(appId => {
+  apps[appId] = new App(appId);
+  apps[appId].load();
+});
+document.querySelectorAll('.back-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    showHome();
+  });
+});
+const calculator = {
+  screen: document.querySelector('.calculator-screen'),
+  currentValue: '0',
+  previousValue: null,
+  operator: null,
+  newNumber: true,
+  updateScreen() {
+    this.screen.textContent = this.currentValue;
+  },
+  number(num) {
+    if (this.newNumber) {
+      this.currentValue = num;
+      this.newNumber = false;
+    } else {
+      this.currentValue = this.currentValue === '0' ? num : this.currentValue + num;
+    }
+    this.updateScreen();
+  },
+  decimal() {
+    if (this.newNumber) {
+      this.currentValue = '0.';
+      this.newNumber = false;
+    } else if (!this.currentValue.includes('.')) {
+      this.currentValue += '.';
+    }
+    this.updateScreen();
+  },
+  operator(op) {
+    if (this.previousValue !== null) {
+      this.equals();
+    }
+    this.previousValue = parseFloat(this.currentValue);
+    this.operator = op;
+    this.newNumber = true;
+  },
+  equals() {
+    if (this.operator === null || this.previousValue === null) return;
+    const current = parseFloat(this.currentValue);
+    let result;
+    switch (this.operator) {
+      case '+':
+        result = this.previousValue + current;
+        break;
+      case '-':
+        result = this.previousValue - current;
+        break;
+      case '*':
+        result = this.previousValue * current;
+        break;
+      case '/':
+        result = this.previousValue / current;
+        break;
+    }
+    this.currentValue = result.toString();
+    this.operator = null;
+    this.previousValue = null;
+    this.newNumber = true;
+    this.updateScreen();
+  },
+  clear() {
+    this.currentValue = '0';
+    this.previousValue = null;
+    this.operator = null;
+    this.newNumber = true;
+    this.updateScreen();
+  },
+  delete() {
+    if (this.currentValue.length === 1) {
+      this.currentValue = '0';
+    } else {
+      this.currentValue = this.currentValue.slice(0, -1);
+    }
+    this.updateScreen();
+  },
+  percent() {
+    this.currentValue = (parseFloat(this.currentValue) / 100).toString();
+    this.updateScreen();
+  }
+};
+class Terminal extends App {
+  constructor() {
+    super('terminal');
+    this.data = {
+      history: [],
+      workingDir: '~'
+    };
+    this.load();
+    this.output = document.getElementById('terminal-output');
+    this.input = document.getElementById('terminal-input');
+    this.input.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        this.executeCommand(this.input.value);
+        this.input.value = '';
+      }
+    });
+    this.print('Welcome to PDA Terminal v1.0');
+    this.print('Type "help" for available commands\n');
+  }
+  print(text) {
+    const line = document.createElement('div');
+    line.className = 'terminal-output';
+    line.textContent = text;
+    this.output.appendChild(line);
+    this.output.scrollTop = this.output.scrollHeight;
+  }
+  executeCommand(cmd) {
+    this.print(`$ ${cmd}`);
+    const args = cmd.trim().split(' ');
+    const command = args[0].toLowerCase();
+    switch (command) {
+      case 'help':
+        this.print(`Available commands:
+  help     - Show this help
+  clear    - Clear terminal
+  ls       - List directory contents
+  pwd      - Print working directory
+  echo     - Print text
+  date     - Show current date/time
+  uname    - Print system information
+  whoami   - Print current user`);
+        break;
+      case 'clear':
+        this.output.innerHTML = '';
+        break;
+      case 'ls':
+        this.print('Documents  Downloads  Pictures  Music  Videos');
+        break;
+      case 'pwd':
+        this.print(this.data.workingDir);
+        break;
+      case 'echo':
+        this.print(args.slice(1).join(' '));
+        break;
+      case 'date':
+        this.print(new Date().toString());
+        break;
+      case 'uname':
+        this.print('PDA OS v1.0');
+        break;
+      case 'whoami':
+        this.print('user');
+        break;
+      case '':
+        break;
+      default:
+        this.print(`Command not found: ${command}`);
+    }
+    this.data.history.push(cmd);
+    this.save();
+  }
+  load() {}
+  save() {}
+}
+const terminal = new Terminal();
+apps.terminal = terminal;
+class Search extends App {
+  constructor() {
+    super('search');
+    this.data = {
+      recentSearches: []
+    };
+    this.load();
+    this.resultsContainer = document.querySelector('.search-results');
+    this.searchableItems = [{
+      title: 'Notes',
+      type: 'app',
+      icon: 'bi-journal-text',
+      action: () => openApp('notes')
+    }, {
+      title: 'Calculator',
+      type: 'app',
+      icon: 'bi-calculator',
+      action: () => openApp('calculator')
+    }, {
+      title: 'Calendar',
+      type: 'app',
+      icon: 'bi-calendar3',
+      action: () => openApp('calendar')
+    }, {
+      title: 'Weather',
+      type: 'app',
+      icon: 'bi-cloud-sun',
+      action: () => openApp('weather')
+    }, {
+      title: 'Tasks',
+      type: 'app',
+      icon: 'bi-check2-square',
+      action: () => openApp('tasks')
+    }, {
+      title: 'Contacts',
+      type: 'app',
+      icon: 'bi-person-lines-fill',
+      action: () => openApp('contacts')
+    }, {
+      title: 'Settings',
+      type: 'app',
+      icon: 'bi-gear',
+      action: () => openApp('settings')
+    }, {
+      title: 'Files',
+      type: 'app',
+      icon: 'bi-folder2',
+      action: () => openApp('files')
+    }, {
+      title: 'Terminal',
+      type: 'app',
+      icon: 'bi-terminal',
+      action: () => openApp('terminal')
+    }];
+  }
+  handleSearch(query) {
+    if (!query) {
+      this.showRecentSearches();
+      return;
+    }
+    const results = this.searchableItems.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+    this.renderResults(results);
+  }
+  showRecentSearches() {
+    this.renderResults(this.data.recentSearches);
+  }
+  renderResults(results) {
+    this.resultsContainer.innerHTML = results.map(item => `
+          <div class="search-result" onclick="search.handleResultClick('${item.title}')">
+            <i class="bi ${item.icon}"></i>
+            <div class="details">
+              <div class="title">${item.title}</div>
+              <div class="subtitle">${item.type}</div>
+            </div>
+          </div>
+        `).join('');
+  }
+  handleResultClick(title) {
+    const item = this.searchableItems.find(i => i.title === title);
+    if (item) {
+      if (!this.data.recentSearches.find(i => i.title === item.title)) {
+        this.data.recentSearches.unshift(item);
+        this.data.recentSearches = this.data.recentSearches.slice(0, 5);
+        this.save();
+      }
+      item.action();
+    }
+  }
+}
+const search = new Search();
+apps.search = search;
+class Settings extends App {
+  constructor() {
+    super('settings');
+    this.data = {
+      darkMode: false,
+      soundEffects: true,
+      analytics: true
+    };
+    this.load();
+    this.applySettings();
+  }
+  applySettings() {
+    if (this.data.darkMode) {
+      document.documentElement.style.setProperty('--bg', '#222222');
+      document.documentElement.style.setProperty('--card-bg', '#333333');
+      document.documentElement.style.setProperty('--text', '#FFFFFF');
+      document.documentElement.style.setProperty('--border', '#444444');
+    } else {
+      document.documentElement.style.setProperty('--bg', '#CCCCCC');
+      document.documentElement.style.setProperty('--card-bg', '#E6E6E6');
+      document.documentElement.style.setProperty('--text', '#000000');
+      document.documentElement.style.setProperty('--border', '#666666');
+    }
+    const darkModeSwitch = document.querySelector('#settings input[type="checkbox"]');
+    const soundSwitch = document.querySelectorAll('#settings input[type="checkbox"]')[1];
+    const analyticsSwitch = document.querySelectorAll('#settings input[type="checkbox"]')[2];
+    if (darkModeSwitch) darkModeSwitch.checked = this.data.darkMode;
+    if (soundSwitch) soundSwitch.checked = this.data.soundEffects;
+    if (analyticsSwitch) analyticsSwitch.checked = this.data.analytics;
+  }
+  toggleDarkMode(enabled) {
+    this.data.darkMode = enabled;
+    this.save();
+    this.applySettings();
+  }
+  toggleSounds(enabled) {
+    this.data.soundEffects = enabled;
+    this.save();
+  }
+  toggleAnalytics(enabled) {
+    this.data.analytics = enabled;
+    this.save();
+  }
+}
+const settings = new Settings();
+apps.settings = settings;
+class RecentApps extends App {
+  constructor() {
+    super('recent-apps');
+    this.data = {
+      recentApps: []
+    };
+    this.load();
+    this.container = document.querySelector('.recent-apps-container');
+  }
+  addApp(appId, appTitle, appIcon) {
+    const timestamp = new Date().toLocaleString();
+    this.data.recentApps = this.data.recentApps.filter(app => app.id !== appId);
+    this.data.recentApps.unshift({
+      id: appId,
+      title: appTitle,
+      icon: appIcon,
+      timestamp
+    });
+    this.data.recentApps = this.data.recentApps.slice(0, 10);
+    this.save();
+    this.render();
+  }
+  removeApp(appId) {
+    this.data.recentApps = this.data.recentApps.filter(app => app.id !== appId);
+    this.save();
+    this.render();
+  }
+  render() {
+    this.container.innerHTML = this.data.recentApps.map(app => `
+          <div class="recent-app-card" onclick="openApp('${app.id}')">
+            <i class="bi ${app.icon}"></i>
+            <div class="details">
+              <div class="title">${app.title}</div>
+              <div class="timestamp">Last opened: ${app.timestamp}</div>
+            </div>
+            <div class="close" onclick="event.stopPropagation(); recentApps.removeApp('${app.id}')">
+              <i class="bi bi-x"></i>
+            </div>
+          </div>
+        `).join('');
+  }
+  load() {}
+  save() {}
+}
+const recentApps = new RecentApps();
+apps.recentApps = recentApps;
+class Tasks extends App {
+  constructor() {
+    super('tasks');
+    this.data = {
+      tasks: []
+    };
+    this.load();
+    this.tasksList = document.querySelector('.tasks-list');
+    this.render();
+  }
+  addTask() {
+    const taskTitle = prompt('Enter task:');
+    if (taskTitle) {
+      const task = {
+        id: Date.now(),
+        title: taskTitle,
+        completed: false,
+        created: new Date().toISOString()
+      };
+      this.data.tasks.unshift(task);
+      this.save();
+      this.render();
+    }
+  }
+  toggleTask(id) {
+    const task = this.data.tasks.find(t => t.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      this.save();
+      this.render();
+    }
+  }
+  deleteTask(id) {
+    this.data.tasks = this.data.tasks.filter(t => t.id !== id);
+    this.save();
+    this.render();
+  }
+  render() {
+    this.tasksList.innerHTML = this.data.tasks.map(task => `
+          <div class="task-item ${task.completed ? 'completed' : ''}">
+            <div class="task-checkbox" onclick="tasks.toggleTask(${task.id})">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="task-title">${task.title}</div>
+            <div class="task-delete" onclick="tasks.deleteTask(${task.id})">
+              <i class="bi bi-trash"></i>
+            </div>
+          </div>
+        `).join('');
+  }
+}
+const tasks = new Tasks();
+apps.tasks = tasks;
+class Contacts extends App {
+  constructor() {
+    super('contacts');
+    this.data = {
+      contacts: []
+    };
+    this.load();
+    this.contactsList = document.querySelector('.contacts-list');
+    this.render();
+  }
+  addContact() {
+    const name = prompt('Enter contact name:');
+    if (name) {
+      const phone = prompt('Enter phone number:');
+      const email = prompt('Enter email:');
+      const contact = {
+        id: Date.now(),
+        name,
+        phone: phone || '',
+        email: email || '',
+        created: new Date().toISOString()
+      };
+      this.data.contacts.push(contact);
+      this.data.contacts.sort((a, b) => a.name.localeCompare(b.name));
+      this.save();
+      this.render();
+    }
+  }
+  editContact(id) {
+    const contact = this.data.contacts.find(c => c.id === id);
+    if (contact) {
+      const name = prompt('Edit name:', contact.name);
+      if (name) {
+        const phone = prompt('Edit phone:', contact.phone);
+        const email = prompt('Edit email:', contact.email);
+        contact.name = name;
+        contact.phone = phone || '';
+        contact.email = email || '';
+        this.data.contacts.sort((a, b) => a.name.localeCompare(b.name));
+        this.save();
+        this.render();
+      }
+    }
+  }
+  deleteContact(id) {
+    if (confirm('Delete this contact?')) {
+      this.data.contacts = this.data.contacts.filter(c => c.id !== id);
+      this.save();
+      this.render();
+    }
+  }
+  getInitials(name) {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+  }
+  render() {
+    this.contactsList.innerHTML = this.data.contacts.map(contact => `
+          <div class="contact-item">
+            <div class="contact-avatar">
+              ${this.getInitials(contact.name)}
+            </div>
+            <div class="contact-details">
+              <div class="contact-name">${contact.name}</div>
+              <div class="contact-info">
+                ${contact.phone ? `📞 ${contact.phone}<br>` : ''}
+                ${contact.email ? `✉️ ${contact.email}` : ''}
+              </div>
+            </div>
+            <div class="contact-actions">
+              <div class="contact-action" onclick="contacts.editContact(${contact.id})">
+                <i class="bi bi-pencil"></i>
+              </div>
+              <div class="contact-action delete" onclick="contacts.deleteContact(${contact.id})">
+                <i class="bi bi-trash"></i>
+              </div>
+            </div>
+          </div>
+        `).join('');
+  }
+}
+const contacts = new Contacts();
+apps.contacts = contacts;
+class Files extends App {
+  constructor() {
+    super('files');
+    this.data = {
+      currentPath: '/',
+      filesystem: {
+        '/': {
+          type: 'folder',
+          items: {
+            'readme.txt': {
+              type: 'file',
+              size: '2 KB',
+              modified: new Date().toLocaleDateString()
+            }
+          }
+        }
+      }
+    };
+    this.load();
+    this.filesList = document.querySelector('.files-list');
+    this.pathDisplay = document.querySelector('.folder-path');
+    this.render();
+  }
+  getFolder(path) {
+    let current = this.data.filesystem;
+    const parts = path.split('/').filter(p => p);
+    for (const part of parts) {
+      current = current[part].items;
+    }
+    return current;
+  }
+  navigateTo(path) {
+    this.data.currentPath = path;
+    this.render();
+  }
+  createFolder() {
+    const name = prompt('Enter folder name:');
+    if (name && !name.includes('/')) {
+      const current = this.getFolder(this.data.currentPath);
+      if (!current[name]) {
+        current[name] = {
+          type: 'folder',
+          items: {}
+        };
+        this.save();
+        this.render();
+      } else {
+        alert('A file or folder with that name already exists');
+      }
+    }
+  }
+  uploadFile() {
+    const name = prompt('Enter file name:');
+    if (name && !name.includes('/')) {
+      const current = this.getFolder(this.data.currentPath);
+      if (!current[name]) {
+        current[name] = {
+          type: 'file',
+          size: '0 KB',
+          modified: new Date().toLocaleDateString()
+        };
+        this.save();
+        this.render();
+      } else {
+        alert('A file or folder with that name already exists');
+      }
+    }
+  }
+  deleteItem(name) {
+    if (confirm(`Delete ${name}?`)) {
+      const current = this.getFolder(this.data.currentPath);
+      delete current[name];
+      this.save();
+      this.render();
+    }
+  }
+  getFileIcon(type, name) {
+    if (type === 'folder') return 'bi-folder';
+    const ext = name.split('.').pop().toLowerCase();
+    const iconMap = {
+      txt: 'bi-file-text',
+      pdf: 'bi-file-pdf',
+      doc: 'bi-file-word',
+      docx: 'bi-file-word',
+      xls: 'bi-file-excel',
+      xlsx: 'bi-file-excel',
+      jpg: 'bi-file-image',
+      jpeg: 'bi-file-image',
+      png: 'bi-file-image',
+      mp3: 'bi-file-music',
+      wav: 'bi-file-music',
+      mp4: 'bi-file-play',
+      mov: 'bi-file-play'
+    };
+    return iconMap[ext] || 'bi-file';
+  }
+  render() {
+    const current = this.getFolder(this.data.currentPath);
+    const parentPath = this.data.currentPath.split('/').slice(0, -1).join('/') || '/';
+    this.pathDisplay.textContent = this.data.currentPath || '/';
+    let html = '';
+    if (this.data.currentPath !== '/') {
+      html += `
+        <div class="file-item" onclick="files.navigateTo('${parentPath}')">
+          <i class="bi bi-arrow-up file-icon"></i>
+          <div class="file-details">
+            <div class="file-name">..</div>
+            <div class="file-info">Parent Directory</div>
+          </div>
+        </div>
+      `;
+    }
+    Object.entries(current).sort(([, a], [, b]) => a.type === b.type ? 0 : a.type === 'folder' ? -1 : 1).forEach(([name, item]) => {
+      const icon = this.getFileIcon(item.type, name);
+      const fullPath = this.data.currentPath + (this.data.currentPath.endsWith('/') ? '' : '/') + name;
+      html += `
+        <div class="file-item" ${item.type === 'folder' ? `onclick="files.navigateTo('${fullPath}')"` : ''}>
+          <i class="bi ${icon} file-icon"></i>
+          <div class="file-details">
+            <div class="file-name">${name}</div>
+            <div class="file-info">
+              ${item.type === 'folder' ? 'Folder' : `${item.size} • ${item.modified}`}
+            </div>
+          </div>
+          <div class="file-actions">
+            <div class="file-action delete" onclick="event.stopPropagation(); files.deleteItem('${name}')">
+              <i class="bi bi-trash"></i>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    this.filesList.innerHTML = html;
+  }
+}
+const files = new Files();
+apps.files = files;
+let controlCenterVisible = false;
+let touchStartY = 0;
+function initControlCenter() {
+  const statusBar = document.querySelector('.status-bar');
+  const controlCenter = document.querySelector('.control-center');
+  statusBar.addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+  });
+  statusBar.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touchY = e.touches[0].clientY;
+    const diff = touchY - touchStartY;
+    if (diff > 30 && !controlCenterVisible) {
+      controlCenter.classList.add('visible');
+      controlCenterVisible = true;
+    }
+  });
+  document.addEventListener('touchstart', e => {
+    if (controlCenterVisible && !controlCenter.contains(e.target) && !statusBar.contains(e.target)) {
+      controlCenter.classList.remove('visible');
+      controlCenterVisible = false;
+    }
+  });
+  document.querySelectorAll('.quick-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+    });
+  });
+  const brightnessSlider = document.querySelector('.brightness-slider input');
+  const volumeSlider = document.querySelector('.volume-slider input');
+  brightnessSlider.addEventListener('input', e => {
+    document.body.style.filter = `brightness(${e.target.value}%)`;
+  });
+  volumeSlider.addEventListener('input', e => {});
+}
+document.addEventListener('DOMContentLoaded', () => {
+  initControlCenter();
+});</script>
+</body>
+</html>

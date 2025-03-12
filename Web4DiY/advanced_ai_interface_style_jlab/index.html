@@ -1,0 +1,63 @@
+<title>Terminal Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Questrial&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+  <div class="interface">
+    <svg class="circular-ui" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0,168,255,0.2)" stroke-width="2"/>
+      <path d="M50,5 A45,45 0 0,1 95,50" fill="none" stroke="var(--primary)" stroke-width="2">
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from="0 50 50"
+          to="360 50 50"
+          dur="4s"
+          repeatCount="indefinite"/>
+      </path>
+    </svg>
+    
+    <div class="pulse"></div>
+    
+    <svg class="hologram" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" stroke-width="1">
+        <animate attributeName="r" from="40" to="45" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="1" to="0.5" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="var(--accent)" stroke-width="1">
+        <animate attributeName="r" from="30" to="35" dur="1s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="chat">AI Interface</button>
+      <button class="tab-btn" data-tab="terminal">Terminal</button>
+    </div>
+
+    <div class="tab-content" id="chat-tab">
+      <div class="chat-container" id="chat-container"></div>
+      <div class="input-container">
+        <input type="text" id="user-input" placeholder="Speak with My...">
+        <button id="send-btn">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-content hidden" id="terminal-tab">
+      <div class="terminal" id="terminal">
+        <div class="terminal-output" id="terminal-output"></div>
+        <div class="terminal-input-line">
+          <span class="prompt">user@jarvis2159:~$</span>
+          <input type="text" id="terminal-input" spellcheck="false">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body></html>
